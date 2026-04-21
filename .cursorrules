@@ -1,0 +1,49 @@
+# SYSTEM INSTRUCTIONS: AI TRANSLATOR FULLSTACK (FREE-TIER OPTIMIZED)
+
+**Stack:** Flutter (UI) | Python FastAPI (API) | PostgreSQL (DB) | Redis (Cache) | CMS (Admin)
+
+---
+
+## 1. PERFORMANCE & TOKEN OPTIMIZATION (CRITICAL FOR FREE USERS)
+- **Token Saving:** Keep responses extremely concise. Do NOT output entire files if making small edits. Output ONLY the modified functions/classes with surrounding context.
+- **Context Management:** Avoid loading the entire project. Only attach explicitly needed files.
+- **Model Selection:**
+  - `Claude 3.5 Haiku`: For simple UI, documentation, single-file edits.
+  - `Claude 3.5 Sonnet`: For complex architecture, DB schemas, multi-file features.
+- **Build Troubleshooting:** If a build fails, analyze the error incrementally. DO NOT rewrite the entire file to fix a single typo.
+
+## 2. SEARCH-FIRST WORKFLOW (RESEARCH BEFORE CODING)
+Always check for existing libraries before writing custom code to avoid token waste and bloat.
+- **Workflow:** Need Analysis -> Parallel Search (`pub.dev` for Flutter, `PyPI` for Python) -> Evaluate -> Decide.
+- **Decision Matrix:**
+  - *Adopt:* Exact match (e.g., `httpx` for requests, `dio` for Flutter API).
+  - *Extend:* Partial match (write a thin wrapper).
+  - *Build:* No match found. Write custom, minimal code.
+
+## 3. PYTHON & FASTAPI STANDARDS
+- **Formatting:** PEP 8, `black`, `isort`, `ruff`. Use `mypy` for 100% type annotations.
+- **Immutability & Patterns:** Prefer `@dataclass(frozen=True)` or `NamedTuple`. Use `Protocol` (Duck Typing) for interfaces instead of ABCs. No `print()` statements; use `logging`.
+- **API Design (RESTful):**
+  - **URLs:** Nouns, plural, kebab-case (e.g., `/api/v1/translation-history`).
+  - **Status Codes:** Strict semantic use (200, 201, 400, 404, 422, 429).
+  - **Response Envelope:** `{"data": {...}, "meta": {"page": 1}}` or `{"error": {"code": "...", "message": "..."}}`.
+  - **Pagination:** Offset-based (`page`, `per_page`) for Admin CMS. Cursor-based (`cursor`, `limit`) for Flutter App infinite scroll.
+
+## 4. LLM ROUTING & COST TRACKING
+Every LLM call (AI Translate) must track costs and optimize API usage.
+- **Pattern:** `route_llm_request(text, complexity) -> tuple[Result, CostTracker]`.
+- **Cache First:** ALWAYS check Redis (`hash(source_text + target_lang)`) before calling LLM. Return cached result if exists to save LLM API money.
+- **Tracking:** Append `CostRecord(model, input_tokens, output_tokens, cost_usd)` immutably to Postgres. Never mutate cost state.
+- **Error Handling:** Never retry LLM calls on validation/auth errors. Only retry transient failures (Rate limit 429, 500).
+
+## 5. SECURITY GUIDELINES (MANDATORY)
+Before ANY commit or code finalization:
+- **No Hardcoded Secrets:** Use `.env` or secret manager. NO API KEYS IN SOURCE CODE.
+- **Validation:** All FastAPI inputs validated via `Pydantic`.
+- **SQL Injection:** Use parameterized queries / SQLAlchemy / SQLModel.
+- **Rate Limiting:** Redis-based rate limiting on ALL translation endpoints (e.g., 30/min).
+
+## 6. FLUTTER UI/UX RULES
+- Tách components nhỏ gọn để tái sử dụng.
+- Dùng state management hợp lý, tránh rebuild toàn bộ màn hình.
+- Viết API Client tự động đính kèm Bearer Token vào Header và xử lý Global Error.

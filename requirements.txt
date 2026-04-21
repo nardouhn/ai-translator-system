@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+alembic
+psycopg[binary]
+pydantic-settings
+redis
+python-multipart
+# Nếu bạn dùng thêm LLM thì có thể thêm:
+# openai
+# langchain

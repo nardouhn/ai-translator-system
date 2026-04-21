@@ -1,0 +1,46 @@
+services:
+  # --- BACKEND (FastAPI) ---
+  api:
+    build: . # Nó sẽ tự tìm file Dockerfile ở cùng thư mục để build code của bạn
+    container_name: aitrans_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app # Sync code từ máy vào container để bạn sửa code là nó tự reload
+    environment:
+      - DATABASE_URL=postgresql://admin:password123@postgres:5432/ai_translator
+      - REDIS_URL=redis://redis:6379/0
+      # Thêm các API Key của bạn vào đây nếu cần
+      - OPENAI_API_KEY=your_key_here 
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+  # --- DATABASE (Postgres) ---
+  postgres:
+    image: postgres:15-alpine
+    container_name: aitrans_postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: ai_translator
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # --- CACHE (Redis) ---
+  redis:
+    image: redis:alpine
+    container_name: aitrans_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
