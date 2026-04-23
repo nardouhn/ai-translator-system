@@ -1,17 +1,16 @@
 from fastapi import APIRouter, Depends, File as FastAPIFile, Form, Header, HTTPException, UploadFile, status
-from sqlalchemy.orm import Session as ORMSession
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.concurrency import run_in_threadpool
+import hashlib
 
-from app.db.models import File, FileSegment, Logs, StatusEnum
-from app.db.session import get_db
-from app.services.file_parser import extract_text
+from app.db.models import File, FileSegment, Logs, StatusEnum, RequestTypeEnum
+from app.db.session import get_async_db
 from app.services.rate_limit_service import check_rate_limit
 from app.services.session_service import SessionService
-from app.services.text_splitter import split_text
-from app.services.translation_service import translate_text
 
 router = APIRouter()
 
-MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024
+MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024
 
 
 @router.post("/file/translate")
@@ -21,7 +20,7 @@ async def file_translate_api(
     target_lang: str = Form(...),
     domain: str | None = Form(default=None),
     x_session_id: str | None = Header(default=None, alias="X-Session-ID"),
-    db: ORMSession = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
 ):
     file_content = await upload_file.read()
     file_size = len(file_content)
@@ -30,10 +29,23 @@ async def file_translate_api(
     if file_size > MAX_FILE_SIZE_BYTES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="File size must be <= 15MB",
+            detail="File exceeds 20MB limit.",
         )
 
-    session_id = x_session_id or SessionService.create_session(db=db, ip_address=None, user_agent=None)
+    filename = upload_file.filename or "unknown"
+    ext = filename.split('.')[-1].lower()
+    if ext not in ['pdf', 'docx', 'txt']:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file format. Only .pdf, .docx, and .txt are allowed.",
+        )
+
+    session_id = x_session_id
+    if not session_id:
+        session_id = await db.run_sync(
+            lambda session: SessionService.create_session(db=session, ip_address=None, user_agent=None)
+        )
+    
     check_rate_limit(session_id)
 
     file_data = {
@@ -41,71 +53,86 @@ async def file_translate_api(
         "file_size": file_size,
     }
     if hasattr(File, "filename"):
-        file_data["filename"] = upload_file.filename
+        file_data["filename"] = filename
     else:
-        file_data["original_filename"] = upload_file.filename
+        file_data["original_filename"] = filename
     if hasattr(File, "status"):
-        file_data["status"] = "uploaded"
+        file_data["status"] = "pending"
 
     file_row = File(**file_data)
     db.add(file_row)
-    db.commit()
-    db.refresh(file_row)
+    await db.commit()
+    await db.refresh(file_row)
 
-    extracted_text = await extract_text(upload_file)
-    segments = split_text(extracted_text)
+    from app.services.document_translator import convert_pdf_to_docx, translate_docx_document, translate_txt_document
+    from app.services.translator_provider import translate_batch_with_provider
 
-    file_segments: list[FileSegment] = []
-    for index, segment in enumerate(segments):
+    segments_list = []
+    
+    async def _do_translate_batch(texts: list[str]) -> list[str]:
+        if not texts:
+            return []
+        translated_texts, _ = await translate_batch_with_provider(texts, source_lang, target_lang, domain or "General")
+        for orig, tr in zip(texts, translated_texts):
+            segments_list.append({
+                "source_text": orig,
+                "translated_text": tr
+            })
+        return translated_texts
+
+    async def _do_translate(text: str) -> str:
+        res = await _do_translate_batch([text])
+        return res[0] if res else text
+
+    # Perform document translation asynchronously
+    if ext == "txt":
+        full_text, b64_data = await translate_txt_document(file_content, _do_translate)
+    elif ext == "docx" or ext == "pdf":
+        if ext == "pdf":
+            docx_bytes = await run_in_threadpool(convert_pdf_to_docx, file_content)
+        else:
+            docx_bytes = file_content
+        full_text, b64_data = await translate_docx_document(docx_bytes, _do_translate_batch)
+    else:
+        full_text, b64_data = "", ""
+        
+    file_id_val_inner = getattr(file_row, "file_id", getattr(file_row, "id", None))
+    
+    # Save segments asynchronously
+    for index, seg in enumerate(segments_list):
         segment_data = {
-            "file_id": file_row.file_id,
+            "file_id": file_id_val_inner,
             "segment_order": index,
+            "translated_text": seg['translated_text']
         }
         if hasattr(FileSegment, "content"):
-            segment_data["content"] = segment
+            segment_data["content"] = seg['source_text']
         else:
-            segment_data["source_text"] = segment
+            segment_data["source_text"] = seg['source_text']
         if hasattr(FileSegment, "status"):
-            segment_data["status"] = "pending"
-        file_segments.append(FileSegment(**segment_data))
-
-    if file_segments:
-        db.add_all(file_segments)
-        db.flush()
-
-    for segment_row in file_segments:
-        source_segment_text = getattr(segment_row, "content", None) or getattr(segment_row, "source_text", "") or ""
-        result = translate_text(
-            db=db,
-            session_id=session_id,
-            source_text=source_segment_text,
-            source_lang=source_lang,
-            target_lang=target_lang,
-            domain=domain,
-            auto_commit=False,
-        )
-        segment_row.translated_text = result["translated_text"]
-        if hasattr(FileSegment, "status"):
-            segment_row.status = "done"
-
-    sorted_segments = sorted(file_segments, key=lambda x: x.segment_order)
-    translated_segments = [
-        segment.translated_text for segment in sorted_segments
-    ]
+            segment_data["status"] = "done"
+        
+        db.add(FileSegment(**segment_data))
+        
+    await db.flush()
 
     if hasattr(File, "status"):
-        file_row.status = "completed"
-
-    db.commit()
+        file_row.status = StatusEnum.success
+    
+    file_id_val = getattr(file_row, "id", getattr(file_row, "file_id", None))
+    await db.commit()
+    
     log_record = Logs(
         session_id=session_id,
         translation_id=None,
         status=StatusEnum.success,
+        request_type=RequestTypeEnum.file,
     )
     db.add(log_record)
-    db.commit()
+    await db.commit()
 
     return {
-        "file_id": getattr(file_row, "id", file_row.file_id),
-        "translated_text": " ".join(translated_segments).strip(),
+        "file_id": file_id_val,
+        "translated_text": full_text,
+        "file_content_b64": b64_data,
     }

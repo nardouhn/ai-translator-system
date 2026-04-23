@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color _lightBg = Color(0xFFF3E5F7);
-  static const Color _lightSurface = Color(0xFFF0D9F5);
-  static const Color _lightPrimary = Color(0xFF8E44CF);
-  static const Color _lightSecondary = Color(0xFFCDA6E8);
-  static const Color _lightText = Color(0xFF2F223A);
+  // Light Mode Colors
+  static const Color _lightBg = Color(0xFFF8F5FB);
+  static const Color _lightSurface = Color(0xFFFFFFFF);
+  static const Color _lightPrimary = Color(0xFF7E3FB8);
+  static const Color _lightSecondary = Color(0xFFB580E0);
+  static const Color _lightText = Color(0xFF1E1525);
 
-  static const Color _darkBg = Color(0xFF090511);
-  static const Color _darkSurface = Color(0xFF1A1530);
-  static const Color _darkPrimary = Color(0xFFB53CFF);
-  static const Color _darkSecondary = Color(0xFFDDB3FF);
-  static const Color _darkText = Color(0xFFF2E8FF);
+  // Dark Mode Colors
+  static const Color _darkBg = Color(0xFF0D0814);
+  static const Color _darkSurface = Color(0xFF1A1325);
+  static const Color _darkPrimary = Color(0xFFA55EED);
+  static const Color _darkSecondary = Color(0xFFC794F5);
+  static const Color _darkText = Color(0xFFEFE8F7);
 
   static ThemeData get lightTheme {
     final scheme = const ColorScheme.light(
@@ -28,6 +30,10 @@ class AppTheme {
       brightness: Brightness.light,
       scaffoldBackgroundColor: _lightBg,
       colorScheme: scheme,
+      textTheme: const TextTheme(
+        titleLarge: TextStyle(color: _lightText, fontWeight: FontWeight.bold),
+        bodyMedium: TextStyle(color: _lightText),
+      ),
       navigationRailTheme: NavigationRailThemeData(
         backgroundColor: _lightSurface,
         selectedIconTheme: const IconThemeData(color: _lightPrimary),
@@ -43,11 +49,12 @@ class AppTheme {
         ),
         indicatorColor: _lightPrimary.withValues(alpha: 0.14),
       ),
-      cardTheme: const CardThemeData(
+      cardTheme: CardThemeData(
         color: _lightSurface,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(18)),
+        elevation: 4,
+        shadowColor: _lightPrimary.withValues(alpha: 0.1),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
       ),
     );
@@ -68,6 +75,10 @@ class AppTheme {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: _darkBg,
       colorScheme: scheme,
+      textTheme: const TextTheme(
+        titleLarge: TextStyle(color: _darkText, fontWeight: FontWeight.bold),
+        bodyMedium: TextStyle(color: _darkText),
+      ),
       navigationRailTheme: NavigationRailThemeData(
         backgroundColor: _darkSurface,
         selectedIconTheme: const IconThemeData(color: _darkPrimary),
@@ -83,11 +94,12 @@ class AppTheme {
         ),
         indicatorColor: _darkPrimary.withValues(alpha: 0.2),
       ),
-      cardTheme: const CardThemeData(
+      cardTheme: CardThemeData(
         color: _darkSurface,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(18)),
+        elevation: 8,
+        shadowColor: Colors.black.withValues(alpha: 0.4),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
       ),
     );

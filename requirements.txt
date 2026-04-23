@@ -2,10 +2,17 @@ fastapi
 uvicorn[standard]
 sqlalchemy
 alembic
-psycopg[binary]
+psycopg2-binary
+asyncpg
 pydantic-settings
 redis
 python-multipart
+deep-translator
+httpx
+asyncpg==0.29.0
+SQLAlchemy>=2.0.0
 # Nếu bạn dùng thêm LLM thì có thể thêm:
 # openai
 # langchain
+python-docx
+pdf2docx

@@ -11,6 +11,7 @@ from app.db.base import Base
 
 
 class FileTypeEnum(str, Enum):
+    pdf = "pdf"
     docx = "docx"
     txt = "txt"
 
@@ -60,9 +61,9 @@ class Session(Base):
     user_agent: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
-    translations: Mapped[list["Translation"]] = relationship(back_populates="session")
-    files: Mapped[list["File"]] = relationship(back_populates="session")
-    logs: Mapped[list["Logs"]] = relationship(back_populates="session")
+    translations: Mapped[list["Translation"]] = relationship(back_populates="session", cascade="all, delete-orphan", passive_deletes=True)
+    files: Mapped[list["File"]] = relationship(back_populates="session", cascade="all, delete-orphan", passive_deletes=True)
+    logs: Mapped[list["Logs"]] = relationship(back_populates="session", cascade="all, delete-orphan", passive_deletes=True)
 
 
 class Translation(Base):
@@ -83,7 +84,7 @@ class Translation(Base):
     model_name: Mapped[str] = mapped_column(String(100), nullable=False)
     temperature: Mapped[float | None] = mapped_column(Float, nullable=True)
     token_usage: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    session_id: Mapped[str | None] = mapped_column(String(64), ForeignKey("session.session_id"), nullable=True)
+    session_id: Mapped[str | None] = mapped_column(String(64), ForeignKey("session.session_id", ondelete="CASCADE"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
     session: Mapped["Session | None"] = relationship(back_populates="translations")
@@ -100,14 +101,18 @@ class File(Base):
     source_lang: Mapped[int | None] = mapped_column(Integer, ForeignKey("language.lang_id"), nullable=True)
     target_lang: Mapped[int | None] = mapped_column(Integer, ForeignKey("language.lang_id"), nullable=True)
     domain_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("domain.domain_id"), nullable=True)
-    session_id: Mapped[str | None] = mapped_column(String(64), ForeignKey("session.session_id"), nullable=True)
+    session_id: Mapped[str | None] = mapped_column(String(64), ForeignKey("session.session_id", ondelete="CASCADE"), nullable=True)
     uploaded_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
     file_type: Mapped[FileTypeEnum | None] = mapped_column(
         SQLEnum(FileTypeEnum, name="file_type_t", native_enum=True), nullable=True
     )
+    status: Mapped[StatusEnum] = mapped_column(
+        SQLEnum(StatusEnum, name="status_t", native_enum=True), default=StatusEnum.pending
+    )
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     session: Mapped["Session | None"] = relationship(back_populates="files")
-    segments: Mapped[list["FileSegment"]] = relationship(back_populates="file")
+    segments: Mapped[list["FileSegment"]] = relationship(back_populates="file", cascade="all, delete-orphan", passive_deletes=True)
 
 
 class FileSegment(Base):
@@ -115,7 +120,7 @@ class FileSegment(Base):
     __table_args__ = (Index("idx_file_segment_file", "file_id"),)
 
     segment_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    file_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("file.file_id"), nullable=True)
+    file_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("file.file_id", ondelete="CASCADE"), nullable=True)
     source_text: Mapped[str | None] = mapped_column(Text, nullable=True)
     translated_text: Mapped[str | None] = mapped_column(Text, nullable=True)
     text_hash: Mapped[str | None] = mapped_column(CHAR(64), nullable=True)
@@ -132,12 +137,12 @@ class Logs(Base):
     )
 
     log_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    session_id: Mapped[str | None] = mapped_column(String(64), ForeignKey("session.session_id"), nullable=True)
+    session_id: Mapped[str | None] = mapped_column(String(64), ForeignKey("session.session_id", ondelete="CASCADE"), nullable=True)
     request_type: Mapped[RequestTypeEnum | None] = mapped_column(
         SQLEnum(RequestTypeEnum, name="request_type_t", native_enum=True), nullable=True
     )
-    translation_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("translation.trans_id"), nullable=True)
-    file_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("file.file_id"), nullable=True)
+    translation_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("translation.trans_id", ondelete="CASCADE"), nullable=True)
+    file_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("file.file_id", ondelete="CASCADE"), nullable=True)
     status: Mapped[StatusEnum | None] = mapped_column(
         SQLEnum(StatusEnum, name="status_t", native_enum=True), nullable=True
     )

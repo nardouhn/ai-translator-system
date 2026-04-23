@@ -3,15 +3,17 @@ services:
   api:
     build: . # Nó sẽ tự tìm file Dockerfile ở cùng thư mục để build code của bạn
     container_name: aitrans_backend
+    command: [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload" ]
     ports:
       - "8000:8000"
     volumes:
-      - .:/app # Sync code từ máy vào container để bạn sửa code là nó tự reload
+      - ./backend:/app
+    working_dir: /app
     environment:
       - DATABASE_URL=postgresql://admin:password123@postgres:5432/ai_translator
       - REDIS_URL=redis://redis:6379/0
       # Thêm các API Key của bạn vào đây nếu cần
-      - OPENAI_API_KEY=your_key_here 
+      - OPENAI_API_KEY=your_key_here
     depends_on:
       - postgres
       - redis
