@@ -223,37 +223,6 @@ class TipCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: primaryColor.withOpacity(0.2)),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.lightbulb_outline, color: primaryColor, size: 24),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Tip from the Architect",
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  "To get the best layout preservation, ensure your document uses standard fonts and clear paragraph structures.",
-                  style: TextStyle(
-                    color: onSurface.withOpacity(0.8),
-                    fontSize: 13,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

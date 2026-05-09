@@ -51,16 +51,11 @@ async def translate_docx_document(
     """
     doc = Document(io.BytesIO(file_bytes))
     
-    runs_to_process = []
+    paragraphs_to_process = []
     
     def collect_paragraph(paragraph):
         if paragraph.text.strip():
-            for run in paragraph.runs:
-                if run.text.strip():
-                    leading_spaces = run.text[:len(run.text) - len(run.text.lstrip())]
-                    trailing_spaces = run.text[len(run.text.rstrip()):]
-                    original_clean = run.text.strip()
-                    runs_to_process.append((paragraph, run, leading_spaces, trailing_spaces, original_clean))
+            paragraphs_to_process.append(paragraph)
 
     for paragraph in doc.paragraphs:
         collect_paragraph(paragraph)
@@ -71,26 +66,22 @@ async def translate_docx_document(
                 for paragraph in cell.paragraphs:
                     collect_paragraph(paragraph)
                     
-    if runs_to_process:
-        texts = [r[4] for r in runs_to_process]
+    if paragraphs_to_process:
+        texts = [p.text for p in paragraphs_to_process]
         # Await the async translation function
         translated_texts = await translate_batch_fn(texts)
         
-        for i, (paragraph, run, leading_spaces, trailing_spaces, original_clean) in enumerate(runs_to_process):
-            translated_clean = translated_texts[i] if i < len(translated_texts) else original_clean
+        for i, paragraph in enumerate(paragraphs_to_process):
+            translated_clean = translated_texts[i] if i < len(translated_texts) else paragraph.text
             if not translated_clean:
-                translated_clean = original_clean
+                translated_clean = paragraph.text
             
-            if original_clean.isupper():
-                translated_clean = translated_clean.upper()
-            elif original_clean.istitle():
-                translated_clean = translated_clean.title()
-            elif original_clean and original_clean[0].isupper():
-                translated_clean = translated_clean[0].upper() + translated_clean[1:]
-            elif original_clean.islower():
-                translated_clean = translated_clean.lower()
-                
-            run.text = leading_spaces + translated_clean + trailing_spaces
+            if paragraph.runs:
+                paragraph.runs[0].text = translated_clean
+                for run in paragraph.runs[1:]:
+                    run.text = ""
+            else:
+                paragraph.add_run(translated_clean)
 
     all_translated_texts = []
     for paragraph in doc.paragraphs:

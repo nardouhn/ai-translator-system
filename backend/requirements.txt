@@ -4,3 +4,4 @@ psycopg[binary]
 pydantic-settings
 redis
 sqlalchemy
+arq

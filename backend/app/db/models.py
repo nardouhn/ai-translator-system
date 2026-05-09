@@ -23,8 +23,10 @@ class RequestTypeEnum(str, Enum):
 
 class StatusEnum(str, Enum):
     pending = "pending"
+    processing = "processing"
     success = "success"
     error = "error"
+    failed = "failed"
 
 
 class DomainNameEnum(str, Enum):

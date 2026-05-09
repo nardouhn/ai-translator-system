@@ -1,11 +1,16 @@
 import hashlib
-
+import asyncio
+import logging
+from fastapi import BackgroundTasks
+from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session as DBSession
 
 from app.db.models import Domain, DomainNameEnum, Language, Translation
-from app.services.cache_service import get_cached_translation, set_cached_translation
-from app.services.translator_provider import translate_with_provider
+from app.services.cache_service import get_cached_translation, set_cached_translation, mget_cached_translations, mset_cached_translations
+from app.services.translator_provider import translate_with_provider, translate_chunk_async
+from app.services.text_splitter import split_text_into_chunks
 
+logger = logging.getLogger(__name__)
 
 def _get_or_create_language(db: DBSession, lang_code: str) -> Language:
     normalized_code = lang_code.strip().lower()
@@ -38,99 +43,28 @@ def _get_or_create_domain(db: DBSession, domain: str | None) -> Domain:
     return domain_row
 
 
-async def translate_text(
-    db,
+import json
+
+async def stream_translate_text(
+    db: DBSession,
     session_id: str,
     source_text: str,
     source_lang: str,
     target_lang: str,
     domain: str | None,
+    background_tasks: BackgroundTasks,
     auto_commit: bool = True,
 ):
-    from fastapi.concurrency import run_in_threadpool
-    from app.services.text_splitter import split_text_into_chunks
-    from app.services.cache_service import mget_cached_translations, mset_cached_translations
-    from app.services.translator_provider import translate_chunk_async
-    import asyncio
-    import logging
-    logger = logging.getLogger(__name__)
-
     # Ensure domain is a string for cache key logic
     domain_str = (domain or DomainNameEnum.general.value).strip().lower()
 
-    # 1. Text Splitting
-    chunks = split_text_into_chunks(source_text)
-    if not chunks:
-        return {
-            "translated_text": "",
-            "translation_id": None,
-            "from_cache": True,
-        }
-    
-    logger.info(f"Translating text (session: {session_id}): split into {len(chunks)} chunks.")
+    text_hash = hashlib.sha256(source_text.encode("utf-8")).hexdigest()
 
-    # 2. Redis Batch Check (MGET) - Now passing domain_str
-    cached_results = await mget_cached_translations(domain_str, chunks)
-    
-    # 3. Classify Hit/Miss
-    hit_chunks = {}
-    miss_chunks = []
-    
-    for i, chunk in enumerate(chunks):
-        cached_val = cached_results.get(chunk)
-        if cached_val is not None:
-            hit_chunks[i] = cached_val
-        else:
-            miss_chunks.append((i, chunk))
-
-    # 4. Parallel Translation for Misses
-    translated_misses = {}
-    newly_translated_mapping = {}
-    provider = "custom-ai"
-    
-    if miss_chunks:
-        # Create a list of tasks - Now passing domain_str
-        tasks = [
-            translate_chunk_async(chunk, source_lang, target_lang, domain_str)
-            for _, chunk in miss_chunks
-        ]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        
-        i_miss = 0
-        for (i, chunk) in miss_chunks:
-            translated_chunk = results[i_miss] if i_miss < len(results) else None
-            i_miss += 1
-            
-            if translated_chunk is None or isinstance(translated_chunk, Exception) or translated_chunk == chunk:
-                # Fallback to original text if exception occurred or result is same as source (failure)
-                translated_misses[i] = chunk
-                if isinstance(translated_chunk, Exception):
-                    logger.error(f"Chunk {i} translation failed: {translated_chunk}")
-            else:
-                translated_misses[i] = translated_chunk
-                newly_translated_mapping[chunk] = translated_chunk
-
-    # 5. Update Cache (MSET) in background - Now passing domain_str
-    if newly_translated_mapping:
-        asyncio.create_task(mset_cached_translations(domain_str, newly_translated_mapping))
-
-    # 6. Reassembly - Join without extra spaces because separators are already in chunks
-    final_translated_chunks = []
-    for i in range(len(chunks)):
-        if i in hit_chunks:
-            final_translated_chunks.append(hit_chunks[i])
-        else:
-            final_translated_chunks.append(translated_misses[i])
-            
-    translated_text = "".join(final_translated_chunks)
-    
-    # 7. Database Logging (Synchronous operations wrapped in threadpool)
-    def db_operations():
+    # 1. Check DB first (Synchronous operations wrapped in threadpool)
+    def check_db():
         source_language = _get_or_create_language(db, source_lang)
         target_language = _get_or_create_language(db, target_lang)
         domain_row = _get_or_create_domain(db, domain)
-
-        text_hash = hashlib.sha256(source_text.encode("utf-8")).hexdigest()
 
         # Check DB cache
         existing_translation = db.query(Translation).filter(
@@ -140,34 +74,82 @@ async def translate_text(
             Translation.domain_id == domain_row.domain_id
         ).first()
 
-        # If it exists and is a GOOD translation, return it
         if existing_translation and existing_translation.translated_text != source_text:
             return {
+                "hit": True,
                 "translated_text": existing_translation.translated_text,
                 "translation_id": getattr(existing_translation, "id", getattr(existing_translation, "trans_id", None)),
                 "from_cache": True,
-            }
+            }, source_language, target_language, domain_row
+            
+        return {"hit": False, "existing_translation": existing_translation}, source_language, target_language, domain_row
 
-        # Otherwise, prepare to Save/Update
-        translation_data = {
-            "session_id": session_id,
-            "source_text": source_text,
-            "translated_text": translated_text,
-            "source_lang": source_language.lang_id,
-            "target_lang": target_language.lang_id,
-            "domain_id": domain_row.domain_id,
-            "text_hash": text_hash,
-        }
-        if hasattr(Translation, "provider"):
-            translation_data["provider"] = provider
+    db_check_result, source_language, target_language, domain_row = await run_in_threadpool(check_db)
+    
+    if db_check_result["hit"]:
+        yield f"data: {json.dumps({'chunk': db_check_result['translated_text']})}\n\n"
+        return
+
+    # 2. Text Splitting
+    chunks = split_text_into_chunks(source_text)
+    if not chunks:
+        yield f"data: {json.dumps({'chunk': ''})}\n\n"
+        return
+    
+    logger.info(f"Translating text (session: {session_id}): split into {len(chunks)} chunks.")
+
+    # 3. Redis Batch Check (MGET)
+    cached_results = await mget_cached_translations(domain_str, chunks, source_lang, target_lang)
+    
+    final_translated_chunks = []
+    newly_translated_mapping = {}
+    provider = "custom-ai"
+    
+    for i, chunk in enumerate(chunks):
+        from app.services.cache_service import strictly_normalize_text
+        cleaned_chunk = strictly_normalize_text(chunk)
+        cached_val = cached_results.get(chunk)
+        debug_hash = __import__('hashlib').sha256(cleaned_chunk.encode("utf-8")).hexdigest()
+        logger.debug(f"Text Cache Key: translate:v3:{domain_str}:{source_lang.strip().lower()}:{target_lang.strip().lower()}:{debug_hash} | Text: '{cleaned_chunk[:20]}'")
+        
+        if cached_val is not None:
+            logger.info(f"🟢 CACHE HIT for chunk: '{cleaned_chunk[:20]}...'")
+            yield f"data: {json.dumps({'chunk': cached_val})}\n\n"
+            final_translated_chunks.append(cached_val)
         else:
-            translation_data["model_name"] = provider
+            logger.warning(f"🔴 CACHE MISS for chunk: '{cleaned_chunk[:20]}...'. Calling Kaggle...")
+            try:
+                translated_chunk = await translate_chunk_async(chunk, source_lang, target_lang, domain_str)
+                if translated_chunk is None or translated_chunk == chunk:
+                    logger.error(f"Chunk {i} translation returned identical text, treating as failure.")
+                    from fastapi import HTTPException
+                    raise HTTPException(status_code=502, detail="Translation API returned identical source text.")
+                
+                yield f"data: {json.dumps({'chunk': translated_chunk})}\n\n"
+                final_translated_chunks.append(translated_chunk)
+                newly_translated_mapping[chunk] = translated_chunk
+                
+                if i < len(chunks) - 1:
+                    await asyncio.sleep(1)
+            except Exception as e:
+                logger.error(f"Chunk {i} translation failed: {e}")
+                # We yield an error event so the client knows
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+                return
 
+    translated_text = "".join(final_translated_chunks)
+    
+    # 6. Update Cache (MSET) in background
+    if newly_translated_mapping:
+        asyncio.create_task(mset_cached_translations(domain_str, newly_translated_mapping, source_lang, target_lang))
+
+    # 7. Database Logging
+    def save_to_db():
+        existing_translation = db_check_result.get("existing_translation")
         final_trans_id = None
-        # Only save/update if it's a real translation (different from source)
+
         if translated_text != source_text:
             if existing_translation:
-                # UPDATE existing bad record instead of INSERT
                 existing_translation.translated_text = translated_text
                 if hasattr(existing_translation, "provider"):
                     existing_translation.provider = provider
@@ -175,22 +157,49 @@ async def translate_text(
                     existing_translation.model_name = provider
                 existing_translation.session_id = session_id
                 final_trans_id = getattr(existing_translation, "id", getattr(existing_translation, "trans_id", None))
+                if auto_commit:
+                    db.commit()
             else:
-                # INSERT new record
+                translation_data = {
+                    "session_id": session_id,
+                    "source_text": source_text,
+                    "translated_text": translated_text,
+                    "source_lang": source_language.lang_id,
+                    "target_lang": target_language.lang_id,
+                    "domain_id": domain_row.domain_id,
+                    "text_hash": text_hash,
+                }
+                if hasattr(Translation, "provider"):
+                    translation_data["provider"] = provider
+                else:
+                    translation_data["model_name"] = provider
+
                 translation = Translation(**translation_data)
                 db.add(translation)
-                db.flush() # Get the ID
+                db.flush()
                 final_trans_id = getattr(translation, "id", getattr(translation, "trans_id", None))
-            
-            if auto_commit:
-                db.commit()
-                if not existing_translation:
+                if auto_commit:
+                    db.commit()
                     db.refresh(translation)
+        else:
+            if existing_translation:
+                final_trans_id = getattr(existing_translation, "id", getattr(existing_translation, "trans_id", None))
+                
+        return final_trans_id
 
-        return {
-            "translated_text": translated_text,
-            "translation_id": final_trans_id,
-            "from_cache": len(miss_chunks) == 0 and translated_text != source_text,
-        }
+    final_trans_id = await run_in_threadpool(save_to_db)
+    
+    # Log operations to DB before closing
+    def log_operations():
+        from app.db.models import Logs, StatusEnum, RequestTypeEnum
+        log_status = getattr(StatusEnum, "cache_hit", StatusEnum.success) if len(newly_translated_mapping) == 0 else StatusEnum.success
+        log_record = Logs(
+            session_id=session_id,
+            request_type=getattr(RequestTypeEnum, "text", "text"),
+            translation_id=final_trans_id,
+            status=log_status,
+        )
+        db.add(log_record)
+        db.commit()
 
-    return await run_in_threadpool(db_operations)
+    await run_in_threadpool(log_operations)

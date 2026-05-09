@@ -70,10 +70,10 @@ class _FileTranslationViewState extends State<FileTranslationView> {
     }
 
     final double sizeInMb = sizeInBytes / (1024 * 1024);
-    if (sizeInMb > 20) {
+    if (sizeInMb > 5) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('File exceeds 20MB limit. Please upload another file.'),
+          content: Text('File exceeds 5MB limit. Please upload another file.'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -119,7 +119,7 @@ class _FileTranslationViewState extends State<FileTranslationView> {
     });
 
     try {
-      final result = await ApiService.translateFile(
+      final initResult = await ApiService.translateFile(
         filePath: _selectedFilePath,
         fileBytes: _selectedFileBytes,
         fileName: _selectedFileName,
@@ -128,14 +128,46 @@ class _FileTranslationViewState extends State<FileTranslationView> {
         domain: _selectedDomain,
       );
 
+      final int fileId = initResult['file_id'];
+      Map<String, dynamic> statusResult = {};
+      bool isSuccess = false;
+
+      // Poll until success or failure (timeout after ~1200 seconds for large files)
+      for (int i = 0; i < 600; i++) {
+        await Future.delayed(const Duration(seconds: 2));
+        if (!mounted) return;
+        statusResult = await ApiService.checkFileStatus(fileId);
+        final statusStr = statusResult['status'];
+        final progressVal = statusResult['progress'] ?? 0;
+        
+        setState(() {
+          _activeQueue.last['progress'] = progressVal / 100.0;
+          if (statusStr == 'processing') {
+            _activeQueue.last['status'] = 'Processing ($progressVal%)...';
+          }
+        });
+        
+        if (statusStr == 'success') {
+          isSuccess = true;
+          break;
+        } else if (statusStr == 'failed' || statusStr == 'error') {
+          throw Exception('Translation failed on server.');
+        }
+      }
+
+      if (!isSuccess) {
+        throw Exception('Translation timed out.');
+      }
+
       if (!mounted) return;
       setState(() {
         _activeQueue.last['status'] = 'Done';
         _activeQueue.last['progress'] = 1.0;
-        _activeQueue.last['translatedText'] = result['translated_text'];
-        _activeQueue.last['fileContentB64'] = result['file_content_b64'];
+        _activeQueue.last['translatedText'] = statusResult['translated_text'];
+        _activeQueue.last['fileContentB64'] = statusResult['file_content_b64'];
+        _activeQueue.last['fileUrl'] = statusResult['file_url'];
       });
-      debugPrint("Translation success: ${result['file_id']}");
+      debugPrint("Translation success: $fileId");
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -162,15 +194,25 @@ class _FileTranslationViewState extends State<FileTranslationView> {
 
   void _onDownload(int index) {
     final item = _activeQueue[index];
+    final fileUrl = item['fileUrl'] as String?;
     final b64Data = item['fileContentB64'] as String?;
     final text = item['translatedText'] as String?;
+    
+    if (kIsWeb && fileUrl != null && fileUrl.isNotEmpty) {
+      html.window.open(fileUrl, '_blank');
+      return;
+    }
     
     if (b64Data == null && text == null) return;
     
     if (kIsWeb) {
       if (b64Data != null && b64Data.isNotEmpty) {
         // Trả về file docx hoặc txt xịn từ base64
-        final bytes = base64Decode(b64Data);
+        String sanitizedB64 = b64Data.replaceAll(RegExp(r'\s+'), '');
+        final padLength = (4 - (sanitizedB64.length % 4)) % 4;
+        sanitizedB64 = sanitizedB64.padRight(sanitizedB64.length + padLength, '=');
+        
+        final bytes = base64Decode(sanitizedB64);
         final blob = html.Blob([bytes]);
         final url = html.Url.createObjectUrlFromBlob(blob);
         final originalFileName = item['fileName'] as String;
@@ -247,8 +289,11 @@ class _FileTranslationViewState extends State<FileTranslationView> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Container(
-        key: const ValueKey<String>('file_translation_view'),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 600;
+          return Container(
+            key: const ValueKey<String>('file_translation_view'),
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
@@ -258,24 +303,27 @@ class _FileTranslationViewState extends State<FileTranslationView> {
             end: Alignment.bottomRight,
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 24),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 16 : 42,
+          vertical: isMobile ? 16 : 24,
+        ),
         child: Column(
           children: [
-            TranslationTopBar(
-              scale: 1,
-              pageTitle: 'Text Translation',
-              onPagePressed: widget.onSwitchToText,
-              isDarkMode: widget.isDarkMode,
-              onToggleTheme: widget.onToggleTheme,
-            ),
-            const SizedBox(height: 32),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Card(
+              TranslationTopBar(
+                scale: isMobile ? 0.85 : 1.0,
+                pageTitle: 'Text Translation',
+                onPagePressed: widget.onSwitchToText,
+                isDarkMode: widget.isDarkMode,
+                onToggleTheme: widget.onToggleTheme,
+              ),
+              SizedBox(height: isMobile ? 16 : 32),
+              Expanded(
+                child: isMobile
+                    ? Column(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Card(
                       margin: EdgeInsets.zero,
                       child: Padding(
                         padding: const EdgeInsets.all(24.0),
@@ -310,101 +358,189 @@ class _FileTranslationViewState extends State<FileTranslationView> {
                                     ),
                             ),
                             const SizedBox(height: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Wrap(
-                                    spacing: 16,
-                                    runSpacing: 16,
-                                    crossAxisAlignment: WrapCrossAlignment.center,
+                            isMobile
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      DomainDropdown(
-                                        scale: 0.8,
-                                        selectedDomain: _selectedDomain,
-                                        onDomainChanged: (newValue) {
-                                          setState(() {
-                                            _selectedDomain = newValue;
-                                          });
-                                        },
+                                      Wrap(
+                                        spacing: 12,
+                                        runSpacing: 12,
+                                        alignment: WrapAlignment.center,
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+                                          DomainDropdown(
+                                            scale: 0.8,
+                                            selectedDomain: _selectedDomain,
+                                            onDomainChanged: (newValue) {
+                                              setState(() {
+                                                _selectedDomain = newValue;
+                                              });
+                                            },
+                                          ),
+                                          _buildLangDropdown('en', _selectedSourceLang, (val) => setState(() => _selectedSourceLang = val!)),
+                                          const Icon(Icons.arrow_forward_rounded, color: Colors.grey),
+                                          _buildLangDropdown('vi', _selectedTargetLang, (val) => setState(() => _selectedTargetLang = val!)),
+                                        ],
                                       ),
-                                      _buildLangDropdown('en', _selectedSourceLang, (val) => setState(() => _selectedSourceLang = val!)),
-                                      const Icon(Icons.arrow_forward_rounded, color: Colors.grey),
-                                      _buildLangDropdown('vi', _selectedTargetLang, (val) => setState(() => _selectedTargetLang = val!)),
+                                      const SizedBox(height: 16),
+                                      ElevatedButton.icon(
+                                        onPressed: _isTranslating ? null : _onTranslatePressed,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: primaryColor,
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          elevation: 4,
+                                        ),
+                                        icon: _isTranslating
+                                            ? const SizedBox(
+                                                width: 20,
+                                                height: 20,
+                                                child: CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                  strokeWidth: 2,
+                                                ),
+                                              )
+                                            : const Icon(Icons.auto_awesome, size: 20),
+                                        label: Text(
+                                          _isTranslating ? 'Translating...' : 'Translate Document',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Wrap(
+                                          spacing: 16,
+                                          runSpacing: 16,
+                                          crossAxisAlignment: WrapCrossAlignment.center,
+                                          children: [
+                                            DomainDropdown(
+                                              scale: 0.8,
+                                              selectedDomain: _selectedDomain,
+                                              onDomainChanged: (newValue) {
+                                                setState(() {
+                                                  _selectedDomain = newValue;
+                                                });
+                                              },
+                                            ),
+                                            _buildLangDropdown('en', _selectedSourceLang, (val) => setState(() => _selectedSourceLang = val!)),
+                                            const Icon(Icons.arrow_forward_rounded, color: Colors.grey),
+                                            _buildLangDropdown('vi', _selectedTargetLang, (val) => setState(() => _selectedTargetLang = val!)),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      ElevatedButton.icon(
+                                        onPressed: _isTranslating ? null : _onTranslatePressed,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: primaryColor,
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          elevation: 4,
+                                        ),
+                                        icon: _isTranslating
+                                            ? const SizedBox(
+                                                width: 20,
+                                                height: 20,
+                                                child: CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                  strokeWidth: 2,
+                                                ),
+                                              )
+                                            : const Icon(Icons.auto_awesome, size: 20),
+                                        label: Text(
+                                          _isTranslating ? 'Translating...' : 'Translate Document',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
-                                ),
-                                const SizedBox(width: 16),
-                                ElevatedButton.icon(
-                                  onPressed: _isTranslating ? null : _onTranslatePressed,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: primaryColor,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 4,
-                                  ),
-                                  icon: _isTranslating
-                                      ? const SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            strokeWidth: 2,
-                                          ),
-                                        )
-                                      : const Icon(Icons.auto_awesome, size: 20),
-                                  label: Text(
-                                    _isTranslating ? 'Translating...' : 'Translate Document',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 24),
-                  SizedBox(
-                    width: 320,
-                    child: Card(
-                      margin: EdgeInsets.zero,
-                      child: Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Translation Queue',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontSize: 20,
-                                  ),
-                            ),
-                            const SizedBox(height: 16),
-                            Expanded(
-                              child: SidebarQueueWidget(
-                                queue: _activeQueue,
-                                onDownload: _onDownload,
-                                onDelete: _onDelete,
+                  if (isMobile) const SizedBox(height: 16) else const SizedBox(width: 24),
+                  if (isMobile)
+                    Expanded(
+                      flex: 2,
+                      child: Card(
+                        margin: EdgeInsets.zero,
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Translation Queue',
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      fontSize: 20,
+                                    ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 16),
+                              Expanded(
+                                child: SidebarQueueWidget(
+                                  queue: _activeQueue,
+                                  onDownload: _onDownload,
+                                  onDelete: _onDelete,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    SizedBox(
+                      width: 320,
+                      child: Card(
+                        margin: EdgeInsets.zero,
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Translation Queue',
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      fontSize: 20,
+                                    ),
+                              ),
+                              const SizedBox(height: 16),
+                              Expanded(
+                                child: SidebarQueueWidget(
+                                  queue: _activeQueue,
+                                  onDownload: _onDownload,
+                                  onDelete: _onDelete,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
           ],
         ),
+      );
+      },
       ),
     );
   }

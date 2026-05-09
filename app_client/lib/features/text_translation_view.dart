@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../services/api_service.dart';
 import '../widgets/domain_dropdown.dart';
@@ -37,10 +38,35 @@ class _TextTranslationViewState extends State<TextTranslationView> {
   bool _isSpeakingSource = false;
   bool _isSpeakingTarget = false;
 
+  final stt.SpeechToText _speech = stt.SpeechToText();
+  bool _isListening = false;
+  bool _speechAvailable = false;
+
   @override
   void initState() {
     super.initState();
     _initTts();
+    _initSpeech();
+  }
+
+  void _initSpeech() async {
+    _speechAvailable = await _speech.initialize(
+      onStatus: (status) {
+        if (mounted) {
+          if (status == 'done' || status == 'notListening') {
+            setState(() => _isListening = false);
+          }
+        }
+      },
+      onError: (errorNotification) {
+        if (mounted) {
+          setState(() => _isListening = false);
+        }
+      },
+    );
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _initTts() {
@@ -107,8 +133,40 @@ class _TextTranslationViewState extends State<TextTranslationView> {
   @override
   void dispose() {
     flutterTts.stop();
+    _speech.stop();
     _inputController.dispose();
     super.dispose();
+  }
+
+  void _handleMicPressed() async {
+    if (_selectedSourceLang != 'en') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Voice dictation is only available for English')),
+      );
+      return;
+    }
+
+    if (!_speechAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Speech recognition not available on this device/browser')),
+      );
+      return;
+    }
+
+    if (_isListening) {
+      _speech.stop();
+      setState(() => _isListening = false);
+    } else {
+      setState(() => _isListening = true);
+      _speech.listen(
+        onResult: (result) {
+          setState(() {
+            _inputController.text = result.recognizedWords;
+          });
+        },
+        localeId: 'en_US',
+      );
+    }
   }
 
   Future<void> _handleTranslate() async {
@@ -133,16 +191,22 @@ class _TextTranslationViewState extends State<TextTranslationView> {
     });
 
     try {
-      final result = await ApiService.translateText(
+      setState(() {
+        _outputText = '';
+      });
+      await ApiService.translateTextStream(
         text: inputText,
         sourceLang: _selectedSourceLang,
         targetLang: _selectedTargetLang,
-        domain: _selectedDomain, // Try to pass domain if API supports it
+        domain: _selectedDomain,
+        onProgress: (chunk) {
+          if (mounted) {
+            setState(() {
+              _outputText += chunk;
+            });
+          }
+        },
       );
-      if (!mounted) return;
-      setState(() {
-        _outputText = result;
-      });
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -169,15 +233,17 @@ class _TextTranslationViewState extends State<TextTranslationView> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final base = (constraints.maxWidth / 1600).clamp(0.72, 1.0);
+        final isMobile = constraints.maxWidth < 600;
+        final base = isMobile ? 0.85 : (constraints.maxWidth / 1600).clamp(0.72, 1.0);
+        
         return Container(
           key: const ValueKey<String>('text_translation_view'),
           width: double.infinity,
           height: double.infinity,
           color: isDark ? const Color(0xFF020204) : const Color(0xFFF4E9F8),
           padding: EdgeInsets.symmetric(
-            horizontal: 42 * base,
-            vertical: 24 * base,
+            horizontal: isMobile ? 16 : 42 * base,
+            vertical: isMobile ? 16 : 24 * base,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,8 +278,10 @@ class _TextTranslationViewState extends State<TextTranslationView> {
                     onCopy: _handleCopy,
                     onSpeakSource: _handleSpeakSource,
                     onSpeakTarget: _handleSpeakTarget,
+                    onMicPressed: _handleMicPressed,
                     isSpeakingSource: _isSpeakingSource,
                     isSpeakingTarget: _isSpeakingTarget,
+                    isListening: _isListening,
                     isLoading: _isLoading,
                   ),
                 ),

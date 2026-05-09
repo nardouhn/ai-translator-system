@@ -22,19 +22,20 @@ class ApiService {
     return "http://10.0.2.2:8000/api/v1";
   }
 
-  static Future<String> translateText({
+  static Future<void> translateTextStream({
     required String text,
     required String sourceLang,
     required String targetLang,
     String? domain,
+    required void Function(String chunk) onProgress,
   }) async {
     try {
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-      };
+      final uri = Uri.parse('$baseUrl/translate');
+      final request = http.Request('POST', uri);
 
+      request.headers['Content-Type'] = 'application/json';
       if (sessionId != null) {
-        headers['X-Session-ID'] = sessionId!;
+        request.headers['X-Session-ID'] = sessionId!;
       }
 
       final bodyData = {
@@ -45,27 +46,55 @@ class ApiService {
       if (domain != null) {
         bodyData['domain'] = domain.toLowerCase();
       }
+      
+      request.body = jsonEncode(bodyData);
 
-      final response = await http.post(
-        Uri.parse('$baseUrl/translate'),
-        headers: headers,
-        body: jsonEncode(bodyData),
-      );
+      final streamedResponse = await request.send();
 
-      debugPrint('translate statusCode: ${response.statusCode}');
-      debugPrint('translate body: ${response.body}');
-
-      final responseSessionId = response.headers['x-session-id'];
+      final responseSessionId = streamedResponse.headers['x-session-id'];
       if (responseSessionId != null && responseSessionId.isNotEmpty) {
         sessionId = responseSessionId;
       }
 
-      if (response.statusCode != 200) {
-        throw Exception('API error: ${response.statusCode} - ${response.body}');
+      if (streamedResponse.statusCode != 200) {
+        final bodyStr = await streamedResponse.stream.bytesToString();
+        throw Exception('API error: ${streamedResponse.statusCode} - $bodyStr');
       }
 
-      final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
-      return data['translated_text'] as String;
+      String buffer = '';
+      await for (final value in streamedResponse.stream.transform(utf8.decoder)) {
+        buffer += value;
+        // Split by \n\n to get complete SSE events
+        final events = buffer.split('\n\n');
+        
+        // Keep the last part in buffer if it's incomplete
+        if (!buffer.endsWith('\n\n')) {
+          buffer = events.removeLast();
+        } else {
+          buffer = '';
+        }
+
+        for (var event in events) {
+          final lines = event.split('\n');
+          for (var line in lines) {
+            if (line.startsWith('data: ')) {
+              final jsonStr = line.substring(6).trim();
+              if (jsonStr.isEmpty) continue;
+              try {
+                final data = jsonDecode(jsonStr);
+                if (data['error'] != null) {
+                  throw Exception(data['error']);
+                }
+                if (data['chunk'] != null) {
+                  onProgress(data['chunk'] as String);
+                }
+              } catch (e) {
+                debugPrint('Error parsing SSE json: $e, line: $jsonStr');
+              }
+            }
+          }
+        }
+      }
     } catch (e) {
       if (e.toString().contains('Failed host lookup') || e.toString().contains('XMLHttpRequest')) {
         throw Exception('Lỗi kết nối máy chủ (CORS hoặc Server chưa bật). Chi tiết: $e');
@@ -132,6 +161,24 @@ class ApiService {
       if (e.toString().contains('Failed host lookup') || e.toString().contains('XMLHttpRequest')) {
         throw Exception('Lỗi kết nối máy chủ (CORS hoặc Server chưa bật). Chi tiết: $e');
       }
+      rethrow;
+    }
+  }
+
+  static Future<Map<String, dynamic>> checkFileStatus(int fileId) async {
+    try {
+      final uri = Uri.parse('$baseUrl/file/translate/$fileId/status');
+      final headers = <String, String>{};
+      if (sessionId != null) {
+        headers['X-Session-ID'] = sessionId!;
+      }
+
+      final response = await http.get(uri, headers: headers);
+      if (response.statusCode != 200) {
+        throw Exception('Check status failed: ${response.statusCode} - ${response.body}');
+      }
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } catch (e) {
       rethrow;
     }
   }

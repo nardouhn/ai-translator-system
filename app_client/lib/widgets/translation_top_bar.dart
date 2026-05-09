@@ -20,6 +20,7 @@ class TranslationTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
     final textColor = Theme.of(context).colorScheme.onSurface;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Row(
       children: [
@@ -38,28 +39,30 @@ class TranslationTopBar extends StatelessWidget {
                 size: 22 * scale,
               ),
             ),
-            SizedBox(width: 12 * scale),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'AutoTrans',
-                  style: TextStyle(
-                    color: primary,
-                    fontSize: 30 * scale,
-                    fontWeight: FontWeight.w700,
+            if (!isMobile) ...[
+              SizedBox(width: 12 * scale),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'AutoTrans',
+                    style: TextStyle(
+                      color: primary,
+                      fontSize: 30 * scale,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                Text(
-                  'AI Translator',
-                  style: TextStyle(
-                    color: textColor.withValues(alpha: 0.6),
-                    fontSize: 12 * scale,
-                    fontStyle: FontStyle.italic,
+                  Text(
+                    'AI Translator',
+                    style: TextStyle(
+                      color: textColor.withValues(alpha: 0.6),
+                      fontSize: 12 * scale,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ],
         ),
         const Spacer(),
@@ -68,8 +71,8 @@ class TranslationTopBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(26 * scale),
           child: Container(
             padding: EdgeInsets.symmetric(
-              horizontal: 22 * scale,
-              vertical: 11 * scale,
+              horizontal: (isMobile ? 16 : 22) * scale,
+              vertical: (isMobile ? 8 : 11) * scale,
             ),
             decoration: BoxDecoration(
               color:
@@ -105,7 +108,7 @@ class TranslationTopBar extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: 18 * scale),
+        SizedBox(width: (isMobile ? 8 : 18) * scale),
         IconButton(
           onPressed: onToggleTheme,
           icon: Icon(

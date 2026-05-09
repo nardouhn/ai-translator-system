@@ -21,7 +21,7 @@ def split_text_into_chunks(text: str, max_chars: int = 350) -> list[str]:
         
         if sep_idx >= len(separators):
             # Final fallback: Hard split by length
-            return [text_to_split[i : i + max_chars].strip() for i in range(0, len(text_to_split), max_chars)]
+            return [text_to_split[i : i + max_chars] for i in range(0, len(text_to_split), max_chars)]
         
         sep = separators[sep_idx]
         # Split but keep the separators to re-assemble
@@ -36,7 +36,7 @@ def split_text_into_chunks(text: str, max_chars: int = 350) -> list[str]:
             # If a single part is too long, split it with next separator
             if len(part) > max_chars:
                 if current_chunk:
-                    chunks.append(current_chunk.strip())
+                    chunks.append(current_chunk)
                     current_chunk = ""
                 chunks.extend(split_recursive(part, sep_idx + 1))
                 continue
@@ -45,13 +45,13 @@ def split_text_into_chunks(text: str, max_chars: int = 350) -> list[str]:
                 current_chunk += part
             else:
                 if current_chunk:
-                    chunks.append(current_chunk.strip())
+                    chunks.append(current_chunk)
                 current_chunk = part
         
         if current_chunk:
-            chunks.append(current_chunk.strip())
+            chunks.append(current_chunk)
             
-        return [c for c in chunks if c]
+        return [c for c in chunks if c.strip()]
 
     return split_recursive(text, 0)
 

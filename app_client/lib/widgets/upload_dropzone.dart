@@ -60,7 +60,7 @@ class UploadDropzone extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Upload Manuscript',
+                  'Upload',
                   style: TextStyle(
                     color: onSurface,
                     fontSize: 14,
@@ -108,7 +108,7 @@ class UploadDropzone extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'MAXIMUM FILE SIZE: 20MB',
+                  'MAXIMUM FILE SIZE: 5MB',
                   style: TextStyle(
                     color: onSurface.withOpacity(0.4),
                     fontSize: 12,

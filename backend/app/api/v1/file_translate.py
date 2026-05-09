@@ -1,20 +1,30 @@
-from fastapi import APIRouter, Depends, File as FastAPIFile, Form, Header, HTTPException, UploadFile, status
+import os
+import uuid
+import tempfile
+from fastapi import APIRouter, Depends, File as FastAPIFile, Form, Header, HTTPException, status, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi.concurrency import run_in_threadpool
-import hashlib
+from sqlalchemy.future import select
 
-from app.db.models import File, FileSegment, Logs, StatusEnum, RequestTypeEnum
+from app.db.models import File, FileSegment, StatusEnum
 from app.db.session import get_async_db
 from app.services.rate_limit_service import check_rate_limit
 from app.services.session_service import SessionService
 
+from fastapi import BackgroundTasks
+from app.settings import settings
+
 router = APIRouter()
 
-MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024
+MAX_TXT_SIZE = 5 * 1024 * 1024
+MAX_DOC_SIZE = 5 * 1024 * 1024
+
+from app.services.file_translation_service import process_file_translation
+from app.services.redis_client import get_async_redis
 
 
 @router.post("/file/translate")
 async def file_translate_api(
+    background_tasks: BackgroundTasks,
     upload_file: UploadFile = FastAPIFile(...),
     source_lang: str = Form(...),
     target_lang: str = Form(...),
@@ -22,23 +32,22 @@ async def file_translate_api(
     x_session_id: str | None = Header(default=None, alias="X-Session-ID"),
     db: AsyncSession = Depends(get_async_db),
 ):
-    file_content = await upload_file.read()
-    file_size = len(file_content)
-    await upload_file.seek(0)
-
-    if file_size > MAX_FILE_SIZE_BYTES:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="File exceeds 20MB limit.",
-        )
-
     filename = upload_file.filename or "unknown"
     ext = filename.split('.')[-1].lower()
+    
     if ext not in ['pdf', 'docx', 'txt']:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid file format. Only .pdf, .docx, and .txt are allowed.",
         )
+        
+    file_content = await upload_file.read()
+    file_size = len(file_content)
+    
+    if ext == 'txt' and file_size > MAX_TXT_SIZE:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="TXT file exceeds 5MB limit.")
+    elif ext in ['pdf', 'docx'] and file_size > MAX_DOC_SIZE:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File exceeds 5MB limit.")
 
     session_id = x_session_id
     if not session_id:
@@ -46,93 +55,91 @@ async def file_translate_api(
             lambda session: SessionService.create_session(db=session, ip_address=None, user_agent=None)
         )
     
-    check_rate_limit(session_id)
+    await check_rate_limit(session_id)
 
-    file_data = {
-        "session_id": session_id,
-        "file_size": file_size,
-    }
-    if hasattr(File, "filename"):
-        file_data["filename"] = filename
-    else:
-        file_data["original_filename"] = filename
-    if hasattr(File, "status"):
-        file_data["status"] = "pending"
+    # Reset the file cursor because await upload_file.read() consumed it
+    await upload_file.seek(0)
 
-    file_row = File(**file_data)
+    # Instead of local tempfile, upload to R2
+    from app.services.storage_service import StorageService
+    r2_key = await StorageService.upload_file(upload_file)
+    if not r2_key:
+        raise HTTPException(status_code=500, detail="Failed to upload file to storage")
+
+    file_row = File(
+        original_filename=filename,
+        session_id=session_id,
+        file_size=file_size,
+        status=StatusEnum.pending
+    )
     db.add(file_row)
     await db.commit()
     await db.refresh(file_row)
 
-    from app.services.document_translator import convert_pdf_to_docx, translate_docx_document, translate_txt_document
-    from app.services.translator_provider import translate_batch_with_provider
-
-    segments_list = []
-    
-    async def _do_translate_batch(texts: list[str]) -> list[str]:
-        if not texts:
-            return []
-        translated_texts, _ = await translate_batch_with_provider(texts, source_lang, target_lang, domain or "General")
-        for orig, tr in zip(texts, translated_texts):
-            segments_list.append({
-                "source_text": orig,
-                "translated_text": tr
-            })
-        return translated_texts
-
-    async def _do_translate(text: str) -> str:
-        res = await _do_translate_batch([text])
-        return res[0] if res else text
-
-    # Perform document translation asynchronously
-    if ext == "txt":
-        full_text, b64_data = await translate_txt_document(file_content, _do_translate)
-    elif ext == "docx" or ext == "pdf":
-        if ext == "pdf":
-            docx_bytes = await run_in_threadpool(convert_pdf_to_docx, file_content)
-        else:
-            docx_bytes = file_content
-        full_text, b64_data = await translate_docx_document(docx_bytes, _do_translate_batch)
-    else:
-        full_text, b64_data = "", ""
-        
-    file_id_val_inner = getattr(file_row, "file_id", getattr(file_row, "id", None))
-    
-    # Save segments asynchronously
-    for index, seg in enumerate(segments_list):
-        segment_data = {
-            "file_id": file_id_val_inner,
-            "segment_order": index,
-            "translated_text": seg['translated_text']
-        }
-        if hasattr(FileSegment, "content"):
-            segment_data["content"] = seg['source_text']
-        else:
-            segment_data["source_text"] = seg['source_text']
-        if hasattr(FileSegment, "status"):
-            segment_data["status"] = "done"
-        
-        db.add(FileSegment(**segment_data))
-        
-    await db.flush()
-
-    if hasattr(File, "status"):
-        file_row.status = StatusEnum.success
-    
     file_id_val = getattr(file_row, "id", getattr(file_row, "file_id", None))
-    await db.commit()
-    
-    log_record = Logs(
-        session_id=session_id,
-        translation_id=None,
-        status=StatusEnum.success,
-        request_type=RequestTypeEnum.file,
+
+    background_tasks.add_task(
+        process_file_translation,
+        file_id=file_id_val,
+        file_path=r2_key,
+        source_lang=source_lang,
+        target_lang=target_lang,
+        domain=domain,
+        session_id=session_id
     )
-    db.add(log_record)
-    await db.commit()
 
     return {
         "file_id": file_id_val,
-        "translated_text": full_text,
-        "file_content_b64": b64_data,
+        "status": "pending",
     }
+
+
+@router.get("/file/translate/{file_id}/status")
+async def file_translate_status(
+    file_id: int,
+    db: AsyncSession = Depends(get_async_db)
+):
+    result = await db.execute(select(File).where(File.file_id == file_id))
+    file_row = result.scalars().first()
+    
+    if not file_row:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    response_data = {
+        "file_id": file_id,
+        "status": file_row.status.value if hasattr(file_row.status, "value") else file_row.status
+    }
+    
+    # Read progress from Upstash Redis
+    if response_data["status"] == StatusEnum.processing.value or response_data["status"] == "processing":
+        redis_client = get_async_redis()
+        progress_val = await redis_client.get(f"job_progress:{file_id}")
+        response_data["progress"] = int(progress_val) if progress_val else 0
+    elif response_data["status"] == StatusEnum.success.value or response_data["status"] == "success":
+        response_data["progress"] = 100
+    else:
+        response_data["progress"] = 0
+    
+    if file_row.status == StatusEnum.success:
+        seg_result = await db.execute(select(FileSegment).where(FileSegment.file_id == file_id).order_by(FileSegment.segment_order))
+        segments = seg_result.scalars().all()
+        translated_text = "\n".join([s.translated_text for s in segments if s.translated_text])
+        response_data["translated_text"] = translated_text
+        
+        # Instead of reading local file and converting to base64, we generate a presigned URL from R2
+        from app.services.storage_service import StorageService
+        if file_row.file_path:
+            try:
+                # file_row.file_path should now hold the R2 object key (e.g. translated file key)
+                presigned_url = await StorageService.get_presigned_url(file_row.file_path)
+                response_data["file_url"] = presigned_url
+                # Maintain backward compatibility if needed, or just return empty b64
+                response_data["file_content_b64"] = ""
+            except Exception:
+                response_data["file_url"] = None
+                response_data["file_content_b64"] = ""
+        else:
+            response_data["file_url"] = None
+            response_data["file_content_b64"] = ""
+
+    return response_data

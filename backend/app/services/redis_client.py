@@ -1,20 +1,26 @@
-import os
-from redis import Redis
 import redis.asyncio as aioredis
+from redis.asyncio import Redis, ConnectionPool
+from app.settings import settings
 
-redis_client = None
-async_redis_client = None
+redis_pool = None
 
+def get_async_redis() -> Redis:
+    global redis_pool
+    if redis_pool is None:
+        redis_url = settings.redis_url
+
+        
+        # Determine if SSL is needed based on the protocol
+        # For Upstash rediss://, we should set ssl_cert_reqs="none" to avoid certificate errors
+        kwargs = {"decode_responses": True}
+        if redis_url.startswith("rediss://"):
+            kwargs["ssl_cert_reqs"] = "none"
+            
+        redis_pool = ConnectionPool.from_url(redis_url, **kwargs)
+        
+    return Redis(connection_pool=redis_pool)
+
+# To maintain backward compatibility if other parts import get_redis
+# We provide the async version. If there are sync usages, they need to be refactored to await.
 def get_redis() -> Redis:
-    global redis_client
-    if redis_client is None:
-        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-        redis_client = Redis.from_url(redis_url, decode_responses=True)
-    return redis_client
-
-def get_async_redis() -> aioredis.Redis:
-    global async_redis_client
-    if async_redis_client is None:
-        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-        async_redis_client = aioredis.from_url(redis_url, decode_responses=True)
-    return async_redis_client
+    return get_async_redis()

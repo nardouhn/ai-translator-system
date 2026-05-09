@@ -51,10 +51,10 @@ class _FileTranslationPanelState extends State<FileTranslationPanel> {
     }
 
     final double sizeInMb = sizeInBytes / (1024 * 1024);
-    if (sizeInMb > 20) {
+    if (sizeInMb > 5) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('File exceeds 20MB limit. Please upload another file.'),
+          content: Text('File exceeds 5MB limit. Please upload another file.'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -122,7 +122,7 @@ class _FileTranslationPanelState extends State<FileTranslationPanel> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Upload Manuscript',
+                        'Upload',
                         style: TextStyle(
                           color: onSurface,
                           fontSize: 20,
@@ -171,7 +171,7 @@ class _FileTranslationPanelState extends State<FileTranslationPanel> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'MAXIMUM FILE SIZE: 20MB',
+                      'MAXIMUM FILE SIZE: 5MB',
                       style: TextStyle(
                         color: onSurface.withOpacity(0.4),
                         fontSize: 12,
