@@ -48,7 +48,6 @@ class SidebarQueueWidget extends StatelessWidget {
               },
             ),
           const SizedBox(height: 16),
-          const TipCard(),
         ],
       ),
     );
@@ -99,12 +98,12 @@ class QueueItemCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryColor.withOpacity(0.1)),
+        // Removed border to make it look cleaner
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -214,7 +213,6 @@ class TipCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
-    final onSurface = Theme.of(context).colorScheme.onSurface;
 
     return Container(
       padding: const EdgeInsets.all(16),

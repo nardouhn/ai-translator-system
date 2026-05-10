@@ -4,6 +4,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../services/api_service.dart';
+import '../services/local_cache_service.dart';
 import '../widgets/domain_dropdown.dart';
 import '../widgets/translation_bottom_note.dart';
 import '../widgets/translation_dual_panel.dart';
@@ -30,8 +31,8 @@ class _TextTranslationViewState extends State<TextTranslationView> {
   bool _isLoading = false;
   String _outputText = '';
   String _errorMessage = '';
-  String _selectedSourceLang = 'en';
-  String _selectedTargetLang = 'vi';
+  final String _selectedSourceLang = 'en';
+  final String _selectedTargetLang = 'vi';
   String _selectedDomain = 'General';
   
   final FlutterTts flutterTts = FlutterTts();
@@ -194,6 +195,16 @@ class _TextTranslationViewState extends State<TextTranslationView> {
       setState(() {
         _outputText = '';
       });
+      
+      final cachedResult = await LocalCacheService.getTranslation(inputText, _selectedTargetLang);
+      if (cachedResult != null && cachedResult.isNotEmpty) {
+        debugPrint("⚡ Đã tìm thấy trong Cache, không gọi API!");
+        setState(() {
+          _outputText = cachedResult;
+        });
+        return;
+      }
+
       await ApiService.translateTextStream(
         text: inputText,
         sourceLang: _selectedSourceLang,
@@ -207,6 +218,10 @@ class _TextTranslationViewState extends State<TextTranslationView> {
           }
         },
       );
+      
+      if (_outputText.isNotEmpty) {
+        await LocalCacheService.saveTranslation(inputText, _selectedTargetLang, _outputText);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -245,29 +260,29 @@ class _TextTranslationViewState extends State<TextTranslationView> {
             horizontal: isMobile ? 16 : 42 * base,
             vertical: isMobile ? 16 : 24 * base,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TranslationTopBar(
-                scale: base,
-                pageTitle: 'File Translation',
-                onPagePressed: widget.onSwitchToFile,
-                isDarkMode: widget.isDarkMode,
-                onToggleTheme: widget.onToggleTheme,
-              ),
-              SizedBox(height: 64 * base),
-              DomainDropdown(
-                scale: base,
-                selectedDomain: _selectedDomain,
-                onDomainChanged: (newValue) {
-                  setState(() {
-                    _selectedDomain = newValue;
-                  });
-                },
-              ),
-              SizedBox(height: 46 * base),
-              Expanded(
-                child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TranslationTopBar(
+                  scale: base,
+                  pageTitle: 'File Translation',
+                  onPagePressed: widget.onSwitchToFile,
+                  isDarkMode: widget.isDarkMode,
+                  onToggleTheme: widget.onToggleTheme,
+                ),
+                SizedBox(height: 64 * base),
+                DomainDropdown(
+                  scale: base,
+                  selectedDomain: _selectedDomain,
+                  onDomainChanged: (newValue) {
+                    setState(() {
+                      _selectedDomain = newValue;
+                    });
+                  },
+                ),
+                SizedBox(height: 46 * base),
+                Center(
                   child: TranslationDualPanel(
                     scale: base,
                     inputController: _inputController,
@@ -285,16 +300,17 @@ class _TextTranslationViewState extends State<TextTranslationView> {
                     isLoading: _isLoading,
                   ),
                 ),
-              ),
-              if (_errorMessage.isNotEmpty) ...[
-                SizedBox(height: 8 * base),
-                Text(
-                  _errorMessage,
-                  style: const TextStyle(color: Colors.redAccent),
-                ),
+                if (_errorMessage.isNotEmpty) ...[
+                  SizedBox(height: 8 * base),
+                  Text(
+                    _errorMessage,
+                    style: const TextStyle(color: Colors.redAccent),
+                  ),
+                ],
+                SizedBox(height: 24 * base),
+                TranslationBottomNote(scale: base),
               ],
-              TranslationBottomNote(scale: base),
-            ],
+            ),
           ),
         );
       },

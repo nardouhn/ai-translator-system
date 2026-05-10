@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:universal_html/html.dart' as html;
-import 'package:file_picker/file_picker.dart';
+import 'package:file_picker/file_picker.dart' as fp;
 
 import '../services/api_service.dart';
 import '../widgets/translation_top_bar.dart';
@@ -42,8 +42,8 @@ class _FileTranslationViewState extends State<FileTranslationView> {
 
   Future<void> _pickFile() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
+      fp.FilePickerResult? result = await fp.FilePicker.pickFiles(
+        type: fp.FileType.custom,
         allowedExtensions: ['pdf', 'docx', 'txt'],
         withData: kIsWeb,
       );
@@ -243,6 +243,160 @@ class _FileTranslationViewState extends State<FileTranslationView> {
     }
   }
 
+  Widget _buildMainCardContent(BuildContext context, Color primaryColor, bool isMobile) {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'File Translation',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontSize: 24,
+                ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Upload a document to translate its contents while preserving layout.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                ),
+          ),
+          const SizedBox(height: 24),
+          _selectedFileName != null
+              ? FileInfoCard(
+                  fileName: _selectedFileName!,
+                  onClear: _clearSelectedFile,
+                )
+              : SizedBox(
+                  height: 250,
+                  child: UploadDropzone(
+                    isDragging: _isDragging,
+                    onDraggingChanged: (val) => setState(() => _isDragging = val),
+                    onFileDropped: _validateAndProcessFile,
+                    onPickFile: _pickFile,
+                  ),
+                ),
+          const SizedBox(height: 24),
+          // Language and Translate controls
+          isMobile
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        DomainDropdown(
+                          scale: 0.8,
+                          selectedDomain: _selectedDomain,
+                          onDomainChanged: (newValue) {
+                            setState(() {
+                              _selectedDomain = newValue;
+                            });
+                          },
+                        ),
+                        _buildLangDropdown('en', _selectedSourceLang, (val) => setState(() => _selectedSourceLang = val!)),
+                        const Icon(Icons.arrow_forward_rounded, color: Colors.grey),
+                        _buildLangDropdown('vi', _selectedTargetLang, (val) => setState(() => _selectedTargetLang = val!)),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: _isTranslating ? null : _onTranslatePressed,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                      ),
+                      icon: _isTranslating
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(Icons.auto_awesome, size: 20),
+                      label: Text(
+                        _isTranslating ? 'Translating...' : 'Translate Document',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Wrap(
+                        spacing: 16,
+                        runSpacing: 16,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          DomainDropdown(
+                            scale: 0.8,
+                            selectedDomain: _selectedDomain,
+                            onDomainChanged: (newValue) {
+                              setState(() {
+                                _selectedDomain = newValue;
+                              });
+                            },
+                          ),
+                          _buildLangDropdown('en', _selectedSourceLang, (val) => setState(() => _selectedSourceLang = val!)),
+                          const Icon(Icons.arrow_forward_rounded, color: Colors.grey),
+                          _buildLangDropdown('vi', _selectedTargetLang, (val) => setState(() => _selectedTargetLang = val!)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton.icon(
+                      onPressed: _isTranslating ? null : _onTranslatePressed,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                      ),
+                      icon: _isTranslating
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(Icons.auto_awesome, size: 20),
+                      label: Text(
+                        _isTranslating ? 'Translating...' : 'Translate Document',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+        ],
+      ),
+    );
+  }
+
   void _onDelete(int index) {
     setState(() {
       _activeQueue.removeAt(index);
@@ -294,253 +448,85 @@ class _FileTranslationViewState extends State<FileTranslationView> {
           final isMobile = constraints.maxWidth < 600;
           return Container(
             key: const ValueKey<String>('file_translation_view'),
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: gradientColors,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 16 : 42,
-          vertical: isMobile ? 16 : 24,
-        ),
-        child: Column(
-          children: [
-              TranslationTopBar(
-                scale: isMobile ? 0.85 : 1.0,
-                pageTitle: 'Text Translation',
-                onPagePressed: widget.onSwitchToText,
-                isDarkMode: widget.isDarkMode,
-                onToggleTheme: widget.onToggleTheme,
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: gradientColors,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              SizedBox(height: isMobile ? 16 : 32),
-              Expanded(
-                child: isMobile
-                    ? Column(
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: Card(
-                      margin: EdgeInsets.zero,
-                      child: Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'File Translation',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontSize: 24,
-                                  ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Upload a document to translate its contents while preserving layout.',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                                  ),
-                            ),
-                            const SizedBox(height: 24),
-                            Expanded(
-                              child: _selectedFileName != null
-                                  ? FileInfoCard(
-                                      fileName: _selectedFileName!,
-                                      onClear: _clearSelectedFile,
-                                    )
-                                  : UploadDropzone(
-                                      isDragging: _isDragging,
-                                      onDraggingChanged: (val) => setState(() => _isDragging = val),
-                                      onFileDropped: _validateAndProcessFile,
-                                      onPickFile: _pickFile,
-                                    ),
-                            ),
-                            const SizedBox(height: 24),
-                            isMobile
-                                ? Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      Wrap(
-                                        spacing: 12,
-                                        runSpacing: 12,
-                                        alignment: WrapAlignment.center,
-                                        crossAxisAlignment: WrapCrossAlignment.center,
-                                        children: [
-                                          DomainDropdown(
-                                            scale: 0.8,
-                                            selectedDomain: _selectedDomain,
-                                            onDomainChanged: (newValue) {
-                                              setState(() {
-                                                _selectedDomain = newValue;
-                                              });
-                                            },
-                                          ),
-                                          _buildLangDropdown('en', _selectedSourceLang, (val) => setState(() => _selectedSourceLang = val!)),
-                                          const Icon(Icons.arrow_forward_rounded, color: Colors.grey),
-                                          _buildLangDropdown('vi', _selectedTargetLang, (val) => setState(() => _selectedTargetLang = val!)),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 16),
-                                      ElevatedButton.icon(
-                                        onPressed: _isTranslating ? null : _onTranslatePressed,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: primaryColor,
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          elevation: 4,
-                                        ),
-                                        icon: _isTranslating
-                                            ? const SizedBox(
-                                                width: 20,
-                                                height: 20,
-                                                child: CircularProgressIndicator(
-                                                  color: Colors.white,
-                                                  strokeWidth: 2,
-                                                ),
-                                              )
-                                            : const Icon(Icons.auto_awesome, size: 20),
-                                        label: Text(
-                                          _isTranslating ? 'Translating...' : 'Translate Document',
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                : Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Wrap(
-                                          spacing: 16,
-                                          runSpacing: 16,
-                                          crossAxisAlignment: WrapCrossAlignment.center,
-                                          children: [
-                                            DomainDropdown(
-                                              scale: 0.8,
-                                              selectedDomain: _selectedDomain,
-                                              onDomainChanged: (newValue) {
-                                                setState(() {
-                                                  _selectedDomain = newValue;
-                                                });
-                                              },
-                                            ),
-                                            _buildLangDropdown('en', _selectedSourceLang, (val) => setState(() => _selectedSourceLang = val!)),
-                                            const Icon(Icons.arrow_forward_rounded, color: Colors.grey),
-                                            _buildLangDropdown('vi', _selectedTargetLang, (val) => setState(() => _selectedTargetLang = val!)),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      ElevatedButton.icon(
-                                        onPressed: _isTranslating ? null : _onTranslatePressed,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: primaryColor,
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          elevation: 4,
-                                        ),
-                                        icon: _isTranslating
-                                            ? const SizedBox(
-                                                width: 20,
-                                                height: 20,
-                                                child: CircularProgressIndicator(
-                                                  color: Colors.white,
-                                                  strokeWidth: 2,
-                                                ),
-                                              )
-                                            : const Icon(Icons.auto_awesome, size: 20),
-                                        label: Text(
-                                          _isTranslating ? 'Translating...' : 'Translate Document',
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                          ],
-                        ),
-                      ),
-                    ),
+            ),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 16 : 42,
+                vertical: isMobile ? 16 : 24,
+              ),
+              child: Column(
+                children: [
+                  TranslationTopBar(
+                    scale: isMobile ? 0.85 : 1.0,
+                    pageTitle: 'Text Translation',
+                    onPagePressed: widget.onSwitchToText,
+                    isDarkMode: widget.isDarkMode,
+                    onToggleTheme: widget.onToggleTheme,
                   ),
-                  if (isMobile) const SizedBox(height: 16) else const SizedBox(width: 24),
-                  if (isMobile)
-                    Expanded(
-                      flex: 2,
-                      child: Card(
-                        margin: EdgeInsets.zero,
-                        child: Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Translation Queue',
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                      fontSize: 20,
-                                    ),
-                              ),
-                              const SizedBox(height: 16),
-                              Expanded(
-                                child: SidebarQueueWidget(
+                  SizedBox(height: isMobile ? 16 : 32),
+                  Flex(
+                    direction: isMobile ? Axis.vertical : Axis.horizontal,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Main translation card
+                      if (isMobile)
+                        Card(
+                          margin: EdgeInsets.zero,
+                          child: _buildMainCardContent(context, primaryColor, isMobile),
+                        )
+                      else
+                        Expanded(
+                          flex: 3,
+                          child: Card(
+                            margin: EdgeInsets.zero,
+                            child: _buildMainCardContent(context, primaryColor, isMobile),
+                          ),
+                        ),
+                      if (isMobile) const SizedBox(height: 16) else const SizedBox(width: 24),
+                      // Queue card
+                      SizedBox(
+                        width: isMobile ? double.infinity : 320,
+                        child: Card(
+                          margin: EdgeInsets.zero,
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Translation Queue',
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                        fontSize: 20,
+                                      ),
+                                ),
+                                const SizedBox(height: 16),
+                                SidebarQueueWidget(
                                   queue: _activeQueue,
                                   onDownload: _onDownload,
                                   onDelete: _onDelete,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    )
-                  else
-                    SizedBox(
-                      width: 320,
-                      child: Card(
-                        margin: EdgeInsets.zero,
-                        child: Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Translation Queue',
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                      fontSize: 20,
-                                    ),
-                              ),
-                              const SizedBox(height: 16),
-                              Expanded(
-                                child: SidebarQueueWidget(
-                                  queue: _activeQueue,
-                                  onDownload: _onDownload,
-                                  onDelete: _onDelete,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                    ],
+                  ),
+                  const SizedBox(height: 48), // Padding at bottom
                 ],
               ),
             ),
-          ],
-        ),
-      );
-      },
+          );
+        },
       ),
     );
   }

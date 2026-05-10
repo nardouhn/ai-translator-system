@@ -1,7 +1,15 @@
-alembic
 fastapi
+uvicorn[standard]
+alembic
 psycopg[binary]
 pydantic-settings
 redis
-sqlalchemy
+python-multipart
+deep-translator
+httpx
+asyncpg==0.29.0
+SQLAlchemy>=2.0.0
+python-docx
+pdf2docx
+aioboto3==12.3.0
 arq

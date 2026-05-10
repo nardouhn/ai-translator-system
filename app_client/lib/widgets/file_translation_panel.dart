@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_picker/file_picker.dart' as fp;
 import 'package:desktop_drop/desktop_drop.dart';
+import 'package:flutter/foundation.dart' show kIsWeb; // Thêm dòng này để nhận diện Web
+import 'dart:typed_data'; // Thêm dòng này để dùng Uint8List
+
 import 'domain_dropdown.dart';
 
 class FileTranslationPanel extends StatefulWidget {
@@ -11,7 +14,8 @@ class FileTranslationPanel extends StatefulWidget {
     required this.onTranslatePressed,
   });
 
-  final Function(String fileName, int sizeInBytes, String path) onFileValidated;
+  // SỬA: Thêm Uint8List? bytes vào callback để truyền data file lên cho Web
+  final Function(String fileName, int sizeInBytes, String? path, Uint8List? bytes) onFileValidated;
   final Function(String domain) onTranslatePressed;
 
   @override
@@ -25,20 +29,22 @@ class _FileTranslationPanelState extends State<FileTranslationPanel> {
 
   Future<void> _pickFile() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
+      fp.FilePickerResult? result = await fp.FilePicker.pickFiles(
+        type: fp.FileType.custom,
         allowedExtensions: ['pdf', 'docx', 'txt'],
+        withData: kIsWeb, // SỬA: Bắt buộc phải có cái này để lấy data trên Web
       );
       if (result != null && result.files.isNotEmpty) {
         final file = result.files.single;
-        _validateAndProcessFile(file.name, file.size, file.path ?? '');
+        _validateAndProcessFile(file.name, file.size, file.path, file.bytes);
       }
     } catch (e) {
       debugPrint('File picker error: $e');
     }
   }
 
-  void _validateAndProcessFile(String fileName, int sizeInBytes, String path) {
+  // SỬA: Nhận thêm biến bytes
+  void _validateAndProcessFile(String fileName, int sizeInBytes, String? path, Uint8List? bytes) {
     final ext = fileName.split('.').last.toLowerCase();
     if (ext != 'pdf' && ext != 'docx' && ext != 'txt') {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -67,7 +73,8 @@ class _FileTranslationPanelState extends State<FileTranslationPanel> {
       });
     }
 
-    widget.onFileValidated(fileName, sizeInBytes, path);
+    // Gửi trả cả path và bytes về cho Widget cha xử lý gọi API
+    widget.onFileValidated(fileName, sizeInBytes, path, bytes);
   }
 
   @override
@@ -86,7 +93,14 @@ class _FileTranslationPanelState extends State<FileTranslationPanel> {
               if (details.files.isNotEmpty) {
                 final file = details.files.first;
                 final len = await file.length();
-                _validateAndProcessFile(file.name, len, file.path);
+
+                // SỬA: Lấy bytes nếu là Web khi kéo thả file
+                Uint8List? bytes;
+                if (kIsWeb) {
+                  bytes = await file.readAsBytes();
+                }
+
+                _validateAndProcessFile(file.name, len, file.path, bytes);
               }
             },
             child: DottedBorder(

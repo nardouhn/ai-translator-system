@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -19,7 +18,8 @@ class ApiService {
       }
       return "http://127.0.0.1:8000/api/v1";
     }
-    return "http://10.0.2.2:8000/api/v1";
+    // Update to physical machine's IP (IPv4) instead of emulator IP
+    return "http://192.168.52.103:8000/api/v1";
   }
 
   static Future<void> translateTextStream({
@@ -49,7 +49,7 @@ class ApiService {
       
       request.body = jsonEncode(bodyData);
 
-      final streamedResponse = await request.send();
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 30));
 
       final responseSessionId = streamedResponse.headers['x-session-id'];
       if (responseSessionId != null && responseSessionId.isNotEmpty) {
@@ -141,7 +141,7 @@ class ApiService {
         throw Exception('Either fileBytes or filePath must be provided');
       }
 
-      final streamedResponse = await request.send();
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 60));
       final response = await http.Response.fromStream(streamedResponse);
 
       debugPrint('translateFile statusCode: ${response.statusCode}');
@@ -152,10 +152,12 @@ class ApiService {
       }
 
       if (response.statusCode != 200) {
-        throw Exception('File translation failed: ${response.statusCode} - ${response.body}');
+        final errorBody = utf8.decode(response.bodyBytes);
+        throw Exception('File translation failed: ${response.statusCode} - $errorBody');
       }
 
-      final Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
+      final utf8Body = utf8.decode(response.bodyBytes);
+      final Map<String, dynamic> data = jsonDecode(utf8Body) as Map<String, dynamic>;
       return data;
     } catch (e) {
       if (e.toString().contains('Failed host lookup') || e.toString().contains('XMLHttpRequest')) {
@@ -173,11 +175,13 @@ class ApiService {
         headers['X-Session-ID'] = sessionId!;
       }
 
-      final response = await http.get(uri, headers: headers);
+      final response = await http.get(uri, headers: headers).timeout(const Duration(seconds: 15));
       if (response.statusCode != 200) {
-        throw Exception('Check status failed: ${response.statusCode} - ${response.body}');
+        final errorBody = utf8.decode(response.bodyBytes);
+        throw Exception('Check status failed: ${response.statusCode} - $errorBody');
       }
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      final utf8Body = utf8.decode(response.bodyBytes);
+      return jsonDecode(utf8Body) as Map<String, dynamic>;
     } catch (e) {
       rethrow;
     }

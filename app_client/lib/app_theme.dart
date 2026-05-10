@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Light Mode Colors
@@ -30,9 +31,11 @@ class AppTheme {
       brightness: Brightness.light,
       scaffoldBackgroundColor: _lightBg,
       colorScheme: scheme,
-      textTheme: const TextTheme(
-        titleLarge: TextStyle(color: _lightText, fontWeight: FontWeight.bold),
-        bodyMedium: TextStyle(color: _lightText),
+      textTheme: GoogleFonts.interTextTheme(
+        ThemeData.light().textTheme,
+      ).copyWith(
+        titleLarge: GoogleFonts.inter(color: _lightText, fontWeight: FontWeight.bold),
+        bodyMedium: GoogleFonts.inter(color: _lightText),
       ),
       navigationRailTheme: NavigationRailThemeData(
         backgroundColor: _lightSurface,
@@ -75,9 +78,11 @@ class AppTheme {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: _darkBg,
       colorScheme: scheme,
-      textTheme: const TextTheme(
-        titleLarge: TextStyle(color: _darkText, fontWeight: FontWeight.bold),
-        bodyMedium: TextStyle(color: _darkText),
+      textTheme: GoogleFonts.interTextTheme(
+        ThemeData.dark().textTheme,
+      ).copyWith(
+        titleLarge: GoogleFonts.inter(color: _darkText, fontWeight: FontWeight.bold),
+        bodyMedium: GoogleFonts.inter(color: _darkText),
       ),
       navigationRailTheme: NavigationRailThemeData(
         backgroundColor: _darkSurface,

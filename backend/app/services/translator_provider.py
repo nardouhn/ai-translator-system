@@ -38,11 +38,18 @@ async def translate_with_provider(
         client = get_shared_client()
         for attempt in range(max_retries + 1):
                 try:
-                    system_prompt = f"Instruction: Translate the following text to {target_lang}. ONLY output the translated text. DO NOT explain, DO NOT repeat this instruction, and DO NOT output quotes.\nText to translate:\n\"\"\"\n{source_text}\n\"\"\""
+                    system_content = f"You are a raw translation API. Translate {source_lang} to {target_lang}. Return ONLY the translated string. Absolutely NO explanations, NO markdown, NO quotation marks, NO conversational filler."
                     
                     payload = {
-                        "text": system_prompt,
-                        "domain": domain.lower()
+                        "messages": [
+                            {"role": "system", "content": system_content},
+                            {"role": "user", "content": source_text}
+                        ],
+                        "temperature": 0.0,
+                        "domain": domain.lower(),
+                        # Fallback for the custom API in case it hasn't been updated to accept 'messages'
+                        "text": source_text,
+                        "system_prompt": system_content 
                     }
                     response = await client.post(CUSTOM_MODEL_URL, json=payload)
                     
@@ -57,6 +64,9 @@ async def translate_with_provider(
                         except Exception:
                             error_msg += f": {response.text}"
                             
+                        logger.error(f"Lỗi TỪ CHỐI TỪ MODEL. HTTP Status: {response.status_code}")
+                        logger.error(f"Chi tiết response body: {response.text}")
+                            
                         if attempt < max_retries:
                             backoff = 2 ** (attempt + 1)
                             logger.warning(f"Translation attempt {attempt + 1} failed. Retrying in {backoff}s... Error: {error_msg}")
@@ -69,39 +79,29 @@ async def translate_with_provider(
                             return f"[ERROR: {error_msg}] {source_text}", "custom-ai"
 
                     data = response.json()
-                    translated = data.get("output", source_text)
+                    translated = data.get("output", data.get("translated_text", source_text))
                     
-                    # Post-processing: Cleanup hallucinations
+                    # 3. Post-processing: Aggressive Cleanup
                     if translated != source_text:
-                        if '"""' in translated:
-                            parts = translated.split('"""')
-                            for part in reversed(parts):
-                                if part.strip():
-                                    translated = part.strip()
-                                    break
-                                    
-                        translated = translated.strip()
-                        translated = translated.strip('"').strip("'")
+                        # Strip all kinds of whitespace, quotes, and brackets
+                        translated = translated.strip(' \t\n\r"\'{}[]()')
                         
+                        # Remove markdown code blocks if AI outputs them
+                        translated = re.sub(r'^```[a-zA-Z]*\n', '', translated)
+                        translated = re.sub(r'\n```$', '', translated)
+                        translated = translated.replace('```', '').strip()
+                        
+                        # Remove conversational filler prefixes (case insensitive)
                         prefixes_to_remove = [
-                            "dịch sang tiếng việt:",
-                            "translate to:",
-                            "here is the translation:",
-                            "bản dịch:",
-                            "translated text:",
-                            "translation:",
-                            "instruction:",
-                            "text to translate:",
+                            r'^here is the translation:?\s*',
+                            r'^translated text:?\s*',
+                            r'^translation:?\s*',
+                            r'^bản dịch:?\s*',
+                            r'^kết quả:?\s*',
+                            r'^dịch sang tiếng việt:?\s*'
                         ]
-                        
-                        lower_trans = translated.lower()
                         for prefix in prefixes_to_remove:
-                            if lower_trans.startswith(prefix):
-                                translated = translated[len(prefix):].strip()
-                                translated = translated.strip('"').strip("'")
-                                if translated.startswith('"""') and translated.endswith('"""'):
-                                    translated = translated[3:-3].strip()
-                                break
+                            translated = re.sub(prefix, '', translated, flags=re.IGNORECASE).strip(' "\'{}\n\r')
                     
                     # Mandatory sleep to respect Ngrok rate limits and cool down GPU
                     await asyncio.sleep(2)
@@ -109,6 +109,7 @@ async def translate_with_provider(
                     return translated, "custom-ai"
                     
                 except (httpx.TimeoutException, httpx.RequestError) as e:
+                    logger.error(f"Lỗi TIMEOUT / NETWORK: {e}")
                     if attempt < max_retries:
                         backoff = 2 ** (attempt + 1)
                         logger.warning(f"Translation attempt {attempt + 1} failed for chunk. Retrying in {backoff}s... Error: {e}")

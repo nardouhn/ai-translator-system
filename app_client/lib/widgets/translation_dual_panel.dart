@@ -50,120 +50,176 @@ class _TranslationDualPanelState extends State<TranslationDualPanel> {
     final textColor = Theme.of(context).colorScheme.onSurface;
     final isMobile = MediaQuery.of(context).size.width < 600;
 
-    final sourcePane = Expanded(
-      child: _EditorPane(
-        title: widget.sourceLangName,
-        subtitle: null,
-        footerLeft: '${widget.inputController.text.length} / 5000',
-        footerActions: [
-          GestureDetector(
-            onTap: widget.onSpeakSource,
-            child: Icon(
-              widget.isSpeakingSource ? Icons.stop_circle_outlined : Icons.volume_up_outlined,
-              color: widget.isSpeakingSource ? const Color(0xFFB23FFF) : textColor.withOpacity(0.72),
-              size: 18 * widget.scale,
-            ),
+    final sourcePane = _EditorPane(
+      isExpanded: !isMobile,
+      title: widget.sourceLangName,
+      subtitle: null,
+      footerLeft: '${widget.inputController.text.length} / 5000',
+      footerActions: [
+        GestureDetector(
+          onTap: widget.onSpeakSource,
+          child: Icon(
+            widget.isSpeakingSource ? Icons.stop_circle_outlined : Icons.volume_up_outlined,
+            color: widget.isSpeakingSource ? const Color(0xFFB23FFF) : textColor.withOpacity(0.72),
+            size: 18 * widget.scale,
           ),
-          GestureDetector(
-            onTap: widget.onMicPressed,
-            child: Icon(
-              widget.isListening ? Icons.mic_rounded : Icons.mic_none_rounded,
-              color: widget.isListening ? Colors.redAccent : textColor.withOpacity(0.72),
-              size: 18 * widget.scale,
-            ),
+        ),
+        GestureDetector(
+          onTap: widget.onMicPressed,
+          child: Icon(
+            widget.isListening ? Icons.mic_rounded : Icons.mic_none_rounded,
+            color: widget.isListening ? Colors.redAccent : textColor.withOpacity(0.72),
+            size: 18 * widget.scale,
           ),
-        ],
-        backgroundColor: panelBgLeft,
-        textColor: textColor,
-        borderColor: border,
-        scale: widget.scale,
-        content: TextField(
-          controller: widget.inputController,
-          maxLines: null,
-          minLines: null,
-          expands: true,
-          maxLength: 5000,
-          maxLengthEnforcement: MaxLengthEnforcement.enforced,
-          keyboardType: TextInputType.multiline,
-          onChanged: (value) {
-            setState(() {});
-          },
-          style: TextStyle(
-            color: textColor.withOpacity(0.9),
+        ),
+      ],
+      backgroundColor: panelBgLeft,
+      textColor: textColor,
+      borderColor: border,
+      scale: widget.scale,
+      content: TextField(
+        controller: widget.inputController,
+        maxLines: null,
+        minLines: isMobile ? 5 : null,
+        expands: !isMobile,
+        maxLength: 5000,
+        maxLengthEnforcement: MaxLengthEnforcement.enforced,
+        keyboardType: TextInputType.multiline,
+        onChanged: (value) {
+          setState(() {});
+        },
+        style: TextStyle(
+          color: textColor.withOpacity(0.9),
+          fontSize: 18 * widget.scale,
+        ),
+        decoration: InputDecoration(
+          hintText: 'Type or paste text to translate...',
+          hintStyle: TextStyle(
+            color: textColor.withOpacity(0.35),
             fontSize: 18 * widget.scale,
+            fontWeight: FontWeight.w500,
           ),
-          decoration: InputDecoration(
-            hintText: 'Type or paste text to translate...',
-            hintStyle: TextStyle(
-              color: textColor.withOpacity(0.35),
-              fontSize: 18 * widget.scale,
-              fontWeight: FontWeight.w500,
-            ),
-            counterText: "", // Hide default counter
-            border: InputBorder.none,
-          ),
+          counterText: "", // Hide default counter
+          border: InputBorder.none,
         ),
       ),
     );
 
     final divider = Container(
       width: isMobile ? double.infinity : 2 * widget.scale,
-      height: isMobile ? 2 * widget.scale : double.infinity,
+      height: isMobile ? 1 * widget.scale : double.infinity,
       decoration: BoxDecoration(
         color: border,
-        boxShadow: [
-          BoxShadow(
-            color: primary.withOpacity(
-              isDark ? 0.22 : 0.28,
-            ),
-            blurRadius: 18 * widget.scale,
-          ),
-        ],
       ),
     );
 
-    final targetPane = Expanded(
-      child: _EditorPane(
-        title: widget.targetLangName,
-        subtitle: null,
-        footerLeft: '',
-        footerActions: [
-          GestureDetector(
-            onTap: widget.onSpeakTarget,
-            child: Icon(
-              widget.isSpeakingTarget ? Icons.stop_circle_outlined : Icons.volume_up_outlined,
-              color: widget.isSpeakingTarget ? const Color(0xFFB23FFF) : textColor.withOpacity(0.72),
-              size: 18 * widget.scale,
-            ),
+    final targetPane = _EditorPane(
+      isExpanded: !isMobile,
+      title: widget.targetLangName,
+      subtitle: null,
+      footerLeft: '',
+      footerActions: [
+        GestureDetector(
+          onTap: widget.onSpeakTarget,
+          child: Icon(
+            widget.isSpeakingTarget ? Icons.stop_circle_outlined : Icons.volume_up_outlined,
+            color: widget.isSpeakingTarget ? const Color(0xFFB23FFF) : textColor.withOpacity(0.72),
+            size: 18 * widget.scale,
           ),
-          GestureDetector(
-            onTap: widget.onCopy,
-            child: Icon(Icons.copy_all_outlined, color: textColor.withOpacity(0.72), size: 18 * widget.scale),
-          ),
-          Icon(Icons.share_outlined, color: textColor.withOpacity(0.72), size: 18 * widget.scale),
-        ],
-        backgroundColor: panelBgRight,
-        textColor: textColor,
-        borderColor: border,
-        scale: widget.scale,
-        content: SingleChildScrollView(
-          child: SelectableText(
-            widget.outputText.isEmpty ? 'Translation will appear here...' : widget.outputText,
-            style: TextStyle(
-              color: widget.outputText.isEmpty 
-                  ? textColor.withOpacity(0.35)
-                  : textColor.withOpacity(0.9),
-              fontSize: 18 * widget.scale,
-              fontWeight: widget.outputText.isEmpty ? FontWeight.w500 : FontWeight.w400,
-            ),
+        ),
+        GestureDetector(
+          onTap: widget.onCopy,
+          child: Icon(Icons.copy_all_outlined, color: textColor.withOpacity(0.72), size: 18 * widget.scale),
+        ),
+        Icon(Icons.share_outlined, color: textColor.withOpacity(0.72), size: 18 * widget.scale),
+      ],
+      backgroundColor: panelBgRight,
+      textColor: textColor,
+      borderColor: border,
+      scale: widget.scale,
+      content: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: isMobile ? 120 : 0,
+        ),
+        child: SelectableText(
+          widget.outputText.isEmpty ? 'Translation will appear here...' : widget.outputText,
+          style: TextStyle(
+            color: widget.outputText.isEmpty 
+                ? textColor.withOpacity(0.35)
+                : textColor.withOpacity(0.9),
+            fontSize: 18 * widget.scale,
+            fontWeight: widget.outputText.isEmpty ? FontWeight.w500 : FontWeight.w400,
           ),
         ),
       ),
     );
 
+    final translateButton = GestureDetector(
+      onTap: widget.isLoading ? null : widget.onTranslate,
+      child: Container(
+        width: 64 * widget.scale,
+        height: 64 * widget.scale,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const LinearGradient(
+            colors: [Color(0xFF8B2CFF), Color(0xFFD22DFF)],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFB23FFF).withOpacity(0.45),
+              blurRadius: 22 * widget.scale,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: widget.isLoading
+            ? Center(
+                child: SizedBox(
+                  width: 24 * widget.scale,
+                  height: 24 * widget.scale,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2.5 * widget.scale,
+                  ),
+                ),
+              )
+            : Icon(
+                Icons.arrow_forward_rounded,
+                color: Colors.white,
+                size: 26 * widget.scale,
+              ),
+      ),
+    );
+
+    if (isMobile) {
+      return Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: panelBgLeft,
+              borderRadius: BorderRadius.circular(20 * widget.scale),
+              border: Border.all(color: border),
+            ),
+            child: sourcePane,
+          ),
+          SizedBox(height: 16 * widget.scale),
+          translateButton,
+          SizedBox(height: 16 * widget.scale),
+          Container(
+            decoration: BoxDecoration(
+              color: panelBgRight,
+              borderRadius: BorderRadius.circular(20 * widget.scale),
+              border: Border.all(color: border),
+            ),
+            child: targetPane,
+          ),
+        ],
+      );
+    }
+
     return Container(
-      width: isMobile ? double.infinity : 1500 * widget.scale,
-      height: isMobile ? 600 : 520 * widget.scale,
+      width: 1500 * widget.scale,
+      height: 520 * widget.scale,
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF171628) : const Color(0xFFF8ECFF),
         borderRadius: BorderRadius.circular(28 * widget.scale),
@@ -181,58 +237,14 @@ class _TranslationDualPanelState extends State<TranslationDualPanel> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            if (isMobile)
-              Column(
-                children: [
-                  sourcePane,
-                  divider,
-                  targetPane,
-                ],
-              )
-            else
-              Row(
-                children: [
-                  sourcePane,
-                  divider,
-                  targetPane,
-                ],
-              ),
-            GestureDetector(
-              onTap: widget.isLoading ? null : widget.onTranslate,
-              child: Container(
-                width: 64 * widget.scale,
-                height: 64 * widget.scale,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF8B2CFF), Color(0xFFD22DFF)],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFB23FFF).withOpacity(0.45),
-                      blurRadius: 22 * widget.scale,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: widget.isLoading
-                    ? Center(
-                        child: SizedBox(
-                          width: 24 * widget.scale,
-                          height: 24 * widget.scale,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.5 * widget.scale,
-                          ),
-                        ),
-                      )
-                    : Icon(
-                        Icons.arrow_forward_rounded,
-                        color: Colors.white,
-                        size: 26 * widget.scale,
-                      ),
-              ),
+            Row(
+              children: [
+                Expanded(child: sourcePane),
+                divider,
+                Expanded(child: targetPane),
+              ],
             ),
+            translateButton,
           ],
         ),
       ),
@@ -251,6 +263,7 @@ class _EditorPane extends StatelessWidget {
     required this.borderColor,
     required this.scale,
     required this.content,
+    this.isExpanded = true,
   });
 
   final String title;
@@ -262,11 +275,12 @@ class _EditorPane extends StatelessWidget {
   final Color borderColor;
   final double scale;
   final Widget content;
+  final bool isExpanded;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: backgroundColor,
+      color: isExpanded ? backgroundColor : Colors.transparent,
       padding: EdgeInsets.fromLTRB(
         32 * scale,
         24 * scale,
@@ -275,6 +289,7 @@ class _EditorPane extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: isExpanded ? MainAxisSize.max : MainAxisSize.min,
         children: [
           Row(
             children: [
@@ -315,7 +330,7 @@ class _EditorPane extends StatelessWidget {
           SizedBox(height: 18 * scale),
           Divider(color: borderColor, thickness: 1),
           SizedBox(height: 12 * scale),
-          Expanded(child: content),
+          isExpanded ? Expanded(child: content) : content,
           SizedBox(height: 12 * scale),
           Row(
             children: [
