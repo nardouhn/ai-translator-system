@@ -10,16 +10,22 @@ class ApiService {
   // - Flutter web: http://127.0.0.1:8000
   // - Physical phone: use LAN IP (e.g. http://192.168.x.x:8000)
   // Current default:
+  static const bool useLocalBackend = false; // Bật về false để chạy cloud
+
   static String get baseUrl {
-    if (kIsWeb) {
-      final host = Uri.base.host;
-      if (host.isNotEmpty && host != 'localhost') {
-        return "http://$host:8000/api/v1";
+    if (useLocalBackend) {
+      if (kIsWeb) {
+        final host = Uri.base.host;
+        if (host.isNotEmpty && host != 'localhost') {
+          return "http://$host:8000/api/v1";
+        }
+        return "http://127.0.0.1:8000/api/v1";
       }
-      return "http://127.0.0.1:8000/api/v1";
+      return "http://192.168.52.103:8000/api/v1";
     }
-    // Update to physical machine's IP (IPv4) instead of emulator IP
-    return "http://192.168.52.103:8000/api/v1";
+    
+    // Production Railway Backend
+    return "https://ai-translator-system-production.up.railway.app/api/v1";
   }
 
   static Future<void> translateTextStream({

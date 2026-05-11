@@ -16,8 +16,13 @@ if "supabase.com" in settings.database_url:
 # pool_pre_ping: Check connection is still alive before using it
 # pool_recycle: Prevent idle connections from timing out on Supabase
 # pool_size, max_overflow: Manage connection limits
+# Ensure sync URL uses postgresql:// instead of postgres://
+sync_db_url = settings.database_url
+if sync_db_url.startswith("postgres://"):
+    sync_db_url = sync_db_url.replace("postgres://", "postgresql://", 1)
+
 engine = create_engine(
-    settings.database_url, 
+    sync_db_url, 
     pool_pre_ping=True,
     pool_recycle=1800,
     pool_size=5,
