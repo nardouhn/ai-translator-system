@@ -2,6 +2,7 @@ fastapi
 uvicorn[standard]
 alembic
 psycopg[binary]
+psycopg2-binary
 pydantic-settings
 redis
 python-multipart
