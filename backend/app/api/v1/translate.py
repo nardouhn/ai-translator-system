@@ -35,8 +35,8 @@ class TranslateRequest(BaseModel):
         return cleaned_value
 
 
-def create_session(db: ORMSession) -> str:
-    return SessionService.create_session(db=db, ip_address=None, user_agent=None)
+def create_session(db: ORMSession, ip_address: str | None, user_agent: str | None) -> str:
+    return SessionService.create_session(db=db, ip_address=ip_address, user_agent=user_agent)
 
 
 @router.post("/translate")
@@ -60,7 +60,7 @@ async def translate_api(
     
     session_id = x_session_id
     if not session_id:
-        session_id = await run_in_threadpool(create_session, db)
+        session_id = await run_in_threadpool(create_session, db, ip_address, user_agent)
         response.headers["X-Session-ID"] = session_id
 
     await check_rate_limit(session_id)
@@ -74,7 +74,6 @@ async def translate_api(
             background_tasks=background_tasks,
             request_time=request_time,
             ip_address=ip_address,
-            user_agent=user_agent,
         ),
         media_type="text/event-stream",
         headers={

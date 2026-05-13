@@ -39,7 +39,6 @@ async def stream_translate_text(
     background_tasks: BackgroundTasks,
     request_time: __import__('datetime').datetime | None = None,
     ip_address: str | None = None,
-    user_agent: str | None = None,
     auto_commit: bool = True,
 ):
     # Ensure domain is a string for cache key logic
@@ -185,7 +184,6 @@ async def stream_translate_text(
             request_time=request_time,
             completed_time=completed_time,
             ip_address=ip_address,
-            user_agent=user_agent,
             text_hash=text_hash,
             domain=domain_str,
         )

@@ -59,7 +59,7 @@ async def file_translate_api(
     session_id = x_session_id
     if not session_id:
         session_id = await db.run_sync(
-            lambda session: SessionService.create_session(db=session, ip_address=None, user_agent=None)
+            lambda session: SessionService.create_session(db=session, ip_address=ip_address, user_agent=user_agent)
         )
     
     await check_rate_limit(session_id)
@@ -92,8 +92,7 @@ async def file_translate_api(
         domain=domain,
         session_id=session_id,
         request_time=request_time,
-        ip_address=ip_address,
-        user_agent=user_agent
+        ip_address=ip_address
     )
 
     return {

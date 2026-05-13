@@ -22,8 +22,7 @@ async def process_file_translation(
     domain: str, 
     session_id: str,
     request_time: __import__('datetime').datetime | None = None,
-    ip_address: str | None = None,
-    user_agent: str | None = None
+    ip_address: str | None = None
 ):
     domain_str = (domain or "general").strip().lower()
     
@@ -176,7 +175,6 @@ async def process_file_translation(
                     request_time=request_time,
                     completed_time=completed_time,
                     ip_address=ip_address,
-                    user_agent=user_agent,
                     text_hash=text_hash,
                     domain=domain_str,
                     file_type=ext if ext in ["docx", "pdf", "txt"] else None,
@@ -234,7 +232,6 @@ async def process_file_translation(
                 request_time=request_time,
                 completed_time=completed_time,
                 ip_address=ip_address,
-                user_agent=user_agent,
                 text_hash=text_hash,
                 domain=domain_str,
                 file_type=ext if ext in ["docx", "pdf", "txt"] else None,
