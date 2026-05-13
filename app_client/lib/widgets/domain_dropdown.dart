@@ -20,8 +20,8 @@ class DomainDropdown extends StatelessWidget {
     final domains = [
       'General',
       'Medical',
-      'Business',
-      'IT/Technical'
+      'Economic',
+      'Technical'
     ];
 
     // Cố gắng tìm giá trị hợp lệ, nếu không có fallback về General
