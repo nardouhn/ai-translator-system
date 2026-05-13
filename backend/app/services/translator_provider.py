@@ -36,7 +36,10 @@ async def translate_with_provider(
         client = get_shared_client()
         for attempt in range(max_retries + 1):
                 try:
-                    system_content = f"You are a raw translation API. Translate English to Vietnamese. Return ONLY the translated string. Absolutely NO explanations, NO markdown, NO quotation marks, NO conversational filler."
+                    domain_context = ""
+                    if domain and domain.lower() != "general":
+                        domain_context = f" This text is specifically related to the {domain.upper()} domain, so you MUST use appropriate {domain.upper()} terminology."
+                    system_content = f"You are a raw translation API. Translate English to Vietnamese.{domain_context} Return ONLY the translated string. Absolutely NO explanations, NO markdown, NO quotation marks, NO conversational filler."
                     
                     payload = {
                         "messages": [
