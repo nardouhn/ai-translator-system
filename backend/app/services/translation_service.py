@@ -184,7 +184,6 @@ async def stream_translate_text(
             request_time=request_time,
             completed_time=completed_time,
             ip_address=ip_address,
-            text_hash=text_hash,
             domain=domain_str,
         )
         db.add(log_record)

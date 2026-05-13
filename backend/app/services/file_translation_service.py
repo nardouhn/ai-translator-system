@@ -175,7 +175,6 @@ async def process_file_translation(
                     request_time=request_time,
                     completed_time=completed_time,
                     ip_address=ip_address,
-                    text_hash=text_hash,
                     domain=domain_str,
                     file_type=ext if ext in ["docx", "pdf", "txt"] else None,
                     file_id=file_id,
@@ -206,11 +205,13 @@ async def process_file_translation(
 
             # Save segments asynchronously
             for index, seg in enumerate(segments_list):
+                seg_hash = hashlib.sha256(seg['source_text'].encode("utf-8")).hexdigest() if seg['source_text'] else None
                 segment_data = {
                     "file_id": file_id,
                     "segment_order": index,
                     "source_text": seg['source_text'],
-                    "translated_text": seg['translated_text']
+                    "translated_text": seg['translated_text'],
+                    "text_hash": seg_hash
                 }
                 db.add(FileSegment(**segment_data))
                 
@@ -232,7 +233,6 @@ async def process_file_translation(
                 request_time=request_time,
                 completed_time=completed_time,
                 ip_address=ip_address,
-                text_hash=text_hash,
                 domain=domain_str,
                 file_type=ext if ext in ["docx", "pdf", "txt"] else None,
                 file_id=file_id,
