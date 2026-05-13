@@ -155,6 +155,13 @@ async def process_file_translation(
                     else:
                         docx_bytes = file_content
                     full_text, b64_data = await translate_docx_document(docx_bytes, _do_translate_batch)
+                    
+                    if ext == "pdf":
+                        # Convert DOCX back to PDF
+                        from app.services.document_translator import convert_docx_to_pdf
+                        translated_docx_bytes = base64.b64decode(b64_data)
+                        translated_pdf_bytes = convert_docx_to_pdf(translated_docx_bytes)
+                        b64_data = base64.b64encode(translated_pdf_bytes).decode("utf-8")
                 else:
                     full_text, b64_data = "", ""
             except Exception as model_error:
