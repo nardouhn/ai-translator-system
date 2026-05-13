@@ -84,7 +84,6 @@ class File(Base):
 
     file_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     original_filename: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    translated_filename: Mapped[str | None] = mapped_column(String(255), nullable=True)
     file_path: Mapped[str | None] = mapped_column(Text, nullable=True)
     file_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
     domain_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("domain.domain_id"), nullable=True)
