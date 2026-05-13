@@ -5,7 +5,7 @@ from fastapi import BackgroundTasks
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session as DBSession
 
-from app.db.models import Domain, DomainNameEnum, Language, Translation
+from app.db.models import Domain, DomainNameEnum, Translation
 from app.services.cache_service import get_cached_translation, set_cached_translation, mget_cached_translations, mset_cached_translations
 from app.services.translator_provider import translate_with_provider, translate_chunk_async
 from app.services.text_splitter import split_text_into_chunks
