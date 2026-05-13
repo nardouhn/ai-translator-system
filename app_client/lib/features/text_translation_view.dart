@@ -196,7 +196,7 @@ class _TextTranslationViewState extends State<TextTranslationView> {
         _outputText = '';
       });
       
-      final cachedResult = await LocalCacheService.getTranslation(inputText, _selectedTargetLang);
+      final cachedResult = await LocalCacheService.getTranslation(inputText, _selectedTargetLang, _selectedDomain);
       if (cachedResult != null && cachedResult.isNotEmpty) {
         debugPrint("⚡ Đã tìm thấy trong Cache, không gọi API!");
         setState(() {
@@ -220,7 +220,7 @@ class _TextTranslationViewState extends State<TextTranslationView> {
       );
       
       if (_outputText.isNotEmpty) {
-        await LocalCacheService.saveTranslation(inputText, _selectedTargetLang, _outputText);
+        await LocalCacheService.saveTranslation(inputText, _selectedTargetLang, _selectedDomain, _outputText);
       }
     } catch (e) {
       if (!mounted) return;
