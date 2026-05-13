@@ -174,8 +174,6 @@ async def process_file_translation(
                     request_type=RequestTypeEnum.file,
                     request_time=request_time,
                     completed_time=completed_time,
-                    ip_address=ip_address,
-                    domain=domain_str,
                     file_type=ext if ext in ["docx", "pdf", "txt"] else None,
                     file_id=file_id,
                 )
@@ -232,8 +230,6 @@ async def process_file_translation(
                 request_type=RequestTypeEnum.file,
                 request_time=request_time,
                 completed_time=completed_time,
-                ip_address=ip_address,
-                domain=domain_str,
                 file_type=ext if ext in ["docx", "pdf", "txt"] else None,
                 file_id=file_id,
             )

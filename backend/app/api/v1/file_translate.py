@@ -73,11 +73,15 @@ async def file_translate_api(
     if not r2_key:
         raise HTTPException(status_code=500, detail="Failed to upload file to storage")
 
+    from app.services.translation_service import map_domain_to_id
+    domain_id_val = map_domain_to_id(domain)
+
     file_row = File(
         original_filename=filename,
         session_id=session_id,
         file_size=file_size,
-        status=StatusEnum.pending
+        status=StatusEnum.pending,
+        domain_id=domain_id_val
     )
     db.add(file_row)
     await db.commit()

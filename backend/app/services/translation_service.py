@@ -13,20 +13,16 @@ from app.services.text_splitter import split_text_into_chunks
 logger = logging.getLogger(__name__)
 
 
-def _get_or_create_domain(db: DBSession, domain: str | None) -> Domain:
-    domain_value = (domain or DomainNameEnum.general.value).strip().lower()
-    allowed_values = {item.value for item in DomainNameEnum}
-    if domain_value not in allowed_values:
-        domain_value = DomainNameEnum.general.value
-
-    domain_row = db.query(Domain).filter(Domain.domain_name == domain_value).first()
-    if domain_row:
-        return domain_row
-
-    domain_row = Domain(domain_name=DomainNameEnum(domain_value))
-    db.add(domain_row)
-    db.flush()
-    return domain_row
+def map_domain_to_id(domain: str | None) -> int:
+    mapping = {
+        "general": 1,
+        "medical": 2,
+        "technical": 3,
+        "economic": 4
+    }
+    if not domain:
+        return 1
+    return mapping.get(domain.strip().lower(), 1)
 
 
 import json
@@ -48,12 +44,12 @@ async def stream_translate_text(
 
     # 1. Check DB first (Synchronous operations wrapped in threadpool)
     def check_db():
-        domain_row = _get_or_create_domain(db, domain)
+        domain_id_val = map_domain_to_id(domain)
 
         # Check DB cache
         existing_translation = db.query(Translation).filter(
             Translation.text_hash == text_hash,
-            Translation.domain_id == domain_row.domain_id
+            Translation.domain_id == domain_id_val
         ).first()
 
         if existing_translation and existing_translation.translated_text != source_text:
@@ -62,11 +58,11 @@ async def stream_translate_text(
                 "translated_text": existing_translation.translated_text,
                 "translation_id": getattr(existing_translation, "id", getattr(existing_translation, "trans_id", None)),
                 "from_cache": True,
-            }, domain_row
+            }, domain_id_val
             
-        return {"hit": False, "existing_translation": existing_translation}, domain_row
+        return {"hit": False, "existing_translation": existing_translation}, domain_id_val
 
-    db_check_result, domain_row = await run_in_threadpool(check_db)
+    db_check_result, domain_id_val = await run_in_threadpool(check_db)
     
     if db_check_result["hit"]:
         yield f"data: {json.dumps({'chunk': db_check_result['translated_text']})}\n\n"
@@ -146,7 +142,7 @@ async def stream_translate_text(
                     "session_id": session_id,
                     "source_text": source_text,
                     "translated_text": translated_text,
-                    "domain_id": domain_row.domain_id,
+                    "domain_id": domain_id_val,
                     "text_hash": text_hash,
                 }
                 if hasattr(Translation, "provider"):
@@ -183,8 +179,6 @@ async def stream_translate_text(
             status=log_status,
             request_time=request_time,
             completed_time=completed_time,
-            ip_address=ip_address,
-            domain=domain_str,
         )
         db.add(log_record)
         db.commit()

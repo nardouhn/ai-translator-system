@@ -134,8 +134,6 @@ class Logs(Base):
     )
     request_time: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     completed_time: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    ip_address: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    domain: Mapped[str | None] = mapped_column(String(50), nullable=True)
     file_type: Mapped[str | None] = mapped_column(String(10), nullable=True)
 
     session: Mapped["Session | None"] = relationship(back_populates="logs")
