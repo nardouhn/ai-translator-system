@@ -174,7 +174,6 @@ async def process_file_translation(
                     request_type=RequestTypeEnum.file,
                     request_time=request_time,
                     completed_time=completed_time,
-                    file_type=ext if ext in ["docx", "pdf", "txt"] else None,
                     file_id=file_id,
                 )
                 db.add(log_record)
@@ -230,7 +229,6 @@ async def process_file_translation(
                 request_type=RequestTypeEnum.file,
                 request_time=request_time,
                 completed_time=completed_time,
-                file_type=ext if ext in ["docx", "pdf", "txt"] else None,
                 file_id=file_id,
             )
             db.add(log_record)
