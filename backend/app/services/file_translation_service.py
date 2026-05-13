@@ -201,8 +201,15 @@ async def process_file_translation(
                 file_row.file_path = translated_file_key
 
             # Save segments asynchronously
+            from app.services.translation_service import map_domain_to_id
+            domain_id_val = map_domain_to_id(domain_str)
+            
             for index, seg in enumerate(segments_list):
-                seg_hash = hashlib.sha256(seg['source_text'].encode("utf-8")).hexdigest() if seg['source_text'] else None
+                if seg['source_text']:
+                    hash_string = f"{domain_id_val}_{seg['source_text']}"
+                    seg_hash = hashlib.sha256(hash_string.encode("utf-8")).hexdigest()
+                else:
+                    seg_hash = None
                 segment_data = {
                     "file_id": file_id,
                     "segment_order": index,

@@ -37,14 +37,14 @@ async def stream_translate_text(
     ip_address: str | None = None,
     auto_commit: bool = True,
 ):
-    # Ensure domain is a string for cache key logic
-    domain_str = (domain or DomainNameEnum.general.value).strip().lower()
+    domain_str = (domain or "general").strip().lower()
+    domain_id_val = map_domain_to_id(domain_str)
 
-    text_hash = hashlib.sha256(source_text.encode("utf-8")).hexdigest()
+    hash_string = f"{domain_id_val}_{source_text}"
+    text_hash = hashlib.sha256(hash_string.encode("utf-8")).hexdigest()
 
     # 1. Check DB first (Synchronous operations wrapped in threadpool)
     def check_db():
-        domain_id_val = map_domain_to_id(domain)
 
         # Check DB cache
         existing_translation = db.query(Translation).filter(
