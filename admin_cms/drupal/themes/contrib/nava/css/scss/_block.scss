@@ -1,0 +1,70 @@
+/* block title */
+.block-title {
+  position: relative;
+}
+.block-title {
+  margin-bottom: 1rem;
+  padding-bottom: 8px;
+}
+.block-title::before,
+.block-title::after  {
+  position: absolute;
+  content: '';
+  bottom: 0;
+  height: 2px;
+}
+.block-title::before {
+  background-color: var(--color-primary);
+  width: 16px;
+  left: 0;
+}
+.block-title::after {
+  background-color: var(--color-secondary);
+  left: 18px;
+  width: 3rem;
+}
+/* highlighted */
+.region-highlighted {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+/* Content home */
+.region-content-home {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+/* sidebar and footer */
+.sidebar .block-title,
+.footer .block-title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 14px;
+  padding-bottom: 6px;
+}
+.sidebar .block-title::before,
+.footer .block-title::before,
+.sidebar .block-title::after,
+.footer .block-title::after  {
+  position: absolute;
+  content: '';
+  bottom: 0;
+  height: 2px;
+}
+.sidebar .block-title::before,
+.footer .block-title::before {
+  background-color: var(--color-primary);
+  width: 16px;
+  left: 0;
+}
+.footer .block-title::after {
+  background-color: var(--color-text2);
+  left: 18px;
+  width: 3rem;
+}
+.sidebar .block-title::after {
+  background-color: var(--color-secondary);
+  left: 18px;
+  width: 3rem;
+}

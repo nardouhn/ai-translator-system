@@ -1,0 +1,5 @@
+name: Translator Admin
+type: module
+description: Custom admin dashboard for AI Translator
+core_version_requirement: ^10 || ^11
+package: Custom

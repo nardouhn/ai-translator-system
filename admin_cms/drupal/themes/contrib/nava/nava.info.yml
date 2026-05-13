@@ -1,0 +1,35 @@
+name: nava
+type: theme
+base theme: stable9
+description: '<p>nava is a light weight modern Drupal 9, 10, 11 theme by <a href="https://dev5.dev/" target="_blank">Dev5.dev</a></p><p><a href="https://nava.dev5.dev/" target="_blank">Theme Demo</a> | <a href="https://dev5.dev/theme/drupal/nava" target="_blank">Theme Homepage</a> | <a href="https://dev5.dev/doc/nava" target="_blank">User Guide</a></p>'
+package: Dev5
+core_version_requirement: ^9 || ^10 || ^11
+# version: 1.0.4
+# Libraries
+libraries:
+  - nava/global-styling
+regions:
+  header_top: 'Header Top'
+  site_branding: 'Site Branding'
+  primary_menu: 'Primary menu'
+  header_search: 'Header Search'
+  page_header: 'Page Header'
+  hero: 'Hero Header'
+  highlighted: Highlighted
+  page_top: 'Page top'
+  page_bottom: 'Page bottom'
+  content: Content
+  content_top: 'Content Top'
+  content_bottom: 'Content Bottom'
+  content_home: 'Homepage Content'
+  sidebar_left: 'Sidebar Left'
+  sidebar_right: 'Sidebar Right'
+  footer_top: 'Footer Top'
+  footer: 'Footer'
+  footer_bottom: 'Footer Bottom'
+  hidden_blocks: 'Hidden Blocks'
+
+# Information added by Drupal.org packaging script on 2025-03-13
+version: '1.0.4'
+project: 'nava'
+datestamp: 1741834215

@@ -1,0 +1,12 @@
+<header class="header full-width">
+  {% if page.header_top %}
+    {% include '@nava/parts/header/header-top.html.twig' %}
+  {% endif %}
+  {% include '@nava/parts/header/header-main.html.twig' %}
+  {% if not is_front and page.page_header %}
+    {% include '@nava/parts/header/header-page.html.twig' %}
+  {% endif %}
+  {% if page.hero %}
+    {% include '@nava/parts/header/hero.html.twig' %}
+  {% endif %}
+</header>

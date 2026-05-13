@@ -1,0 +1,20 @@
+{{ attach_library('nava/slider') }}
+<section class="section-hero full-width">
+  <div class="container">
+    {{ page.hero }}
+  </div>
+</section>
+<script>
+document.addEventListener( 'DOMContentLoaded', function() {
+  var splide = new Splide( '.splide', {
+    type: 'loop',
+    perPage: 1,
+    autoplay: true,
+    rewind: true,
+    pauseOnHover: false,
+    interval: 5000,
+    arrowPath: 'M0.5 1L20 20.5L0.5 41.5',
+  } );
+  splide.mount();
+});
+</script>

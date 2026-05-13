@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, Header, Response, BackgroundTasks
+from fastapi import APIRouter, Depends, Header, Response, BackgroundTasks, Request
 from fastapi.responses import StreamingResponse
+from datetime import datetime, timezone
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy.orm import Session as ORMSession
 
@@ -14,9 +15,16 @@ router = APIRouter()
 
 class TranslateRequest(BaseModel):
     text: str = Field(max_length=5000)
-    source_lang: str
-    target_lang: str
-    domain: str = "General"
+    domain: str = "general"
+
+    @field_validator("domain")
+    @classmethod
+    def validate_domain(cls, value: str) -> str:
+        cleaned_value = value.strip().lower()
+        allowed = ["general", "medical", "technical", "economic"]
+        if cleaned_value not in allowed:
+            return "general"
+        return cleaned_value
 
     @field_validator("text")
     @classmethod
@@ -36,10 +44,19 @@ async def translate_api(
     payload: TranslateRequest,
     response: Response,
     background_tasks: BackgroundTasks,
+    request: Request,
     x_session_id: str | None = Header(default=None, alias="X-Session-ID"),
     db: ORMSession = Depends(get_db),
 ):
     from fastapi.concurrency import run_in_threadpool
+    
+    request_time = datetime.now(timezone.utc)
+    
+    ip_address = request.headers.get("cf-connecting-ip")
+    if not ip_address and request.client:
+        ip_address = request.client.host
+        
+    user_agent = request.headers.get("user-agent")
     
     session_id = x_session_id
     if not session_id:
@@ -53,10 +70,11 @@ async def translate_api(
             db=db,
             session_id=session_id,
             source_text=payload.text,
-            source_lang=payload.source_lang,
-            target_lang=payload.target_lang,
             domain=payload.domain,
             background_tasks=background_tasks,
+            request_time=request_time,
+            ip_address=ip_address,
+            user_agent=user_agent,
         ),
         media_type="text/event-stream",
         headers={

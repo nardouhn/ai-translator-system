@@ -25,8 +25,6 @@ def get_shared_client() -> httpx.AsyncClient:
 
 async def translate_with_provider(
     source_text: str,
-    source_lang: str,
-    target_lang: str,
     domain: str = "General",
 ) -> tuple[str, str]:
     """
@@ -38,7 +36,7 @@ async def translate_with_provider(
         client = get_shared_client()
         for attempt in range(max_retries + 1):
                 try:
-                    system_content = f"You are a raw translation API. Translate {source_lang} to {target_lang}. Return ONLY the translated string. Absolutely NO explanations, NO markdown, NO quotation marks, NO conversational filler."
+                    system_content = f"You are a raw translation API. Translate English to Vietnamese. Return ONLY the translated string. Absolutely NO explanations, NO markdown, NO quotation marks, NO conversational filler."
                     
                     payload = {
                         "messages": [
@@ -129,8 +127,6 @@ import re
 
 async def translate_chunk_async(
     source_text: str,
-    source_lang: str,
-    target_lang: str,
     domain: str = "General",
 ) -> str:
     """
@@ -140,8 +136,6 @@ async def translate_chunk_async(
     if len(source_text) <= 500:
         translated, _ = await translate_with_provider(
             source_text,
-            source_lang,
-            target_lang,
             domain
         )
         return translated
@@ -171,7 +165,7 @@ async def translate_chunk_async(
             translated_chunks.append(chunk)
             continue
             
-        tr, _ = await translate_with_provider(chunk, source_lang, target_lang, domain)
+        tr, _ = await translate_with_provider(chunk, domain)
         translated_chunks.append(tr)
         if idx < len(chunks) - 1:
             await asyncio.sleep(1)
@@ -180,8 +174,6 @@ async def translate_chunk_async(
 
 async def translate_batch_with_provider(
     texts: list[str],
-    source_lang: str,
-    target_lang: str,
     domain: str = "General",
 ) -> tuple[list[str], str]:
     if not texts:
@@ -193,7 +185,7 @@ async def translate_batch_with_provider(
             results.append(t)
             continue
             
-        translated_text = await translate_chunk_async(t, source_lang, target_lang, domain)
+        translated_text = await translate_chunk_async(t, domain)
         results.append(translated_text)
         
         # Sleep to let Kaggle server breathe

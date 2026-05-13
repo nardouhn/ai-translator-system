@@ -1,0 +1,5 @@
+translator_admin.dashboard:
+  title: "Dashboard"
+  route_name: translator_admin.dashboard
+  menu_name: admin
+  weight: -50

@@ -1,0 +1,21 @@
+Google Fonts:
+https://fonts.google.com/specimen/Sora
+by Jonathan Barnbrook, Julián Moncada
++-------------------+
+https://github.com/sora-xor/sora-font
+
+
+Splide
++-------------------+
+https://github.com/Splidejs/splide
+https://splidejs.com/
+
+
+Bootstrap Font Icons
++-------------------+
+https://icons.getbootstrap.com/
+
+
+Custom font icon library generated using
++-------------------+
+https://iconly.io/

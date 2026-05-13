@@ -1,0 +1,46 @@
+<div class="header-main full-width">
+  <div class="container">
+    <div class="header-main-container full-width">
+      {% if page.site_branding %}
+        <div class="site-branding-region">
+          {{ page.site_branding }}
+        </div>
+      {% endif %}
+      {% if page.primary_menu or page.header_search %}
+      <div class="header-right">
+        {% if page.primary_menu %}
+          <button class="mobile-menu-icon" onclick="showMobileMenu()" aria-label="Open main menu" title="Open main menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button><!-- /mobile-menu -->
+              <div class="primary-menu-wrapper">
+                <div class="menu-wrap">
+                  <button class="close-mobile-menu" onclick="closeMobileMenu()" aria-label="Close main menu" title="close main menu"><i class="ficon-close"></i></button>
+                  {{ page.primary_menu }}
+                </div>
+              </div><!-- /primary-menu-wrapper -->
+        {% endif %}
+        {% if page.header_search %}
+          <div class="header-search">
+            <button class="header-icon header-icon-search" aria-label="Open search form" title="search" onclick="openSearch()">
+              <i class="ficon-search"></i>
+            </button>
+            <div class="header-search-wrap">
+              <div class="header-search-block header-search-section">
+                <button class="close-header-search" aria-label="Close search" title="Close search" onclick="closeSearch()">
+                  <i class="ficon-close"></i>
+                </button>
+                <div class="container">
+                  {{ page.header_search }}
+                </div>
+              </div>
+              <div class="header-search-shadow header-search-section" onclick="closeSearch()"></div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

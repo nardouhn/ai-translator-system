@@ -1,0 +1,19 @@
+<footer class="footer full-width">
+  {% if page.footer_top %}
+    {% include '@nava/parts/footer/footer-top.html.twig' %}
+  {% endif %}
+  <div class="full-width footer-section">
+    {% if page.footer %}
+      {% include '@nava/parts/footer/footer-main.html.twig' %}
+    {% endif %}
+    {% if page.footer_bottom %}
+      {% include '@nava/parts/footer/footer-bottom.html.twig' %}
+    {% endif %}
+    {% if copyright_text or social_icons %}
+      {% include '@nava/parts/footer/footer-last.html.twig' %}
+    {% endif %}
+  </div>
+</footer>
+{% if scrolltotop %}
+<div id="scrollbutton" class="scrolltop" onclick="scrollToTop()"><i class="ficon-arrow-up size-large"></i></div>
+{% endif %}

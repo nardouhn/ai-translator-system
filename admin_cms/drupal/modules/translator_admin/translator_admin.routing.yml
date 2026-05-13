@@ -1,0 +1,7 @@
+translator_admin.dashboard:
+  path: "/dashboard"
+  defaults:
+    _controller: '\Drupal\translator_admin\Controller\DashboardController::dashboard'
+    _title: "AI Translator Dashboard"
+  requirements:
+    _role: "administrator"

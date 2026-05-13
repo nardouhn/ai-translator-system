@@ -1,0 +1,30 @@
+{% if bootstrapicons %}
+  {{ attach_library('nava/bootstrap-icons') }}
+{% endif %}
+<style>
+.container {
+  max-width: {{ container_width }}px;
+}
+{% if header_width == 'header_width_full' %}
+.header .container {
+  max-width: 100%;
+}
+{% endif %}
+{% if main_width == 'main_width_full' %}
+.highlighted .container,
+.main-wrapper .container {
+  max-width: 100%;
+}
+{% endif %}
+
+{% if footer_width == 'footer_width_full' %}
+.footer .container {
+  max-width: 100%;
+}
+{% endif %}
+{% if highlight_author_comment %}
+.by-node-author {
+  box-shadow: var(--shadow-secondary);
+}
+{% endif %}
+</style>

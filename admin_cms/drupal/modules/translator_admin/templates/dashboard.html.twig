@@ -1,0 +1,268 @@
+{#
+/**
+ * @file translation-dashboard.html.twig
+ * Simplified dashboard – Total Requests, Successful, Failed,
+ * Domain Pie (pure canvas), Failed Analysis, Log Viewer
+ * (No model filter, and no model column in log table)
+ */
+#}
+
+{{ attach_library('translator_admin/translation_dashboard') }}
+
+{# Thêm style cho tooltip của pie chart #}
+<style>
+  .tdb-pie-tooltip {
+    position: fixed;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e8f0);
+    color: var(--text-primary, #0f172a);
+    font-family: var(--font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-sm, 6px);
+    pointer-events: none;
+    z-index: 1000;
+    white-space: nowrap;
+    box-shadow: var(--shadow, 0 1px 2px 0 rgba(0,0,0,0.05));
+  }
+</style>
+
+<div class="tdb-wrap" id="translation-dashboard">
+
+  {# ── TOP BAR ──────────────────────────────────────────────── #}
+  <header class="tdb-header">
+    <div class="tdb-header__brand">
+      <span class="tdb-header__icon">⟳</span>
+      <h1 class="tdb-header__title">Translation <em>Dashboard</em></h1>
+    </div>
+
+    <form class="tdb-filters" method="get" action="" autocomplete="off">
+      <div class="tdb-filters__group">
+        <label class="tdb-label">From</label>
+        <input class="tdb-input" type="date" name="date_from" value="{{ filters.date_from|default('') }}">
+      </div>
+      <div class="tdb-filters__group">
+        <label class="tdb-label">To</label>
+        <input class="tdb-input" type="date" name="date_to" value="{{ filters.date_to|default('') }}">
+      </div>
+      <div class="tdb-filters__group">
+        <label class="tdb-label">Domain</label>
+        <select class="tdb-input tdb-select" name="domain">
+          <option value="">All Domains</option>
+          {% for d in available_domains %}
+            <option value="{{ d.domain_id }}" {{ filters.selected_domain|default('') == d.domain_id ? 'selected' }}>
+              {{ d.domain_name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <button class="tdb-btn tdb-btn--primary" type="submit">Apply</button>
+      <a class="tdb-btn tdb-btn--ghost" href="?">Reset</a>
+    </form>
+  </header>
+
+  {# ── KPI CARDS (3 cards) ─────────────────────────────────── #}
+  <section class="tdb-kpi-row">
+    <div class="tdb-card tdb-kpi tdb-kpi--total">
+      <div class="tdb-kpi__label">Total Requests</div>
+      <div class="tdb-kpi__value">{{ stats.total_requests|number_format }}</div>
+      <div class="tdb-kpi__sub">{{ stats.success_count }} successful · {{ stats.failed_count }} failed</div>
+      <div class="tdb-kpi__glow"></div>
+    </div>
+
+    <div class="tdb-card tdb-kpi tdb-kpi--success">
+      <div class="tdb-kpi__label">Successful</div>
+      <div class="tdb-kpi__value">{{ stats.success_count|number_format }}</div>
+      <div class="tdb-kpi__sub tdb-success">{{ stats.success_rate }}% success rate</div>
+      <div class="tdb-kpi__glow"></div>
+    </div>
+
+    <div class="tdb-card tdb-kpi tdb-kpi--failed">
+      <div class="tdb-kpi__label">Failed</div>
+      <div class="tdb-kpi__value">{{ stats.failed_count|number_format }}</div>
+      <div class="tdb-kpi__sub tdb-error">{{ stats.pending_count }} pending</div>
+      <div class="tdb-kpi__glow"></div>
+    </div>
+  </section>
+
+  {# ── ROW 2: Domain Pie + Failed Analysis ─────────────────── #}
+  <section class="tdb-row tdb-row--2col">
+    {# Domain Pie #}
+    <div class="tdb-card tdb-chart-card">
+      <div class="tdb-card__head">
+        <h2 class="tdb-card__title">Request Distribution by Domain</h2>
+        <span class="tdb-badge">Pie</span>
+      </div>
+      <div class="tdb-chart-wrap tdb-chart-wrap--pie">
+        <canvas id="chartDomain" aria-label="Domain distribution chart"></canvas>
+      </div>
+      <div class="tdb-legend">
+        {% for d in domain_distribution %}
+          <div class="tdb-legend__item">
+            <span class="tdb-legend__dot" data-idx="{{ loop.index0 }}"></span>
+            <span class="tdb-legend__name">{{ d.domain_name }}</span>
+            <span class="tdb-legend__val">{{ d.request_count }}</span>
+            <span class="tdb-legend__pct">{{ d.percentage }}%</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# Failed Request Analysis #}
+    <div class="tdb-card">
+      <div class="tdb-card__head">
+        <h2 class="tdb-card__title">Failed Request Analysis</h2>
+        <span class="tdb-badge tdb-badge--red">{{ failed_stats.total }} Fails</span>
+      </div>
+
+      <div class="tdb-fail-summary">
+        <div class="tdb-fail-summary__rate">
+          <span class="tdb-fail-summary__num">{{ failed_stats.rate }}%</span>
+          <span class="tdb-fail-summary__lbl">failure rate</span>
+        </div>
+      </div>
+
+      <div class="tdb-fail-cols">
+        <div>
+          <h3 class="tdb-sub-title">By Request Type</h3>
+          {% for t in failed_stats.by_type %}
+            <div class="tdb-bar-item">
+              <div class="tdb-bar-item__label">
+                <span>{{ t.request_type|upper }}</span>
+                <span class="tdb-mono">{{ t.count }}</span>
+              </div>
+              <div class="tdb-bar-track">
+                <div class="tdb-bar-fill tdb-bar-fill--red" style="width: {{ t.percentage }}%"></div>
+              </div>
+              <span class="tdb-bar-item__pct">{{ t.percentage }}%</span>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div>
+          <h3 class="tdb-sub-title">By Domain</h3>
+          {% for d in failed_stats.by_domain %}
+            <div class="tdb-bar-item">
+              <div class="tdb-bar-item__label">
+                <span>{{ d.domain_name }}</span>
+                <span class="tdb-mono">{{ d.count }}</span>
+              </div>
+              <div class="tdb-bar-track">
+                <div class="tdb-bar-fill tdb-bar-fill--orange" style="width: {{ d.percentage }}%"></div>
+              </div>
+              <span class="tdb-bar-item__pct">{{ d.percentage }}%</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ── ROW 3: Log Viewer (no Model column) ─────────────────── #}
+  <section class="tdb-card tdb-log-section">
+    <div class="tdb-card__head">
+      <h2 class="tdb-card__title">Log Viewer</h2>
+      <div class="tdb-log-controls">
+        <input class="tdb-input tdb-input--sm" type="search" id="logSearch" placeholder="Search logs…">
+        <select class="tdb-input tdb-input--sm tdb-select" id="logStatusFilter">
+          <option value="">All Status</option>
+          <option value="success">Success</option>
+          <option value="error">Failed</option>
+          <option value="pending">Pending</option>
+        </select>
+        <select class="tdb-input tdb-input--sm tdb-select" id="logTypeFilter">
+          <option value="">All Types</option>
+          <option value="text">Text</option>
+          <option value="file">File</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="tdb-table-wrap">
+      <table class="tdb-table tdb-table--log" id="logTable">
+        <thead>
+          <tr>
+            <th>#ID</th>
+            <th>Session</th>
+            <th>Type</th>
+            <th>Domain</th>
+            <th>Status</th>
+            <th>Ref ID</th>
+            <th>Request Time</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in recent_logs %}
+            {% set status_label = log.status == 'error' ? 'Failed' : log.status|capitalize %}
+            <tr class="tdb-log-row {% if log.status == 'error' %}tdb-log-row--failed{% elseif log.status == 'pending' %}tdb-log-row--pending{% endif %}"
+                data-status="{{ log.status }}"
+                data-type="{{ log.request_type }}">
+              <td class="tdb-mono tdb-dim">{{ log.log_id }}</td>
+              <td class="tdb-mono tdb-truncate" title="{{ log.session_id }}">{{ log.session_id|slice(0, 12) }}…</td>
+              <td><span class="tdb-type-badge tdb-type-badge--{{ log.request_type }}">{{ log.request_type|upper }}</span></td>
+              <td>{{ log.domain_name|default('—') }}</td>
+              <td>
+                <span class="tdb-status tdb-status--{{ log.status == 'error' ? 'failed' : log.status }}">
+                  <span class="tdb-status__dot"></span>
+                  {{ status_label }}
+                </span>
+              </td>
+              <td class="tdb-mono tdb-dim tdb-sm">
+                {% if log.translation_id %}T#{{ log.translation_id }}
+                {% elseif log.file_id %}F#{{ log.file_id }}
+                {% else %}—{% endif %}
+              </td>
+              <td class="tdb-mono tdb-sm tdb-dim">{{ log.request_time }}</td>
+              <td>
+                {% if log.status == 'error' and log.error_message %}
+                  <button class="tdb-btn tdb-btn--xs tdb-btn--danger"
+                          onclick="tdbShowError('{{ log.error_message|escape('js') }}')" title="View error">⚠ Error</button>
+                {% else %}
+                  <span class="tdb-dim">—</span>
+                {% endif %}
+               </td>
+             </tr>
+          {% else %}
+             <tr><td colspan="8" class="tdb-empty">No log entries found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if log_total_pages > 1 %}
+      <div class="tdb-pagination">
+        {% if log_current_page > 1 %}
+          <a class="tdb-btn tdb-btn--ghost tdb-btn--sm" href="?page={{ log_current_page - 1 }}">← Prev</a>
+        {% endif %}
+        {% for p in 1..log_total_pages %}
+          <a class="tdb-btn tdb-btn--sm {% if p == log_current_page %}tdb-btn--primary{% else %}tdb-btn--ghost{% endif %}"
+             href="?page={{ p }}">{{ p }}</a>
+        {% endfor %}
+        {% if log_current_page < log_total_pages %}
+          <a class="tdb-btn tdb-btn--ghost tdb-btn--sm" href="?page={{ log_current_page + 1 }}">Next →</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </section>
+
+</div>{# /.tdb-wrap #}
+
+{# ── ERROR MODAL ──────────────────────────────────────────────── #}
+<div class="tdb-modal-overlay" id="tdbModal" style="display:none">
+  <div class="tdb-modal">
+    <div class="tdb-modal__head">
+      <span class="tdb-modal__title">⚠ Error Detail</span>
+      <button class="tdb-modal__close" onclick="tdbCloseModal()">✕</button>
+    </div>
+    <pre class="tdb-modal__body" id="tdbModalBody"></pre>
+  </div>
+</div>
+
+{# ── CHART DATA cho pie chart ────────────────────────────────── #}
+<script>
+  window.tdbChartData = {
+    domain_labels: {{ domain_distribution|map(d => d.domain_name)|json_encode|raw }},
+    domain_counts: {{ domain_distribution|map(d => d.request_count)|json_encode|raw }}
+  };
+</script>

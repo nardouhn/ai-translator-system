@@ -1,0 +1,16 @@
+<div class="footer-last full-width">
+  <div class="container">
+    <div class="footer-last-container full-width">
+      {% if copyright_text %}
+        <div class="copyright">
+          &copy; {{ "now"|date("Y") }} {{ site_name }}, All rights reserved.
+        </div>
+      {% endif %}
+      {% if social_icons %}
+          <div class="footer-social">
+            {% include '@nava/parts/social.html.twig' %}
+          </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

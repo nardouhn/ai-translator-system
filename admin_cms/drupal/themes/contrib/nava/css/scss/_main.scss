@@ -1,0 +1,195 @@
+/* Node viw mode */
+.node-view-mode-teaser {
+  margin-bottom: 6rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-light);
+}
+/* node title */
+.node-title a {
+  position: relative;
+}
+.node-title a::after {
+  position: absolute;
+  content: "";
+  bottom: 0;
+  right: 0;
+  left: auto;
+  height: 2px;
+  width: 0;
+  background-color: var(--color-primary);
+  transition: width 0.4s ease;
+}
+.node-title a:hover::after {
+  width: 100%;
+  left: 0;
+  right: auto;
+}
+/* Node meta */
+.node-meta {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.node-date-author {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;  
+}
+.node-date-author i {
+  color: var(--color-primary);
+}
+/* Node content */
+.node-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.node-content p:last-of-type {
+  margin: 0;
+}
+/* Node content -> body field */
+.node-content .image-field {
+  border-radius: 8px;
+}
+.field--name-body li {
+  padding: 6px 0;
+}
+/* Node content -> node links */
+.node-links-container .links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.node-links-container .links a,
+.node-links-container .links li {
+  color: var(--color-secondary);
+}
+.node-links-container .links a:hover {
+  color: var(--color-primary);
+}
+.node-links-container .links li {
+  position: relative;
+  font-weight: var(--font-weight-bold);
+  transition: 0.4s ease;
+}
+.node-links-container .links li::after {
+  position: absolute;
+  content: "";
+  bottom: 0;
+  right: 0;
+  left: auto;
+  height: 2px;
+  width: 0;
+  background-color: var(--color-primary);
+  transition: width 0.4s ease;
+}
+.node-links-container .links li:hover::after {
+  width: 100%;
+  left: 0;
+  right: auto;
+}
+.node-links-container .links li::before {
+  position: absolute;
+  content: "";
+  bottom: 0;
+  right: 0;
+  left: auto;
+  height: 2px;
+  width: 100%;
+  background-color: var(--color-light);
+  transition: width 0.4s ease;
+}
+.node-links-container .links li:hover::before {
+  width: 0;
+}
+/* comment */
+.comments {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  border-top: 6px double var(--color-text2);
+}
+.comments-title::before {
+  content: "\e01c";
+  font-family: "thex";
+  color: var(--color-primary);
+  padding-right: 5px;
+}
+/* Single comment */
+.comment-single {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: var(--color-secondary-light);
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+}
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.comment-user-picture {
+  background-color: var(--color-border);
+  width: 4rem;
+  height: 4rem;
+  border-radius: 8px;
+}
+.comment-head {
+  display: flex;
+  flex-direction: column;
+}
+.comment-title {
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0;
+}
+.comment-body p:last-of-type {
+  margin-bottom: 20px;
+}
+.comment-body .links {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.comment-body .links a {
+  display: block;
+  background-color: var(--color-secondary);
+  color: #ffffff;
+  padding: 5px 1rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.comment-body .links a:hover {
+  background-color: var(--color-primary);
+}
+.comments .indented {
+  margin-left: 2rem;
+}
+/* Add comment form */
+.add-comment-title::before {
+  content: "\e001";
+  font-family: "thex";
+  color: var(--color-primary);
+  padding-right: 5px;
+}
+.comment-form {
+  background-color: var(--color-secondary-light);
+  padding: 1rem;
+  border-radius: 6px;
+}
+.comment-form label {
+  display: block;
+}

@@ -1,0 +1,22 @@
+<?php
+
+function translator_admin_theme($existing, $type, $theme, $path) {
+  return [
+    'translator_dashboard' => [
+      'template'  => 'dashboard',           // file templates/dashboard.html.twig
+      'variables' => [
+        'stats'               => [],
+        'domain_distribution' => [],
+        'recent_logs'         => [],
+        'failed_stats'        => [],
+        'chart_data'          => [],
+        'filters'             => [],
+        'available_domains'   => [],
+        'available_models'    => [],
+        'log_total_pages'     => 1,
+        'log_current_page'    => 1,
+        'error'               => NULL,      // thêm nếu muốn hiển thị lỗi
+      ],
+    ],
+  ];
+}

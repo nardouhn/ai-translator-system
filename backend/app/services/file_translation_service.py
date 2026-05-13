@@ -16,7 +16,15 @@ from app.services.redis_client import get_async_redis
 
 logger = logging.getLogger(__name__)
 
-async def process_file_translation(file_id: int, file_path: str, source_lang: str, target_lang: str, domain: str, session_id: str):
+async def process_file_translation(
+    file_id: int, 
+    file_path: str, 
+    domain: str, 
+    session_id: str,
+    request_time: __import__('datetime').datetime | None = None,
+    ip_address: str | None = None,
+    user_agent: str | None = None
+):
     domain_str = (domain or "general").strip().lower()
     
     async with AsyncSessionLocal() as db:
@@ -54,6 +62,8 @@ async def process_file_translation(file_id: int, file_path: str, source_lang: st
                 raise Exception("Lỗi: Tải file thất bại. File rỗng (0 bytes).")
 
             ext = file_row.original_filename.split('.')[-1].lower() if file_row.original_filename else "unknown"
+            
+            text_hash = hashlib.sha256(file_content).hexdigest()
 
             if ext in ["docx", "pdf"] and content_length < 100:
                 raise Exception(f"Lỗi: Nội dung file {ext} tải về không hợp lệ (dung lượng quá nhỏ: {content_length} bytes). Trích xuất: {file_content[:100]}")
@@ -77,7 +87,7 @@ async def process_file_translation(file_id: int, file_path: str, source_lang: st
                 logger.info(f"File Translation: Found {total} chunks to translate.")
                 
                 # BATCH MGET Check from Upstash
-                cached_results = await mget_cached_translations(domain_str, texts, source_lang, target_lang)
+                cached_results = await mget_cached_translations(domain_str, texts)
                 
                 translated_texts = []
                 newly_translated = {}
@@ -95,7 +105,7 @@ async def process_file_translation(file_id: int, file_path: str, source_lang: st
                     cached_val = cached_results.get(chunk)
                     
                     debug_hash = __import__('hashlib').sha256(cleaned_chunk.encode("utf-8")).hexdigest()
-                    logger.debug(f"File Cache Key: translate:v3:{domain_str}:{source_lang.strip().lower()}:{target_lang.strip().lower()}:{debug_hash} | Text: '{cleaned_chunk[:20]}'")
+                    logger.debug(f"File Cache Key: translate:v5:{domain_str}:en:vi:{debug_hash} | Text: '{cleaned_chunk[:20]}'")
                     
                     if cached_val is not None:
                         logger.info(f"🟢 CACHE HIT for chunk {idx+1}/{total}: '{cleaned_chunk[:20]}...'")
@@ -103,7 +113,7 @@ async def process_file_translation(file_id: int, file_path: str, source_lang: st
                     else:
                         logger.warning(f"🔴 CACHE MISS for chunk {idx+1}/{total}: '{cleaned_chunk[:20]}...'. Calling Kaggle...")
                         # Kaggle Translation (Protected by Semaphore & Sleep in provider)
-                        tr = await translate_chunk_async(chunk, source_lang, target_lang, domain_str)
+                        tr = await translate_chunk_async(chunk, domain_str)
                         translated_texts.append(tr)
                         
                         # Only cache if it's not an error message
@@ -123,12 +133,12 @@ async def process_file_translation(file_id: int, file_path: str, source_lang: st
                         
                     # Periodically save cache to Upstash to prevent total loss on crash
                     if len(newly_translated) >= 10:
-                        asyncio.create_task(mset_cached_translations(domain_str, newly_translated, source_lang, target_lang))
+                        asyncio.create_task(mset_cached_translations(domain_str, newly_translated))
                         newly_translated.clear()
                         
                 # Save any remaining newly translated chunks to Cache
                 if newly_translated:
-                    asyncio.create_task(mset_cached_translations(domain_str, newly_translated, source_lang, target_lang))
+                    asyncio.create_task(mset_cached_translations(domain_str, newly_translated))
                     
                 return translated_texts
 
@@ -156,11 +166,21 @@ async def process_file_translation(file_id: int, file_path: str, source_lang: st
                 file_row.error_message = error_str
                 await db.commit()
                 
+                from datetime import datetime, timezone
+                completed_time = datetime.now(timezone.utc)
                 log_record = Logs(
                     session_id=session_id,
                     translation_id=None,
                     status=StatusEnum.failed,
                     request_type=RequestTypeEnum.file,
+                    request_time=request_time,
+                    completed_time=completed_time,
+                    ip_address=ip_address,
+                    user_agent=user_agent,
+                    text_hash=text_hash,
+                    domain=domain_str,
+                    file_type=ext if ext in ["docx", "pdf", "txt"] else None,
+                    file_id=file_id,
                 )
                 db.add(log_record)
                 await db.commit()
@@ -204,11 +224,21 @@ async def process_file_translation(file_id: int, file_path: str, source_lang: st
             # Mark 100%
             await redis_client.setex(progress_key, 86400, "100")
 
+            from datetime import datetime, timezone
+            completed_time = datetime.now(timezone.utc)
             log_record = Logs(
                 session_id=session_id,
                 translation_id=None,
                 status=StatusEnum.success,
                 request_type=RequestTypeEnum.file,
+                request_time=request_time,
+                completed_time=completed_time,
+                ip_address=ip_address,
+                user_agent=user_agent,
+                text_hash=text_hash,
+                domain=domain_str,
+                file_type=ext if ext in ["docx", "pdf", "txt"] else None,
+                file_id=file_id,
             )
             db.add(log_record)
             await db.commit()

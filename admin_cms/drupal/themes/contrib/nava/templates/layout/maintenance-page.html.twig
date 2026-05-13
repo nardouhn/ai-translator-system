@@ -1,0 +1,44 @@
+{#
+/**
+ * @file
+ * Theme implementation to display a single Drupal page while offline.
+ *
+ * All available variables are mirrored in page.html.twig.
+ *
+ * @see template_preprocess_maintenance_page()
+ */
+ #}
+<header class=" header maintenance-header" role="banner">
+  <div class="container">
+    <div class="site-branding">
+      {% if site_name or site_slogan %}
+        <div class="site-name-slogan">
+        {% if site_name %}
+        <div class="site-name">
+          <a href="{{ front_page }}" title="{{ 'Home'|t }}" rel="home"><h4>{{ site_name }}</h4></a>
+        </div>
+        {% endif %}
+        {% if site_slogan %}
+        <div class="site-slogan">{{ site_slogan }}</div>
+        {% endif %}
+      </div><!--/site-name-slogan -->
+      {% endif %}
+    </div>
+  </div>
+</header>
+<div class="main-wrapper">
+  <div class="container">
+<main class="main-maintenance">
+    <a id="main-content" tabindex="-1"></a>
+    {% if title %}
+      <h1 class="maintenance-title">{{ title }}</h1>
+    {% endif %}
+    <div class="maintenance-image">
+      <p><img src="{{ base_path ~ directory }}/images/maintenance.svg" alt="maintenance image" /></p>
+    </div>
+    <div class="maintenance-message">
+      {{ page.content }}
+    </div>
+    </main>
+  </div> <!-- /.container -->
+</div>

@@ -1,7 +1,8 @@
 import os
 import uuid
 import tempfile
-from fastapi import APIRouter, Depends, File as FastAPIFile, Form, Header, HTTPException, status, UploadFile
+from fastapi import APIRouter, Depends, File as FastAPIFile, Form, Header, HTTPException, status, UploadFile, Request
+from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -25,13 +26,19 @@ from app.services.redis_client import get_async_redis
 @router.post("/file/translate")
 async def file_translate_api(
     background_tasks: BackgroundTasks,
+    request: Request,
     upload_file: UploadFile = FastAPIFile(...),
-    source_lang: str = Form(...),
-    target_lang: str = Form(...),
     domain: str | None = Form(default=None),
     x_session_id: str | None = Header(default=None, alias="X-Session-ID"),
     db: AsyncSession = Depends(get_async_db),
 ):
+    request_time = datetime.now(timezone.utc)
+    
+    ip_address = request.headers.get("cf-connecting-ip")
+    if not ip_address and request.client:
+        ip_address = request.client.host
+        
+    user_agent = request.headers.get("user-agent")
     filename = upload_file.filename or "unknown"
     ext = filename.split('.')[-1].lower()
     
@@ -82,10 +89,11 @@ async def file_translate_api(
         process_file_translation,
         file_id=file_id_val,
         file_path=r2_key,
-        source_lang=source_lang,
-        target_lang=target_lang,
         domain=domain,
-        session_id=session_id
+        session_id=session_id,
+        request_time=request_time,
+        ip_address=ip_address,
+        user_agent=user_agent
     )
 
     return {

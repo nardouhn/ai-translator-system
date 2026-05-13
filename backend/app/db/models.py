@@ -31,17 +31,9 @@ class StatusEnum(str, Enum):
 
 class DomainNameEnum(str, Enum):
     general = "general"
-    business = "business"
+    economic = "economic"
     technical = "technical"
     medical = "medical"
-
-
-class Language(Base):
-    __tablename__ = "language"
-
-    lang_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    lang_code: Mapped[str] = mapped_column(String(10), unique=True, nullable=False)
-    lang_name: Mapped[str] = mapped_column(String(100), nullable=False)
 
 
 class Domain(Base):
@@ -71,8 +63,7 @@ class Session(Base):
 class Translation(Base):
     __tablename__ = "translation"
     __table_args__ = (
-        UniqueConstraint("text_hash", "source_lang", "target_lang", "domain_id", name="uniq_translation_cache"),
-        Index("idx_translation_lang", "source_lang", "target_lang"),
+        UniqueConstraint("text_hash", "domain_id", name="uniq_translation_cache"),
         Index("idx_translation_domain", "domain_id"),
     )
 
@@ -80,12 +71,8 @@ class Translation(Base):
     source_text: Mapped[str] = mapped_column(Text, nullable=False)
     translated_text: Mapped[str] = mapped_column(Text, nullable=False)
     text_hash: Mapped[str] = mapped_column(CHAR(64), nullable=False)
-    source_lang: Mapped[int] = mapped_column(Integer, ForeignKey("language.lang_id"), nullable=False)
-    target_lang: Mapped[int] = mapped_column(Integer, ForeignKey("language.lang_id"), nullable=False)
     domain_id: Mapped[int] = mapped_column(Integer, ForeignKey("domain.domain_id"), nullable=False)
     model_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    temperature: Mapped[float | None] = mapped_column(Float, nullable=True)
-    token_usage: Mapped[int | None] = mapped_column(Integer, nullable=True)
     session_id: Mapped[str | None] = mapped_column(String(64), ForeignKey("session.session_id", ondelete="CASCADE"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
@@ -100,8 +87,6 @@ class File(Base):
     translated_filename: Mapped[str | None] = mapped_column(String(255), nullable=True)
     file_path: Mapped[str | None] = mapped_column(Text, nullable=True)
     file_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    source_lang: Mapped[int | None] = mapped_column(Integer, ForeignKey("language.lang_id"), nullable=True)
-    target_lang: Mapped[int | None] = mapped_column(Integer, ForeignKey("language.lang_id"), nullable=True)
     domain_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("domain.domain_id"), nullable=True)
     session_id: Mapped[str | None] = mapped_column(String(64), ForeignKey("session.session_id", ondelete="CASCADE"), nullable=True)
     uploaded_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
@@ -151,5 +136,9 @@ class Logs(Base):
     request_time: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     completed_time: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    user_agent: Mapped[str | None] = mapped_column(Text, nullable=True)
+    text_hash: Mapped[str | None] = mapped_column(CHAR(64), nullable=True)
+    domain: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    file_type: Mapped[str | None] = mapped_column(String(10), nullable=True)
 
     session: Mapped["Session | None"] = relationship(back_populates="logs")

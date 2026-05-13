@@ -1,0 +1,82 @@
+<?php
+
+/**
+ * @file
+ * Nava theme overrides and preprocess functions.
+ */
+/**
+ * Sanitise input urls.
+ */
+function santise_val_url($url) {
+	if ($url != '') {
+		// Sanitise (remove all illegal characters) from url.
+		$url = filter_var($url, FILTER_SANITIZE_URL);
+		// Validate url.
+		if (filter_var($url, FILTER_VALIDATE_URL) == TRUE) {
+			$url = $url;
+		} else {
+			$url = '#';
+		}
+		return $url;
+	}
+}
+/**
+ * Html preprocess for nava theme.
+ */
+function nava_preprocess_html(&$variables) {
+	$variables['base_path'] = base_path();
+	$variables['is_front'] = \Drupal::service('path.matcher')->isFrontPage();
+	$variables['container_width'] = theme_get_setting('container_width', 'nava');
+	$variables['header_width'] = theme_get_setting('header_width', 'nava');
+	$variables['main_width'] = theme_get_setting('main_width', 'nava');
+	$variables['footer_width'] = theme_get_setting('footer_width', 'nava');
+	$variables['highlight_author_comment'] = theme_get_setting('highlight_author_comment', 'nava');
+	$variables['bootstrapicons'] = theme_get_setting('bootstrapicons', 'nava');
+	$variables['css_extra'] = theme_get_setting('css_extra', 'nava');
+  $variables['css_code'] = theme_get_setting('css_code', 'nava');
+}
+/**
+ * page preprocess
+ */
+function nava_preprocess_page(array &$variables) {
+	$config = \Drupal::config('system.site');
+	$variables['site_name'] = $config->get('name');
+	$variables['site_slogan'] = $config->get('slogan');
+	$variables['social_icons'] = theme_get_setting('social_icons', 'nava');
+	$variables['facebook_url'] = santise_val_url(theme_get_setting('facebook_url', 'nava'));
+	$variables['twitter_url'] = santise_val_url(theme_get_setting('twitter_url', 'nava'));
+	$variables['instagram_url'] = santise_val_url(theme_get_setting('instagram_url', 'nava'));
+	$variables['linkedin_url'] = santise_val_url(theme_get_setting('linkedin_url', 'nava'));
+	$variables['youtube_url'] = santise_val_url(theme_get_setting('youtube_url', 'nava'));
+	$variables['vk_url'] = santise_val_url(theme_get_setting('vk_url', 'nava'));
+	$variables['vimeo_url'] = santise_val_url(theme_get_setting('vimeo_url', 'nava'));
+	$variables['whatsapp_url'] = santise_val_url(theme_get_setting('whatsapp_url', 'nava'));
+	$variables['github_url'] = santise_val_url(theme_get_setting('github_url', 'nava'));
+	$variables['telegram_url'] = santise_val_url(theme_get_setting('telegram_url', 'nava'));
+	$variables['scrolltotop'] = theme_get_setting('scrolltotop', 'nava');
+	$variables['copyright_text'] = theme_get_setting('copyright_text', 'nava');
+}
+/**
+ * Add current page to breadcrumb.
+ */
+function nava_preprocess_breadcrumb(&$variables) {
+	$request = \Drupal::request();
+	$route_match = \Drupal::routeMatch();
+	$page_title = \Drupal::service('title_resolver')->getTitle($request, $route_match->getRouteObject());
+	if (!empty($page_title)) {
+		$variables['breadcrumb'][] = [
+			'text' => $page_title,
+		];
+		// Add cache context based on url.
+		$variables['#cache']['contexts'][] = 'url';
+	}
+}
+/**
+ * Implements THEME_preprocess_HOOK() for system messages block.
+ */
+use Drupal\Core\Render\Element\StatusMessages;
+
+function nava_preprocess_block__system_messages_block(&$variables) {
+  $variables['content'] = StatusMessages::renderMessages();
+	$variables['#cache']['max-age'] = 0;
+}

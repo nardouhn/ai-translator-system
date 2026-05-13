@@ -12,20 +12,6 @@ from app.services.text_splitter import split_text_into_chunks
 
 logger = logging.getLogger(__name__)
 
-def _get_or_create_language(db: DBSession, lang_code: str) -> Language:
-    normalized_code = lang_code.strip().lower()
-    language = db.query(Language).filter(Language.lang_code == normalized_code).first()
-    if language:
-        return language
-
-    language = Language(
-        lang_code=normalized_code,
-        lang_name=normalized_code.upper(),
-    )
-    db.add(language)
-    db.flush()
-    return language
-
 
 def _get_or_create_domain(db: DBSession, domain: str | None) -> Domain:
     domain_value = (domain or DomainNameEnum.general.value).strip().lower()
@@ -49,10 +35,11 @@ async def stream_translate_text(
     db: DBSession,
     session_id: str,
     source_text: str,
-    source_lang: str,
-    target_lang: str,
     domain: str | None,
     background_tasks: BackgroundTasks,
+    request_time: __import__('datetime').datetime | None = None,
+    ip_address: str | None = None,
+    user_agent: str | None = None,
     auto_commit: bool = True,
 ):
     # Ensure domain is a string for cache key logic
@@ -62,15 +49,11 @@ async def stream_translate_text(
 
     # 1. Check DB first (Synchronous operations wrapped in threadpool)
     def check_db():
-        source_language = _get_or_create_language(db, source_lang)
-        target_language = _get_or_create_language(db, target_lang)
         domain_row = _get_or_create_domain(db, domain)
 
         # Check DB cache
         existing_translation = db.query(Translation).filter(
             Translation.text_hash == text_hash,
-            Translation.source_lang == source_language.lang_id,
-            Translation.target_lang == target_language.lang_id,
             Translation.domain_id == domain_row.domain_id
         ).first()
 
@@ -80,11 +63,11 @@ async def stream_translate_text(
                 "translated_text": existing_translation.translated_text,
                 "translation_id": getattr(existing_translation, "id", getattr(existing_translation, "trans_id", None)),
                 "from_cache": True,
-            }, source_language, target_language, domain_row
+            }, domain_row
             
-        return {"hit": False, "existing_translation": existing_translation}, source_language, target_language, domain_row
+        return {"hit": False, "existing_translation": existing_translation}, domain_row
 
-    db_check_result, source_language, target_language, domain_row = await run_in_threadpool(check_db)
+    db_check_result, domain_row = await run_in_threadpool(check_db)
     
     if db_check_result["hit"]:
         yield f"data: {json.dumps({'chunk': db_check_result['translated_text']})}\n\n"
@@ -99,7 +82,7 @@ async def stream_translate_text(
     logger.info(f"Translating text (session: {session_id}): split into {len(chunks)} chunks.")
 
     # 3. Redis Batch Check (MGET)
-    cached_results = await mget_cached_translations(domain_str, chunks, source_lang, target_lang)
+    cached_results = await mget_cached_translations(domain_str, chunks)
     
     final_translated_chunks = []
     newly_translated_mapping = {}
@@ -110,7 +93,7 @@ async def stream_translate_text(
         cleaned_chunk = strictly_normalize_text(chunk)
         cached_val = cached_results.get(chunk)
         debug_hash = __import__('hashlib').sha256(cleaned_chunk.encode("utf-8")).hexdigest()
-        logger.debug(f"Text Cache Key: translate:v3:{domain_str}:{source_lang.strip().lower()}:{target_lang.strip().lower()}:{debug_hash} | Text: '{cleaned_chunk[:20]}'")
+        logger.debug(f"Text Cache Key: translate:v5:{domain_str}:en:vi:{debug_hash} | Text: '{cleaned_chunk[:20]}'")
         
         if cached_val is not None:
             logger.info(f"🟢 CACHE HIT for chunk: '{cleaned_chunk[:20]}...'")
@@ -119,7 +102,7 @@ async def stream_translate_text(
         else:
             logger.warning(f"🔴 CACHE MISS for chunk: '{cleaned_chunk[:20]}...'. Calling Kaggle...")
             try:
-                translated_chunk = await translate_chunk_async(chunk, source_lang, target_lang, domain_str)
+                translated_chunk = await translate_chunk_async(chunk, domain_str)
                 if translated_chunk is None or translated_chunk == chunk:
                     logger.error(f"Chunk {i} translation returned identical text, treating as failure.")
                     from fastapi import HTTPException
@@ -141,7 +124,7 @@ async def stream_translate_text(
     
     # 6. Update Cache (MSET) in background
     if newly_translated_mapping:
-        asyncio.create_task(mset_cached_translations(domain_str, newly_translated_mapping, source_lang, target_lang))
+        asyncio.create_task(mset_cached_translations(domain_str, newly_translated_mapping))
 
     # 7. Database Logging
     def save_to_db():
@@ -164,8 +147,6 @@ async def stream_translate_text(
                     "session_id": session_id,
                     "source_text": source_text,
                     "translated_text": translated_text,
-                    "source_lang": source_language.lang_id,
-                    "target_lang": target_language.lang_id,
                     "domain_id": domain_row.domain_id,
                     "text_hash": text_hash,
                 }
@@ -192,12 +173,21 @@ async def stream_translate_text(
     # Log operations to DB before closing
     def log_operations():
         from app.db.models import Logs, StatusEnum, RequestTypeEnum
+        from datetime import datetime, timezone
+        completed_time = datetime.now(timezone.utc)
+        
         log_status = getattr(StatusEnum, "cache_hit", StatusEnum.success) if len(newly_translated_mapping) == 0 else StatusEnum.success
         log_record = Logs(
             session_id=session_id,
             request_type=getattr(RequestTypeEnum, "text", "text"),
             translation_id=final_trans_id,
             status=log_status,
+            request_time=request_time,
+            completed_time=completed_time,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            text_hash=text_hash,
+            domain=domain_str,
         )
         db.add(log_record)
         db.commit()

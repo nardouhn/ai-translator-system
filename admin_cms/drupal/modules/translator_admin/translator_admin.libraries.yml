@@ -1,0 +1,9 @@
+translation_dashboard:
+  version: 1.0.0
+  css:
+    theme:
+      css/dashboard.css: {}
+  js:
+    js/dashboard.js: { defer: true }
+  dependencies:
+    - core/drupal

@@ -1,0 +1,4 @@
+services:
+  translator_admin.dashboard_controller:
+    class: Drupal\translator_admin\Controller\DashboardController
+    arguments: ["@http_client"]
