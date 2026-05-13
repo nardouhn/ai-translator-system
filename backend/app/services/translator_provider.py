@@ -36,21 +36,9 @@ async def translate_with_provider(
         client = get_shared_client()
         for attempt in range(max_retries + 1):
                 try:
-                    domain_context = ""
-                    if domain and domain.lower() != "general":
-                        domain_context = f" This text is specifically related to the {domain.upper()} domain, so you MUST use appropriate {domain.upper()} terminology."
-                    system_content = f"You are a raw translation API. Translate English to Vietnamese.{domain_context} Return ONLY the translated string. Absolutely NO explanations, NO markdown, NO quotation marks, NO conversational filler."
-                    
                     payload = {
-                        "messages": [
-                            {"role": "system", "content": system_content},
-                            {"role": "user", "content": source_text}
-                        ],
-                        "temperature": 0.0,
-                        "domain": domain.lower(),
-                        # Fallback for the custom API in case it hasn't been updated to accept 'messages'
                         "text": source_text,
-                        "system_prompt": system_content 
+                        "domain": domain.lower()
                     }
                     response = await client.post(CUSTOM_MODEL_URL, json=payload)
                     
@@ -81,28 +69,6 @@ async def translate_with_provider(
 
                     data = response.json()
                     translated = data.get("output", data.get("translated_text", source_text))
-                    
-                    # 3. Post-processing: Aggressive Cleanup
-                    if translated != source_text:
-                        # Strip all kinds of whitespace, quotes, and brackets
-                        translated = translated.strip(' \t\n\r"\'{}[]()')
-                        
-                        # Remove markdown code blocks if AI outputs them
-                        translated = re.sub(r'^```[a-zA-Z]*\n', '', translated)
-                        translated = re.sub(r'\n```$', '', translated)
-                        translated = translated.replace('```', '').strip()
-                        
-                        # Remove conversational filler prefixes (case insensitive)
-                        prefixes_to_remove = [
-                            r'^here is the translation:?\s*',
-                            r'^translated text:?\s*',
-                            r'^translation:?\s*',
-                            r'^bản dịch:?\s*',
-                            r'^kết quả:?\s*',
-                            r'^dịch sang tiếng việt:?\s*'
-                        ]
-                        for prefix in prefixes_to_remove:
-                            translated = re.sub(prefix, '', translated, flags=re.IGNORECASE).strip(' "\'{}\n\r')
                     
                     # Mandatory sleep to respect Ngrok rate limits and cool down GPU
                     await asyncio.sleep(2)

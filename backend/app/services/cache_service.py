@@ -2,7 +2,7 @@ import hashlib
 from app.services.redis_client import get_redis, get_async_redis
 
 CACHE_TTL_SECONDS = 604800
-MODEL_VERSION = "v6" # Bump version to clear old bad cache
+MODEL_VERSION = "v7" # Bump version to clear old bad cache
 
 import re
 
