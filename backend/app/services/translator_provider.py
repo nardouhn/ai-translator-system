@@ -36,9 +36,15 @@ async def translate_with_provider(
         client = get_shared_client()
         for attempt in range(max_retries + 1):
                 try:
+                    api_domain = domain.lower()
+                    if api_domain == "technical":
+                        api_domain = "it"
+                    elif api_domain == "economic":
+                        api_domain = "finance"
+                        
                     payload = {
                         "text": source_text,
-                        "domain": domain.lower()
+                        "domain": api_domain
                     }
                     response = await client.post(CUSTOM_MODEL_URL, json=payload)
                     
