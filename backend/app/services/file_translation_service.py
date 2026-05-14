@@ -171,23 +171,33 @@ async def process_file_translation(
                 error_str = f"File Translation failed during processing: {str(model_error)}"
                 logger.error(error_str, exc_info=True)
                 
-                file_row.status = StatusEnum.failed
-                file_row.error_message = error_str
-                await db.commit()
-                
-                from datetime import datetime, timezone
-                completed_time = datetime.now(timezone.utc).replace(tzinfo=None)
-                log_record = Logs(
-                    session_id=session_id,
-                    translation_id=None,
-                    status=StatusEnum.failed,
-                    request_type=RequestTypeEnum.file,
-                    request_time=request_time,
-                    completed_time=completed_time,
-                    file_id=file_id,
-                )
-                db.add(log_record)
-                await db.commit()
+                try:
+                    await db.rollback()
+                    
+                    # Lấy lại file_row sau khi rollback
+                    result = await db.execute(select(File).where(File.file_id == file_id))
+                    file_row = result.scalars().first()
+                    if file_row:
+                        file_row.status = StatusEnum.failed
+                        file_row.error_message = error_str
+                    
+                    from datetime import datetime, timezone
+                    completed_time = datetime.now(timezone.utc).replace(tzinfo=None)
+                    
+                    log_record = Logs(
+                        session_id=session_id,
+                        translation_id=None,
+                        status=StatusEnum.failed,
+                        request_type=RequestTypeEnum.file,
+                        request_time=request_time, # Đã được xử lý replace(tzinfo=None) ở đầu hàm
+                        completed_time=completed_time,
+                        file_id=file_id,
+                    )
+                    db.add(log_record)
+                    await db.commit()
+                except Exception as inner_db_error:
+                    await db.rollback()
+                    logger.error(f"Failed to log model error to DB: {str(inner_db_error)}")
                 return  # Exit early
 
             import uuid
@@ -244,18 +254,47 @@ async def process_file_translation(
                 translation_id=None,
                 status=StatusEnum.success,
                 request_type=RequestTypeEnum.file,
-                request_time=request_time,
+                request_time=request_time, # Đã được xử lý tzinfo=None ở đầu hàm
                 completed_time=completed_time,
                 file_id=file_id,
             )
-            db.add(log_record)
-            await db.commit()
+            
+            try:
+                db.add(log_record)
+                await db.commit()
+            except Exception as db_err:
+                await db.rollback()
+                logger.error(f"Failed to commit success log: {str(db_err)}")
 
         except Exception as e:
             logger.error(f"Unexpected error in process_file_translation: {str(e)}", exc_info=True)
-            file_row.status = StatusEnum.error
-            file_row.error_message = str(e)
-            await db.commit()
+            try:
+                await db.rollback()
+                
+                # Lấy lại file_row sau khi rollback
+                result = await db.execute(select(File).where(File.file_id == file_id))
+                file_row = result.scalars().first()
+                if file_row:
+                    file_row.status = StatusEnum.error
+                    file_row.error_message = str(e)
+                    
+                from datetime import datetime, timezone
+                completed_time = datetime.now(timezone.utc).replace(tzinfo=None)
+                
+                log_record = Logs(
+                    session_id=session_id,
+                    translation_id=None,
+                    status=StatusEnum.error,
+                    request_type=RequestTypeEnum.file,
+                    request_time=request_time,
+                    completed_time=completed_time,
+                    file_id=file_id,
+                )
+                db.add(log_record)
+                await db.commit()
+            except Exception as inner_e:
+                await db.rollback()
+                logger.error(f"Failed to commit error state to DB: {str(inner_e)}")
         finally:
             if local_tmp_path and os.path.exists(local_tmp_path):
                 os.remove(local_tmp_path)
