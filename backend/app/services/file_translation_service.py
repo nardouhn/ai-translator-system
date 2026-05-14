@@ -28,6 +28,9 @@ async def process_file_translation(
     
     if request_time and request_time.tzinfo:
         request_time = request_time.replace(tzinfo=None)
+        logger.info(f"Stripped tzinfo from request_time. Is aware? {request_time.tzinfo is not None}")
+    else:
+        logger.info(f"request_time is already naive or None. Is aware? {getattr(request_time, 'tzinfo', None) is not None}")
     
     async with AsyncSessionLocal() as db:
         result = await db.execute(select(File).where(File.file_id == file_id))
