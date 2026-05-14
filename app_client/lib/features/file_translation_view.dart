@@ -204,14 +204,16 @@ class _FileTranslationViewState extends State<FileTranslationView> {
         html.window.open(fileUrl, '_blank');
       } else {
         final uri = Uri.parse(fileUrl);
-        canLaunchUrl(uri).then((canLaunch) {
-          if (canLaunch) {
-            launchUrl(uri, mode: LaunchMode.externalApplication);
-          } else {
+        launchUrl(uri, mode: LaunchMode.externalApplication).then((success) {
+          if (!success) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Could not open download link.')),
             );
           }
+        }).catchError((error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open download link.')),
+          );
         });
       }
       return;
