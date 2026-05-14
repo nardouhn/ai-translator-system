@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -43,11 +44,29 @@ class _TextTranslationViewState extends State<TextTranslationView> {
   bool _isListening = false;
   bool _speechAvailable = false;
 
+  Timer? _debounce;
+
   @override
   void initState() {
     super.initState();
     _initTts();
     _initSpeech();
+    _inputController.addListener(_onInputChanged);
+  }
+
+  void _onInputChanged() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 1000), () {
+      final text = _inputController.text;
+      if (text.trim().isNotEmpty) {
+        _handleTranslate();
+      } else if (text.isEmpty) {
+        setState(() {
+          _outputText = '';
+          _errorMessage = '';
+        });
+      }
+    });
   }
 
   void _initSpeech() async {
@@ -133,8 +152,10 @@ class _TextTranslationViewState extends State<TextTranslationView> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     flutterTts.stop();
     _speech.stop();
+    _inputController.removeListener(_onInputChanged);
     _inputController.dispose();
     super.dispose();
   }

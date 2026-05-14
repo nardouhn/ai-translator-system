@@ -40,6 +40,9 @@ async def stream_translate_text(
     domain_str = (domain or "general").strip().lower()
     domain_id_val = map_domain_to_id(domain_str)
 
+    if request_time and request_time.tzinfo:
+        request_time = request_time.replace(tzinfo=None)
+
     hash_string = f"{domain_id_val}_{source_text}"
     text_hash = hashlib.sha256(hash_string.encode("utf-8")).hexdigest()
 
@@ -169,8 +172,7 @@ async def stream_translate_text(
     def log_operations():
         from app.db.models import Logs, StatusEnum, RequestTypeEnum
         from datetime import datetime, timezone
-        completed_time = datetime.now(timezone.utc)
-        
+        completed_time = datetime.now(timezone.utc).replace(tzinfo=None)
         log_status = getattr(StatusEnum, "cache_hit", StatusEnum.success) if len(newly_translated_mapping) == 0 else StatusEnum.success
         log_record = Logs(
             session_id=session_id,

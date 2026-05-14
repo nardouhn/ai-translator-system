@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'package:universal_html/html.dart' as html;
 import 'package:file_picker/file_picker.dart' as fp;
+import 'package:url_launcher/url_launcher.dart';
 
 import '../services/api_service.dart';
 import '../widgets/translation_top_bar.dart';
@@ -37,8 +38,8 @@ class _FileTranslationViewState extends State<FileTranslationView> {
   Uint8List? _selectedFileBytes;
   String? _selectedFilePath;
   String _selectedDomain = 'General';
-  String _selectedSourceLang = 'en';
-  String _selectedTargetLang = 'vi';
+  final String _selectedSourceLang = 'en';
+  final String _selectedTargetLang = 'vi';
 
   Future<void> _pickFile() async {
     try {
@@ -198,8 +199,21 @@ class _FileTranslationViewState extends State<FileTranslationView> {
     final b64Data = item['fileContentB64'] as String?;
     final text = item['translatedText'] as String?;
     
-    if (kIsWeb && fileUrl != null && fileUrl.isNotEmpty) {
-      html.window.open(fileUrl, '_blank');
+    if (fileUrl != null && fileUrl.isNotEmpty) {
+      if (kIsWeb) {
+        html.window.open(fileUrl, '_blank');
+      } else {
+        final uri = Uri.parse(fileUrl);
+        canLaunchUrl(uri).then((canLaunch) {
+          if (canLaunch) {
+            launchUrl(uri, mode: LaunchMode.externalApplication);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Could not open download link.')),
+            );
+          }
+        });
+      }
       return;
     }
     
@@ -299,9 +313,9 @@ class _FileTranslationViewState extends State<FileTranslationView> {
                             });
                           },
                         ),
-                        _buildLangDropdown('en', _selectedSourceLang, (val) => setState(() => _selectedSourceLang = val!)),
+                        _buildFixedLangLabel('English'),
                         const Icon(Icons.arrow_forward_rounded, color: Colors.grey),
-                        _buildLangDropdown('vi', _selectedTargetLang, (val) => setState(() => _selectedTargetLang = val!)),
+                        _buildFixedLangLabel('Vietnamese'),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -354,9 +368,9 @@ class _FileTranslationViewState extends State<FileTranslationView> {
                               });
                             },
                           ),
-                          _buildLangDropdown('en', _selectedSourceLang, (val) => setState(() => _selectedSourceLang = val!)),
+                          _buildFixedLangLabel('English'),
                           const Icon(Icons.arrow_forward_rounded, color: Colors.grey),
-                          _buildLangDropdown('vi', _selectedTargetLang, (val) => setState(() => _selectedTargetLang = val!)),
+                          _buildFixedLangLabel('Vietnamese'),
                         ],
                       ),
                     ),
@@ -403,31 +417,29 @@ class _FileTranslationViewState extends State<FileTranslationView> {
     });
   }
 
-  Widget _buildLangDropdown(String label, String currentValue, ValueChanged<String?> onChanged) {
+  Widget _buildFixedLangLabel(String label) {
     final primaryColor = Theme.of(context).colorScheme.primary;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: primaryColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: primaryColor.withOpacity(0.3)),
       ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: currentValue,
-          dropdownColor: Theme.of(context).colorScheme.surface,
-          icon: Icon(Icons.language, size: 18, color: primaryColor),
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.language, size: 18, color: primaryColor),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-          items: const [
-            DropdownMenuItem(value: 'en', child: Text('English')),
-            DropdownMenuItem(value: 'vi', child: Text('Vietnamese')),
-          ],
-          onChanged: onChanged,
-        ),
+        ],
       ),
     );
   }

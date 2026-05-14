@@ -26,6 +26,9 @@ async def process_file_translation(
 ):
     domain_str = (domain or "general").strip().lower()
     
+    if request_time and request_time.tzinfo:
+        request_time = request_time.replace(tzinfo=None)
+    
     async with AsyncSessionLocal() as db:
         result = await db.execute(select(File).where(File.file_id == file_id))
         file_row = result.scalars().first()
@@ -173,7 +176,7 @@ async def process_file_translation(
                 await db.commit()
                 
                 from datetime import datetime, timezone
-                completed_time = datetime.now(timezone.utc)
+                completed_time = datetime.now(timezone.utc).replace(tzinfo=None)
                 log_record = Logs(
                     session_id=session_id,
                     translation_id=None,
@@ -235,7 +238,7 @@ async def process_file_translation(
             await redis_client.setex(progress_key, 86400, "100")
 
             from datetime import datetime, timezone
-            completed_time = datetime.now(timezone.utc)
+            completed_time = datetime.now(timezone.utc).replace(tzinfo=None)
             log_record = Logs(
                 session_id=session_id,
                 translation_id=None,

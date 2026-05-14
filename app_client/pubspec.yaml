@@ -43,6 +43,7 @@ dependencies:
   speech_to_text: ^7.3.0
   google_fonts: ^8.1.0
   shared_preferences: ^2.5.5
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

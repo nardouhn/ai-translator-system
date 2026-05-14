@@ -37,9 +37,11 @@ class ApiService {
   }) async {
     try {
       final uri = Uri.parse('$baseUrl/translate');
+      debugPrint('🌍 [API Request] POST $uri');
       final request = http.Request('POST', uri);
 
       request.headers['Content-Type'] = 'application/json';
+      request.headers['ngrok-skip-browser-warning'] = 'true';
       if (sessionId != null) {
         request.headers['X-Session-ID'] = sessionId!;
       }
@@ -119,8 +121,10 @@ class ApiService {
   }) async {
     try {
       final uri = Uri.parse('$baseUrl/file/translate');
+      debugPrint('🌍 [API Request] POST $uri');
       final request = http.MultipartRequest('POST', uri);
 
+      request.headers['ngrok-skip-browser-warning'] = 'true';
       if (sessionId != null) {
         request.headers['X-Session-ID'] = sessionId!;
       }
@@ -176,7 +180,10 @@ class ApiService {
   static Future<Map<String, dynamic>> checkFileStatus(int fileId) async {
     try {
       final uri = Uri.parse('$baseUrl/file/translate/$fileId/status');
-      final headers = <String, String>{};
+      debugPrint('🌍 [API Request] GET $uri');
+      final headers = <String, String>{
+        'ngrok-skip-browser-warning': 'true',
+      };
       if (sessionId != null) {
         headers['X-Session-ID'] = sessionId!;
       }
