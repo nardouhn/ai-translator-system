@@ -105,47 +105,13 @@ async def translate_chunk_async(
     domain: str = "General",
 ) -> str:
     """
-    Asynchronously translates a chunk of text using the custom AI model.
-    Splits text into chunks of <= 500 characters to prevent Kaggle timeout.
+    Asynchronously translates a single chunk of text using the custom AI model.
+    Assumes the caller (translation_service) has already split text into
+    appropriate chunks via text_splitter.split_text_into_chunks().
+    Do NOT re-split here — double-splitting corrupts sentence boundaries.
     """
-    if len(source_text) <= 500:
-        translated, _ = await translate_with_provider(
-            source_text,
-            domain
-        )
-        return translated
-        
-    parts = re.split(r'([.?!]+\s+|\n+)', source_text)
-    chunks = []
-    current_chunk = ""
-    for part in parts:
-        if not part: continue
-        if len(current_chunk) + len(part) <= 500:
-            current_chunk += part
-        else:
-            if current_chunk:
-                chunks.append(current_chunk)
-            if len(part) > 500:
-                for i in range(0, len(part), 500):
-                    chunks.append(part[i:i+500])
-                current_chunk = ""
-            else:
-                current_chunk = part
-    if current_chunk:
-        chunks.append(current_chunk)
-        
-    translated_chunks = []
-    for idx, chunk in enumerate(chunks):
-        if not chunk.strip():
-            translated_chunks.append(chunk)
-            continue
-            
-        tr, _ = await translate_with_provider(chunk, domain)
-        translated_chunks.append(tr)
-        if idx < len(chunks) - 1:
-            await asyncio.sleep(1)
-            
-    return "".join(translated_chunks)
+    translated, _ = await translate_with_provider(source_text, domain)
+    return translated
 
 async def translate_batch_with_provider(
     texts: list[str],
