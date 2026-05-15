@@ -74,7 +74,7 @@ async def translate_with_provider(
                             return f"[ERROR: {error_msg}] {source_text}", "custom-ai"
 
                     data = response.json()
-                    translated = data.get("output", data.get("translated_text", source_text))
+                    translated = data.get("translation", data.get("output", data.get("translated_text", source_text)))
                     
                     # Mandatory sleep to respect Ngrok rate limits and cool down GPU
                     await asyncio.sleep(2)
