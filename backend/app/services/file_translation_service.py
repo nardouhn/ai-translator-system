@@ -117,11 +117,34 @@ async def process_file_translation(
                         translated_texts.append(cached_val)
                     else:
                         logger.warning(f"🔴 CACHE MISS for chunk {idx+1}/{total}: '{cleaned_chunk[:20]}...'. Calling Kaggle...")
-                        # Kaggle Translation (Protected by Semaphore & Sleep in provider)
-                        tr = await translate_chunk_async(chunk, domain_str)
+                        
+                        from app.services.text_splitter import split_text_into_chunks
+                        # Chẻ nhỏ đoạn văn dài thành các sub-chunk (600 ký tự) để Kaggle không bị timeout
+                        sub_chunks = split_text_into_chunks(chunk, max_chars=600)
+                        
+                        tr_parts = []
+                        for sc in sub_chunks:
+                            if not sc.strip():
+                                tr_parts.append(sc)
+                                continue
+                            
+                            # Kiểm tra cache cho từng sub-chunk
+                            sc_cleaned = strictly_normalize_text(sc)
+                            sc_cached = await mget_cached_translations(domain_str, [sc])
+                            sc_val = sc_cached.get(sc)
+                            
+                            if sc_val is not None:
+                                tr_parts.append(sc_val)
+                            else:
+                                sc_tr = await translate_chunk_async(sc, domain_str)
+                                tr_parts.append(sc_tr)
+                                if not sc_tr.startswith("[ERROR") and not sc_tr.startswith("[TIMEOUT") and not sc_tr.startswith("[FAILED"):
+                                    newly_translated[sc] = sc_tr
+                        
+                        tr = "".join(tr_parts) if tr_parts else chunk
                         translated_texts.append(tr)
                         
-                        # Only cache if it's not an error message
+                        # Cache toàn bộ câu văn gốc nếu cần (chỉ khi không có lỗi)
                         if not tr.startswith("[ERROR") and not tr.startswith("[TIMEOUT") and not tr.startswith("[FAILED"):
                             newly_translated[chunk] = tr
                     

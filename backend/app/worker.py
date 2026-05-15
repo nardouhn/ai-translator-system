@@ -62,12 +62,35 @@ async def process_file_translation(ctx, file_id: int, file_path: str, source_lan
             async def _do_translate_batch(texts: list[str]) -> list[str]:
                 if not texts:
                     return []
-                translated_texts, _ = await translate_batch_with_provider(texts, domain or "General")
-                for orig, tr in zip(texts, translated_texts):
+                
+                from app.services.text_splitter import split_text_into_chunks
+                
+                translated_texts = []
+                for chunk in texts:
+                    if not chunk.strip():
+                        translated_texts.append(chunk)
+                        continue
+                        
+                    sub_chunks = split_text_into_chunks(chunk, max_chars=600)
+                    tr_parts = []
+                    
+                    # Batch translate the sub_chunks
+                    sc_translations, _ = await translate_batch_with_provider(sub_chunks, domain or "General")
+                    
+                    for sc, sc_tr in zip(sub_chunks, sc_translations):
+                        if sc.strip():
+                            tr_parts.append(sc_tr)
+                        else:
+                            tr_parts.append(sc)
+                            
+                    tr = "".join(tr_parts) if tr_parts else chunk
+                    translated_texts.append(tr)
+                    
                     segments_list.append({
-                        "source_text": orig,
+                        "source_text": chunk,
                         "translated_text": tr
                     })
+                    
                 return translated_texts
 
             async def _do_translate(text: str) -> str:
