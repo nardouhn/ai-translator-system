@@ -178,19 +178,27 @@ async def translate_txt_document(
     Returns:
         Tuple[str, str]: (translated_text, base64_encoded_txt)
     """
-    original_text = file_bytes.decode("utf-8")
+    # Decode input — try UTF-8 first, fallback to latin-1 for legacy files
+    try:
+        original_text = file_bytes.decode("utf-8-sig")  # utf-8-sig strips BOM if present
+    except UnicodeDecodeError:
+        original_text = file_bytes.decode("latin-1")
+    
     lines = original_text.split("\n")
     
     translated_lines = []
     for line in lines:
         stripped_line = line.strip()
         if stripped_line:
-            # Await the async translation function
             translated_lines.append(await translate_fn(stripped_line))
         else:
             translated_lines.append("")  # Preserve empty lines
             
     translated_text = "\n".join(translated_lines)
-    b64_data = base64.b64encode(translated_text.encode("utf-8")).decode("utf-8")
+    
+    # Encode with UTF-8 BOM so that Windows editors (Notepad, Word, etc.)
+    # correctly detect the encoding and display Vietnamese characters properly.
+    output_bytes = "\ufeff".encode("utf-8") + translated_text.encode("utf-8")
+    b64_data = base64.b64encode(output_bytes).decode("utf-8")
     
     return translated_text, b64_data
