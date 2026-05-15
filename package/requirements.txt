@@ -1,0 +1,14 @@
+chromadb
+sentence-transformers
+transformers
+torch
+requests
+pandas
+scikit-learn
+tqdm
+numpy
+python-dotenv
+fastapi
+uvicorn
+python-multipart
+confluent-kafka

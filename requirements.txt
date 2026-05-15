@@ -1,0 +1,11 @@
+chromadb
+sentence-transformers
+mlx-lm
+transformers
+torch
+requests
+pandas
+scikit-learn
+tqdm
+numpy
+python-dotenv

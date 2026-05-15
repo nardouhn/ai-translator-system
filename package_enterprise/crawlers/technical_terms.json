@@ -1,0 +1,372 @@
+[
+  {
+    "english": "regular expression",
+    "vietnamese": "Biểu thức chính quy",
+    "domain": "technical"
+  },
+  {
+    "english": "machine learning",
+    "vietnamese": "Học máy",
+    "domain": "technical"
+  },
+  {
+    "english": "computer science",
+    "vietnamese": "Khoa học máy tính",
+    "domain": "technical"
+  },
+  {
+    "english": "concurrency control",
+    "vietnamese": "Kiểm soát truy cập đồng thời",
+    "domain": "technical"
+  },
+  {
+    "english": "polish notation",
+    "vietnamese": "Kí pháp Ba Lan",
+    "domain": "technical"
+  },
+  {
+    "english": "computer programming",
+    "vietnamese": "Lập trình máy tính",
+    "domain": "technical"
+  },
+  {
+    "english": "quantum computer",
+    "vietnamese": "Máy tính lượng tử",
+    "domain": "technical"
+  },
+  {
+    "english": "computer hardware",
+    "vietnamese": "Phần cứng máy tính",
+    "domain": "technical"
+  },
+  {
+    "english": "simple directmedia layer",
+    "vietnamese": "Simple DirectMedia Layer",
+    "domain": "technical"
+  },
+  {
+    "english": "graph (discrete mathematics)",
+    "vietnamese": "Đồ thị (lý thuyết đồ thị)",
+    "domain": "technical"
+  },
+  {
+    "english": "integer (computer science)",
+    "vietnamese": "Số nguyên (khoa học máy tính)",
+    "domain": "technical"
+  },
+  {
+    "english": "artificial stupidity",
+    "vietnamese": "Sự ngu dốt nhân tạo",
+    "domain": "technical"
+  },
+  {
+    "english": "tex",
+    "vietnamese": "TeX",
+    "domain": "technical"
+  },
+  {
+    "english": "approximation algorithm",
+    "vietnamese": "Thuật toán xấp xỉ",
+    "domain": "technical"
+  },
+  {
+    "english": "abstraction (computer science)",
+    "vietnamese": "Trừu tượng (công nghệ phần mềm)",
+    "domain": "technical"
+  },
+  {
+    "english": "computational thinking",
+    "vietnamese": "Tư duy tính toán",
+    "domain": "technical"
+  },
+  {
+    "english": "vanishing gradient problem",
+    "vietnamese": "Vấn đề gradient biến mất",
+    "domain": "technical"
+  },
+  {
+    "english": ".ai",
+    "vietnamese": ".ai",
+    "domain": "technical"
+  },
+  {
+    "english": "genetic algorithm",
+    "vietnamese": "Giải thuật di truyền",
+    "domain": "technical"
+  },
+  {
+    "english": "google",
+    "vietnamese": "Google",
+    "domain": "technical"
+  },
+  {
+    "english": "expert system",
+    "vietnamese": "Hệ chuyên gia",
+    "domain": "technical"
+  },
+  {
+    "english": "description logic",
+    "vietnamese": "Logic mô tả",
+    "domain": "technical"
+  },
+  {
+    "english": "fuzzy logic",
+    "vietnamese": "Logic mờ",
+    "domain": "technical"
+  },
+  {
+    "english": "history of artificial intelligence",
+    "vietnamese": "Lịch sử ngành trí tuệ nhân tạo",
+    "domain": "technical"
+  },
+  {
+    "english": "artificial intelligence",
+    "vietnamese": "Trí tuệ nhân tạo",
+    "domain": "technical"
+  },
+  {
+    "english": "neuro-fuzzy",
+    "vietnamese": "Neuro-fuzzy",
+    "domain": "technical"
+  },
+  {
+    "english": "intelligent character recognition",
+    "vietnamese": "Nhận dạng Ký tự Thông minh",
+    "domain": "technical"
+  },
+  {
+    "english": "artificial brain",
+    "vietnamese": "Não nhân tạo",
+    "domain": "technical"
+  },
+  {
+    "english": "recaptcha",
+    "vietnamese": "ReCAPTCHA",
+    "domain": "technical"
+  },
+  {
+    "english": "s voice",
+    "vietnamese": "S Voice",
+    "domain": "technical"
+  },
+  {
+    "english": "greedy coloring",
+    "vietnamese": "Thuật toán tô màu tham lam",
+    "domain": "technical"
+  },
+  {
+    "english": "computer vision",
+    "vietnamese": "Thị giác máy tính",
+    "domain": "technical"
+  },
+  {
+    "english": "software agent",
+    "vietnamese": "Tác tử phần mềm",
+    "domain": "technical"
+  },
+  {
+    "english": "mind–body problem",
+    "vietnamese": "Vấn đề tâm–vật",
+    "domain": "technical"
+  },
+  {
+    "english": "natural language processing",
+    "vietnamese": "Xử lý ngôn ngữ tự nhiên",
+    "domain": "technical"
+  },
+  {
+    "english": "hash table",
+    "vietnamese": "Bảng băm",
+    "domain": "technical"
+  },
+  {
+    "english": "tree (graph theory)",
+    "vietnamese": "Cây (lý thuyết đồ thị)",
+    "domain": "technical"
+  },
+  {
+    "english": "data structure",
+    "vietnamese": "Cấu trúc dữ liệu",
+    "domain": "technical"
+  },
+  {
+    "english": "disjoint-set data structure",
+    "vietnamese": "Cấu trúc dữ liệu cho các tập hợp không giao nhau",
+    "domain": "technical"
+  },
+  {
+    "english": "adjacency list",
+    "vietnamese": "Danh sách kề",
+    "domain": "technical"
+  },
+  {
+    "english": "queue (abstract data type)",
+    "vietnamese": "Hàng đợi",
+    "domain": "technical"
+  },
+  {
+    "english": "stack (abstract data type)",
+    "vietnamese": "Ngăn xếp",
+    "domain": "technical"
+  },
+  {
+    "english": "tree rotation",
+    "vietnamese": "Phép quay cây nhị phân",
+    "domain": "technical"
+  },
+  {
+    "english": "shapefile",
+    "vietnamese": "Shapefile",
+    "domain": "technical"
+  },
+  {
+    "english": "recursion (computer science)",
+    "vietnamese": "Đệ quy (tin học)",
+    "domain": "technical"
+  },
+  {
+    "english": "empty string",
+    "vietnamese": "Chuỗi trống",
+    "domain": "technical"
+  },
+  {
+    "english": "fulkerson prize",
+    "vietnamese": "Giải Fulkerson",
+    "domain": "technical"
+  },
+  {
+    "english": "turing award",
+    "vietnamese": "Giải Turing",
+    "domain": "technical"
+  },
+  {
+    "english": "ieee richard w. hamming medal",
+    "vietnamese": "Huy chương Richard W. Hamming",
+    "domain": "technical"
+  },
+  {
+    "english": "graphical user interface",
+    "vietnamese": "Giao diện đồ họa người dùng",
+    "domain": "technical"
+  },
+  {
+    "english": "hypertext",
+    "vietnamese": "Siêu văn bản",
+    "domain": "technical"
+  },
+  {
+    "english": "packet tracer",
+    "vietnamese": "Packet Tracer",
+    "domain": "technical"
+  },
+  {
+    "english": "master of science in information technology",
+    "vietnamese": "Thạc sĩ Khoa học Công nghệ Thông tin",
+    "domain": "technical"
+  },
+  {
+    "english": "udacity",
+    "vietnamese": "Udacity",
+    "domain": "technical"
+  },
+  {
+    "english": "mechatronics",
+    "vietnamese": "Cơ điện tử",
+    "domain": "technical"
+  },
+  {
+    "english": "firmware",
+    "vietnamese": "Firmware",
+    "domain": "technical"
+  },
+  {
+    "english": "embedded system",
+    "vietnamese": "Hệ thống nhúng",
+    "domain": "technical"
+  },
+  {
+    "english": "assembly language",
+    "vietnamese": "Hợp ngữ",
+    "domain": "technical"
+  },
+  {
+    "english": "lua",
+    "vietnamese": "Lua",
+    "domain": "technical"
+  },
+  {
+    "english": "barcode reader",
+    "vietnamese": "Máy quét mã vạch",
+    "domain": "technical"
+  },
+  {
+    "english": "atm",
+    "vietnamese": "Máy rút tiền tự động",
+    "domain": "technical"
+  },
+  {
+    "english": "point of sale",
+    "vietnamese": "Thiết bị bán hàng",
+    "domain": "technical"
+  },
+  {
+    "english": "microcontroller",
+    "vietnamese": "Vi điều khiển",
+    "domain": "technical"
+  },
+  {
+    "english": "mobile phone",
+    "vietnamese": "Điện thoại di động",
+    "domain": "technical"
+  },
+  {
+    "english": "list of content management systems",
+    "vietnamese": "Danh sách hệ quản trị nội dung",
+    "domain": "technical"
+  },
+  {
+    "english": "dnn (software)",
+    "vietnamese": "DotNetNuke",
+    "domain": "technical"
+  },
+  {
+    "english": "drupal",
+    "vietnamese": "Drupal",
+    "domain": "technical"
+  },
+  {
+    "english": "content management system",
+    "vietnamese": "Hệ quản trị nội dung",
+    "domain": "technical"
+  },
+  {
+    "english": "joomla",
+    "vietnamese": "Joomla!",
+    "domain": "technical"
+  },
+  {
+    "english": "mambo (software)",
+    "vietnamese": "Mambo (CMS)",
+    "domain": "technical"
+  },
+  {
+    "english": "moodle",
+    "vietnamese": "Moodle",
+    "domain": "technical"
+  },
+  {
+    "english": "wiki",
+    "vietnamese": "Wiki",
+    "domain": "technical"
+  },
+  {
+    "english": "wordpress",
+    "vietnamese": "WordPress",
+    "domain": "technical"
+  },
+  {
+    "english": "xoops",
+    "vietnamese": "XOOPS",
+    "domain": "technical"
+  }
+]

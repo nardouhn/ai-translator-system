@@ -1,0 +1,532 @@
+[
+  {
+    "english": "exchange rate regime",
+    "vietnamese": "Chế độ tỷ giá hối đoái",
+    "domain": "economic"
+  },
+  {
+    "english": "monetarism",
+    "vietnamese": "Chủ nghĩa tiền tệ",
+    "domain": "economic"
+  },
+  {
+    "english": "surplus value",
+    "vietnamese": "Giá trị thặng dư",
+    "domain": "economic"
+  },
+  {
+    "english": "corner solution",
+    "vietnamese": "Giải pháp góc (kinh tế học)",
+    "domain": "economic"
+  },
+  {
+    "english": "pareto efficiency",
+    "vietnamese": "Hiệu quả Pareto",
+    "domain": "economic"
+  },
+  {
+    "english": "economics",
+    "vietnamese": "Kinh tế học",
+    "domain": "economic"
+  },
+  {
+    "english": "microeconomics",
+    "vietnamese": "Kinh tế học vi mô",
+    "domain": "economic"
+  },
+  {
+    "english": "accounting",
+    "vietnamese": "Kế toán",
+    "domain": "economic"
+  },
+  {
+    "english": "game theory",
+    "vietnamese": "Lý thuyết trò chơi",
+    "domain": "economic"
+  },
+  {
+    "english": "marketing",
+    "vietnamese": "Marketing",
+    "domain": "economic"
+  },
+  {
+    "english": "sovereign wealth fund",
+    "vietnamese": "Quỹ đầu tư quốc gia",
+    "domain": "economic"
+  },
+  {
+    "english": "reaganomics",
+    "vietnamese": "Thuyết kinh tế của Reagan",
+    "domain": "economic"
+  },
+  {
+    "english": "free market",
+    "vietnamese": "Thị trường tự do",
+    "domain": "economic"
+  },
+  {
+    "english": "saving",
+    "vietnamese": "Tiết kiệm",
+    "domain": "economic"
+  },
+  {
+    "english": "chicago school of economics",
+    "vietnamese": "Trường phái kinh tế học Chicago",
+    "domain": "economic"
+  },
+  {
+    "english": "austrian school of economics",
+    "vietnamese": "Trường phái kinh tế học Áo",
+    "domain": "economic"
+  },
+  {
+    "english": "herd mentality",
+    "vietnamese": "Tâm lý bầy đàn",
+    "domain": "economic"
+  },
+  {
+    "english": "industrial espionage",
+    "vietnamese": "Tình báo kinh tế",
+    "domain": "economic"
+  },
+  {
+    "english": "international statistical institute",
+    "vietnamese": "Viện Thống kê Quốc tế",
+    "domain": "economic"
+  },
+  {
+    "english": "economic stability",
+    "vietnamese": "Ổn định kinh tế vĩ mô",
+    "domain": "economic"
+  },
+  {
+    "english": "cash flow statement",
+    "vietnamese": "Báo cáo lưu chuyển tiền tệ",
+    "domain": "economic"
+  },
+  {
+    "english": "balanced scorecard",
+    "vietnamese": "Bảng điểm cân bằng",
+    "domain": "economic"
+  },
+  {
+    "english": "capitalism",
+    "vietnamese": "Chủ nghĩa tư bản",
+    "domain": "economic"
+  },
+  {
+    "english": "chief financial officer",
+    "vietnamese": "Giám đốc tài chính",
+    "domain": "economic"
+  },
+  {
+    "english": "negotiable instrument",
+    "vietnamese": "Hối phiếu",
+    "domain": "economic"
+  },
+  {
+    "english": "business",
+    "vietnamese": "Kinh doanh",
+    "domain": "economic"
+  },
+  {
+    "english": "finance",
+    "vietnamese": "Tài chính",
+    "domain": "economic"
+  },
+  {
+    "english": "sarbanes–oxley act",
+    "vietnamese": "Đạo luật Sarbanes-Oxley",
+    "domain": "economic"
+  },
+  {
+    "english": "build–operate–transfer",
+    "vietnamese": "Đầu tư BOT",
+    "domain": "economic"
+  },
+  {
+    "english": "treasury",
+    "vietnamese": "Kho bạc",
+    "domain": "economic"
+  },
+  {
+    "english": "accounting period (uk taxation)",
+    "vietnamese": "Kỳ kế toán",
+    "domain": "economic"
+  },
+  {
+    "english": "share repurchase",
+    "vietnamese": "Mua lại cổ phần",
+    "domain": "economic"
+  },
+  {
+    "english": "activity-based costing",
+    "vietnamese": "Quản lý chi phí trên cơ sở hoạt động",
+    "domain": "economic"
+  },
+  {
+    "english": "dividend tax",
+    "vietnamese": "Thuế cổ tức",
+    "domain": "economic"
+  },
+  {
+    "english": "money measurement concept",
+    "vietnamese": "Thước đo tiền tệ",
+    "domain": "economic"
+  },
+  {
+    "english": "financial market",
+    "vietnamese": "Thị trường tài chính",
+    "domain": "economic"
+  },
+  {
+    "english": "public finance",
+    "vietnamese": "Tài chính công",
+    "domain": "economic"
+  },
+  {
+    "english": "asset",
+    "vietnamese": "Tài sản",
+    "domain": "economic"
+  },
+  {
+    "english": "credit",
+    "vietnamese": "Tín dụng",
+    "domain": "economic"
+  },
+  {
+    "english": "secret trusts in english law",
+    "vietnamese": "Tín thác bí mật trong luật pháp Anh",
+    "domain": "economic"
+  },
+  {
+    "english": "fictitious capital",
+    "vietnamese": "Tư bản giả",
+    "domain": "economic"
+  },
+  {
+    "english": "credit union",
+    "vietnamese": "Tổ chức tín dụng",
+    "domain": "economic"
+  },
+  {
+    "english": "sports economics",
+    "vietnamese": "Kinh tế thể thao",
+    "domain": "economic"
+  },
+  {
+    "english": "industry (manufacturing)",
+    "vietnamese": "Công nghiệp",
+    "domain": "economic"
+  },
+  {
+    "english": "light industry",
+    "vietnamese": "Công nghiệp nhẹ",
+    "domain": "economic"
+  },
+  {
+    "english": "tertiary sector",
+    "vietnamese": "Khu vực ba của nền kinh tế",
+    "domain": "economic"
+  },
+  {
+    "english": "quaternary sector of the economy",
+    "vietnamese": "Khu vực bốn của nền kinh tế",
+    "domain": "economic"
+  },
+  {
+    "english": "secondary sector",
+    "vietnamese": "Khu vực hai của nền kinh tế",
+    "domain": "economic"
+  },
+  {
+    "english": "primary sector",
+    "vietnamese": "Khu vực một của nền kinh tế",
+    "domain": "economic"
+  },
+  {
+    "english": "private sector",
+    "vietnamese": "Khu vực tư nhân",
+    "domain": "economic"
+  },
+  {
+    "english": "forestry",
+    "vietnamese": "Lâm nghiệp",
+    "domain": "economic"
+  },
+  {
+    "english": "economic sector",
+    "vietnamese": "Ngành kinh tế",
+    "domain": "economic"
+  },
+  {
+    "english": "agriculture",
+    "vietnamese": "Nông nghiệp",
+    "domain": "economic"
+  },
+  {
+    "english": "economy of china",
+    "vietnamese": "Kinh tế Trung Quốc",
+    "domain": "economic"
+  },
+  {
+    "english": "economy of the republic of vietnam",
+    "vietnamese": "Kinh tế Việt Nam Cộng hòa",
+    "domain": "economic"
+  },
+  {
+    "english": "marshall plan",
+    "vietnamese": "Kế hoạch Marshall",
+    "domain": "economic"
+  },
+  {
+    "english": "sustainability",
+    "vietnamese": "Bền vững",
+    "domain": "economic"
+  },
+  {
+    "english": "happy planet index",
+    "vietnamese": "Chỉ số hành tinh hạnh phúc",
+    "domain": "economic"
+  },
+  {
+    "english": "neglected and underutilized crop",
+    "vietnamese": "Cây trồng chưa sử dụng và khai thác đúng tiềm năng",
+    "domain": "economic"
+  },
+  {
+    "english": "together for sustainability",
+    "vietnamese": "Cùng nhau vì sự bền vững",
+    "domain": "economic"
+  },
+  {
+    "english": "degrowth",
+    "vietnamese": "Giảm phát triển",
+    "domain": "economic"
+  },
+  {
+    "english": "lca",
+    "vietnamese": "LCA",
+    "domain": "economic"
+  },
+  {
+    "english": "sustainable development goals",
+    "vietnamese": "Mục tiêu phát triển bền vững",
+    "domain": "economic"
+  },
+  {
+    "english": "natural resource management",
+    "vietnamese": "Quản lý tài nguyên thiên nhiên",
+    "domain": "economic"
+  },
+  {
+    "english": "ecological design",
+    "vietnamese": "Thiết kế sinh thái",
+    "domain": "economic"
+  },
+  {
+    "english": "wef global competitiveness report",
+    "vietnamese": "Báo cáo cạnh tranh toàn cầu",
+    "domain": "economic"
+  },
+  {
+    "english": "china western development",
+    "vietnamese": "Chiến lược phát triển miền Tây Trung Quốc",
+    "domain": "economic"
+  },
+  {
+    "english": "economic policy",
+    "vietnamese": "Chính sách kinh tế",
+    "domain": "economic"
+  },
+  {
+    "english": "sterilization (economics)",
+    "vietnamese": "Chính sách thanh khoản đối ứng",
+    "domain": "economic"
+  },
+  {
+    "english": "provincial competitiveness index",
+    "vietnamese": "Chỉ số năng lực cạnh tranh cấp tỉnh",
+    "domain": "economic"
+  },
+  {
+    "english": "ease of doing business index",
+    "vietnamese": "Chỉ số thuận lợi kinh doanh",
+    "domain": "economic"
+  },
+  {
+    "english": "index of economic freedom",
+    "vietnamese": "Chỉ số tự do kinh tế",
+    "domain": "economic"
+  },
+  {
+    "english": "import substitution industrialization",
+    "vietnamese": "Công nghiệp hóa thay thế nhập khẩu",
+    "domain": "economic"
+  },
+  {
+    "english": "open market operation",
+    "vietnamese": "Nghiệp vụ thị trường mở",
+    "domain": "economic"
+  },
+  {
+    "english": "budget deficits",
+    "vietnamese": "Thâm hụt ngân sách",
+    "domain": "economic"
+  },
+  {
+    "english": "dutch disease",
+    "vietnamese": "Căn bệnh Hà Lan",
+    "domain": "economic"
+  },
+  {
+    "english": "open economy",
+    "vietnamese": "Kinh tế mở",
+    "domain": "economic"
+  },
+  {
+    "english": "world economy",
+    "vietnamese": "Kinh tế thế giới",
+    "domain": "economic"
+  },
+  {
+    "english": "capital control",
+    "vietnamese": "Kiểm soát vốn",
+    "domain": "economic"
+  },
+  {
+    "english": "razor-and-blades model",
+    "vietnamese": "Mô hình dao cạo và lưỡi dao",
+    "domain": "economic"
+  },
+  {
+    "english": "the rich get richer and the poor get poorer",
+    "vietnamese": "Người giàu càng giàu và người nghèo càng nghèo",
+    "domain": "economic"
+  },
+  {
+    "english": "robinson crusoe economy",
+    "vietnamese": "Nền kinh tế Robinson Crusoe",
+    "domain": "economic"
+  },
+  {
+    "english": "animal spirits (keynes)",
+    "vietnamese": "Tinh thần động vật",
+    "domain": "economic"
+  },
+  {
+    "english": "currency",
+    "vietnamese": "Tiền tệ",
+    "domain": "economic"
+  },
+  {
+    "english": "dollar voting",
+    "vietnamese": "Tín nhiệm sản phẩm",
+    "domain": "economic"
+  },
+  {
+    "english": "indifference curve",
+    "vietnamese": "Bàng quan (kinh tế học)",
+    "domain": "economic"
+  },
+  {
+    "english": "budget constraint",
+    "vietnamese": "Chế ước ngân sách",
+    "domain": "economic"
+  },
+  {
+    "english": "is–lm model",
+    "vietnamese": "Mô hình IS–LM",
+    "domain": "economic"
+  },
+  {
+    "english": "ad–as model",
+    "vietnamese": "Mô hình tổng cầu và tổng cung",
+    "domain": "economic"
+  },
+  {
+    "english": "supply and demand",
+    "vietnamese": "Nguyên lý cung - cầu",
+    "domain": "economic"
+  },
+  {
+    "english": "is/lm model#is schedule",
+    "vietnamese": "Đường IS",
+    "domain": "economic"
+  },
+  {
+    "english": "laffer curve",
+    "vietnamese": "Đường cong Laffer",
+    "domain": "economic"
+  },
+  {
+    "english": "lorenz curve",
+    "vietnamese": "Đường cong Lorenz",
+    "domain": "economic"
+  },
+  {
+    "english": "phillips curve",
+    "vietnamese": "Đường cong Phillips",
+    "domain": "economic"
+  },
+  {
+    "english": "production–possibility frontier",
+    "vietnamese": "Đường giới hạn khả năng sản xuất",
+    "domain": "economic"
+  },
+  {
+    "english": "list of nobel memorial prize laureates in economic sciences",
+    "vietnamese": "Danh sách người đoạt giải Nobel Kinh tế",
+    "domain": "economic"
+  },
+  {
+    "english": "john bates clark medal",
+    "vietnamese": "Giải John Bates Clark",
+    "domain": "economic"
+  },
+  {
+    "english": "nakahara prize",
+    "vietnamese": "Giải Nakahara",
+    "domain": "economic"
+  },
+  {
+    "english": "nobel memorial prize in economic sciences",
+    "vietnamese": "Giải Nobel Kinh tế",
+    "domain": "economic"
+  },
+  {
+    "english": "yrjö jahnsson award",
+    "vietnamese": "Giải Yrjö Jahnsson",
+    "domain": "economic"
+  },
+  {
+    "english": "frisch medal",
+    "vietnamese": "Huy chương Frisch",
+    "domain": "economic"
+  },
+  {
+    "english": "convergence (economics)",
+    "vietnamese": "Giả thuyết hội tụ",
+    "domain": "economic"
+  },
+  {
+    "english": "spillover (economics)",
+    "vietnamese": "Hiệu ứng lan tỏa",
+    "domain": "economic"
+  },
+  {
+    "english": "cobra effect",
+    "vietnamese": "Hiệu ứng rắn hổ mang",
+    "domain": "economic"
+  },
+  {
+    "english": "wealth effect",
+    "vietnamese": "Hiệu ứng tài sản",
+    "domain": "economic"
+  },
+  {
+    "english": "multiplier (economics)",
+    "vietnamese": "Số nhân (kinh tế học)",
+    "domain": "economic"
+  }
+]

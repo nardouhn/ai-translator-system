@@ -1,0 +1,627 @@
+[
+  {
+    "english": "hospital",
+    "vietnamese": "Bệnh viện",
+    "domain": "medical"
+  },
+  {
+    "english": "clinic",
+    "vietnamese": "Cơ sở khám chữa bệnh",
+    "domain": "medical"
+  },
+  {
+    "english": "epidemiology",
+    "vietnamese": "Dịch tễ học",
+    "domain": "medical"
+  },
+  {
+    "english": "elisa",
+    "vietnamese": "ELISA",
+    "domain": "medical"
+  },
+  {
+    "english": "gangrene",
+    "vietnamese": "Hoại thư",
+    "domain": "medical"
+  },
+  {
+    "english": "blood pressure",
+    "vietnamese": "Huyết áp",
+    "domain": "medical"
+  },
+  {
+    "english": "dry eye syndrome",
+    "vietnamese": "Khô mắt",
+    "domain": "medical"
+  },
+  {
+    "english": "lasik",
+    "vietnamese": "Lasik",
+    "domain": "medical"
+  },
+  {
+    "english": "glasgow smile",
+    "vietnamese": "Nụ cười Glasgow",
+    "domain": "medical"
+  },
+  {
+    "english": "medicine",
+    "vietnamese": "Y học",
+    "domain": "medical"
+  },
+  {
+    "english": "somatic symptom disorder",
+    "vietnamese": "Rối loạn dạng cơ thể",
+    "domain": "medical"
+  },
+  {
+    "english": "motion sickness",
+    "vietnamese": "Say tàu xe",
+    "domain": "medical"
+  },
+  {
+    "english": "human biology",
+    "vietnamese": "Sinh học người",
+    "domain": "medical"
+  },
+  {
+    "english": "neonatology",
+    "vietnamese": "Sơ sinh",
+    "domain": "medical"
+  },
+  {
+    "english": "osteopenia",
+    "vietnamese": "Thiếu xương",
+    "domain": "medical"
+  },
+  {
+    "english": "sedative",
+    "vietnamese": "Thuốc an thần",
+    "domain": "medical"
+  },
+  {
+    "english": "contraception",
+    "vietnamese": "Tránh thai",
+    "domain": "medical"
+  },
+  {
+    "english": "constipation",
+    "vietnamese": "Táo bón",
+    "domain": "medical"
+  },
+  {
+    "english": "fowler's position",
+    "vietnamese": "Tư thế Fowler",
+    "domain": "medical"
+  },
+  {
+    "english": "gingival recession",
+    "vietnamese": "Tụt lợi",
+    "domain": "medical"
+  },
+  {
+    "english": "ventricular septal defect",
+    "vietnamese": "Thông liên thất",
+    "domain": "medical"
+  },
+  {
+    "english": "health physics",
+    "vietnamese": "Vật lý sức khỏe",
+    "domain": "medical"
+  },
+  {
+    "english": "vaccine",
+    "vietnamese": "Vắc-xin",
+    "domain": "medical"
+  },
+  {
+    "english": "wound",
+    "vietnamese": "Vết thương",
+    "domain": "medical"
+  },
+  {
+    "english": "food safety",
+    "vietnamese": "Vệ sinh an toàn thực phẩm",
+    "domain": "medical"
+  },
+  {
+    "english": "cystic fibrosis",
+    "vietnamese": "Xơ nang",
+    "domain": "medical"
+  },
+  {
+    "english": "evidence-based medicine",
+    "vietnamese": "Y học chứng cứ",
+    "domain": "medical"
+  },
+  {
+    "english": "physical medicine and rehabilitation",
+    "vietnamese": "Y học thể chất và phục hồi chức năng",
+    "domain": "medical"
+  },
+  {
+    "english": "croup",
+    "vietnamese": "Yết hầu (bệnh)",
+    "domain": "medical"
+  },
+  {
+    "english": "tumor",
+    "vietnamese": "Bướu",
+    "domain": "medical"
+  },
+  {
+    "english": "phyllodes tumor",
+    "vietnamese": "Bướu diệp thể vú",
+    "domain": "medical"
+  },
+  {
+    "english": "disease",
+    "vietnamese": "Bệnh",
+    "domain": "medical"
+  },
+  {
+    "english": "alzheimer's disease",
+    "vietnamese": "Bệnh Alzheimer",
+    "domain": "medical"
+  },
+  {
+    "english": "pulmonary heart disease",
+    "vietnamese": "Bệnh tâm phế",
+    "domain": "medical"
+  },
+  {
+    "english": "priapism",
+    "vietnamese": "Chứng cương đau",
+    "domain": "medical"
+  },
+  {
+    "english": "alopecia",
+    "vietnamese": "Hói đầu",
+    "domain": "medical"
+  },
+  {
+    "english": "irritable bowel syndrome",
+    "vietnamese": "Hội chứng ruột kích thích",
+    "domain": "medical"
+  },
+  {
+    "english": "plantar wart",
+    "vietnamese": "Hột cơm",
+    "domain": "medical"
+  },
+  {
+    "english": "necrophilia",
+    "vietnamese": "Ái tử thi",
+    "domain": "medical"
+  },
+  {
+    "english": "acne",
+    "vietnamese": "Mụn trứng cá",
+    "domain": "medical"
+  },
+  {
+    "english": "dyslipidemia",
+    "vietnamese": "Rối loạn mỡ máu",
+    "domain": "medical"
+  },
+  {
+    "english": "scurvy",
+    "vietnamese": "Scorbut",
+    "domain": "medical"
+  },
+  {
+    "english": "kidney failure",
+    "vietnamese": "Suy thận",
+    "domain": "medical"
+  },
+  {
+    "english": "hemorrhoid",
+    "vietnamese": "Trĩ (bệnh)",
+    "domain": "medical"
+  },
+  {
+    "english": "tetanus",
+    "vietnamese": "Uốn ván",
+    "domain": "medical"
+  },
+  {
+    "english": "meningitis",
+    "vietnamese": "Viêm màng não",
+    "domain": "medical"
+  },
+  {
+    "english": "inflammatory bowel disease",
+    "vietnamese": "Viêm ruột",
+    "domain": "medical"
+  },
+  {
+    "english": "jaundice",
+    "vietnamese": "Vàng da",
+    "domain": "medical"
+  },
+  {
+    "english": "diphtheria",
+    "vietnamese": "Bạch hầu",
+    "domain": "medical"
+  },
+  {
+    "english": "sexual violence",
+    "vietnamese": "Bạo hành tình dục",
+    "domain": "medical"
+  },
+  {
+    "english": "burn",
+    "vietnamese": "Bỏng",
+    "domain": "medical"
+  },
+  {
+    "english": "bleeding",
+    "vietnamese": "Chảy máu",
+    "domain": "medical"
+  },
+  {
+    "english": "traumatic brain injury",
+    "vietnamese": "Chấn thương sọ não",
+    "domain": "medical"
+  },
+  {
+    "english": "hypoglycemia",
+    "vietnamese": "Hạ đường huyết",
+    "domain": "medical"
+  },
+  {
+    "english": "multiple organ dysfunction syndrome",
+    "vietnamese": "Hội chứng rối loạn chức năng đa cơ quan",
+    "domain": "medical"
+  },
+  {
+    "english": "systemic inflammatory response syndrome",
+    "vietnamese": "Hội chứng đáp ứng viêm hệ thống",
+    "domain": "medical"
+  },
+  {
+    "english": "2009 swine flu pandemic",
+    "vietnamese": "Đại dịch cúm 2009",
+    "domain": "medical"
+  },
+  {
+    "english": "sepsis",
+    "vietnamese": "Nhiễm trùng huyết",
+    "domain": "medical"
+  },
+  {
+    "english": "urinary tract infection",
+    "vietnamese": "Nhiễm trùng đường tiết niệu",
+    "domain": "medical"
+  },
+  {
+    "english": "myocardial infarction",
+    "vietnamese": "Nhồi máu cơ tim",
+    "domain": "medical"
+  },
+  {
+    "english": "arrhythmia",
+    "vietnamese": "Rối loạn nhịp tim",
+    "domain": "medical"
+  },
+  {
+    "english": "malaria",
+    "vietnamese": "Sốt rét",
+    "domain": "medical"
+  },
+  {
+    "english": "stroke",
+    "vietnamese": "Tai biến mạch máu não",
+    "domain": "medical"
+  },
+  {
+    "english": "ectopic pregnancy",
+    "vietnamese": "Thai ngoài tử cung",
+    "domain": "medical"
+  },
+  {
+    "english": "glasgow coma scale",
+    "vietnamese": "Thang điểm hôn mê Glasgow",
+    "domain": "medical"
+  },
+  {
+    "english": "pulmonary embolism",
+    "vietnamese": "Thuyên tắc động mạch phổi",
+    "domain": "medical"
+  },
+  {
+    "english": "hyperkalemia",
+    "vietnamese": "Tăng kali máu",
+    "domain": "medical"
+  },
+  {
+    "english": "psychotic depression",
+    "vietnamese": "Trầm cảm tâm thần",
+    "domain": "medical"
+  },
+  {
+    "english": "suicide",
+    "vietnamese": "Tự sát",
+    "domain": "medical"
+  },
+  {
+    "english": "myocarditis",
+    "vietnamese": "Viêm cơ tim",
+    "domain": "medical"
+  },
+  {
+    "english": "encephalitis",
+    "vietnamese": "Viêm não",
+    "domain": "medical"
+  },
+  {
+    "english": "necrotizing enterocolitis",
+    "vietnamese": "Viêm ruột hoại tử",
+    "domain": "medical"
+  },
+  {
+    "english": "appendicitis",
+    "vietnamese": "Viêm ruột thừa",
+    "domain": "medical"
+  },
+  {
+    "english": "acute pancreatitis",
+    "vietnamese": "Viêm tụy cấp",
+    "domain": "medical"
+  },
+  {
+    "english": "chronic pancreatitis",
+    "vietnamese": "Viêm tụy mãn tính",
+    "domain": "medical"
+  },
+  {
+    "english": "pathology",
+    "vietnamese": "Bệnh lý học",
+    "domain": "medical"
+  },
+  {
+    "english": "medical specialty",
+    "vietnamese": "Khoa và chuyên khoa sâu (y học)",
+    "domain": "medical"
+  },
+  {
+    "english": "dentistry",
+    "vietnamese": "Nha khoa",
+    "domain": "medical"
+  },
+  {
+    "english": "pediatrics",
+    "vietnamese": "Nhi khoa",
+    "domain": "medical"
+  },
+  {
+    "english": "internal medicine",
+    "vietnamese": "Nội khoa",
+    "domain": "medical"
+  },
+  {
+    "english": "intraocular lens",
+    "vietnamese": "Phakic IOL",
+    "domain": "medical"
+  },
+  {
+    "english": "plastic surgery",
+    "vietnamese": "Phẫu thuật thẩm mỹ",
+    "domain": "medical"
+  },
+  {
+    "english": "saffron",
+    "vietnamese": "Saffron",
+    "domain": "medical"
+  },
+  {
+    "english": "neurology",
+    "vietnamese": "Thần kinh học",
+    "domain": "medical"
+  },
+  {
+    "english": "pain management",
+    "vietnamese": "Điều trị đau",
+    "domain": "medical"
+  },
+  {
+    "english": "pathogen reduction using riboflavin and uv light",
+    "vietnamese": "Giảm mầm bệnh bằng cách sử dụng riboflavin và tia UV",
+    "domain": "medical"
+  },
+  {
+    "english": "sexually transmitted infection",
+    "vietnamese": "Bệnh lây truyền qua đường tình dục",
+    "domain": "medical"
+  },
+  {
+    "english": "cutaneous condition#primary lesions",
+    "vietnamese": "Chấm (da liễu học)",
+    "domain": "medical"
+  },
+  {
+    "english": "pimple",
+    "vietnamese": "Mụn mủ",
+    "domain": "medical"
+  },
+  {
+    "english": "vesicle",
+    "vietnamese": "Mụn nước",
+    "domain": "medical"
+  },
+  {
+    "english": "nodule (medicine)",
+    "vietnamese": "Nốt (da liễu học)",
+    "domain": "medical"
+  },
+  {
+    "english": "pemphigus",
+    "vietnamese": "Pemphigus",
+    "domain": "medical"
+  },
+  {
+    "english": "leprosy",
+    "vietnamese": "Phong cùi",
+    "domain": "medical"
+  },
+  {
+    "english": "papule",
+    "vietnamese": "Sẩn (da liễu học)",
+    "domain": "medical"
+  },
+  {
+    "english": "desquamation",
+    "vietnamese": "Tróc vảy",
+    "domain": "medical"
+  },
+  {
+    "english": "eczema",
+    "vietnamese": "Viêm da",
+    "domain": "medical"
+  },
+  {
+    "english": "skeletal muscle cramp",
+    "vietnamese": "Chuột rút",
+    "domain": "medical"
+  },
+  {
+    "english": "body mass index",
+    "vietnamese": "Chỉ số khối cơ thể",
+    "domain": "medical"
+  },
+  {
+    "english": "heterochromia",
+    "vietnamese": "Loạn sắc tố mống mắt",
+    "domain": "medical"
+  },
+  {
+    "english": "urination",
+    "vietnamese": "Tiểu tiện",
+    "domain": "medical"
+  },
+  {
+    "english": "flatulence",
+    "vietnamese": "Trung tiện",
+    "domain": "medical"
+  },
+  {
+    "english": "waist–hip ratio",
+    "vietnamese": "Tỷ số vòng eo trên vòng mông",
+    "domain": "medical"
+  },
+  {
+    "english": "mcburney's point",
+    "vietnamese": "Điểm McBurney",
+    "domain": "medical"
+  },
+  {
+    "english": "defecation",
+    "vietnamese": "Đại tiện",
+    "domain": "medical"
+  },
+  {
+    "english": "hallucination",
+    "vietnamese": "Ảo giác",
+    "domain": "medical"
+  },
+  {
+    "english": "digoxin",
+    "vietnamese": "Digoxin",
+    "domain": "medical"
+  },
+  {
+    "english": "pharmacology",
+    "vietnamese": "Dược lý học",
+    "domain": "medical"
+  },
+  {
+    "english": "medication",
+    "vietnamese": "Dược phẩm",
+    "domain": "medical"
+  },
+  {
+    "english": "british pharmacopoeia",
+    "vietnamese": "Dược điển Anh",
+    "domain": "medical"
+  },
+  {
+    "english": "united states pharmacopeia",
+    "vietnamese": "Dược điển Hoa Kỳ",
+    "domain": "medical"
+  },
+  {
+    "english": "pharmacokinetics",
+    "vietnamese": "Dược động học",
+    "domain": "medical"
+  },
+  {
+    "english": "cardiac glycoside",
+    "vietnamese": "Glycoside tim",
+    "domain": "medical"
+  },
+  {
+    "english": "medicinal chemistry",
+    "vietnamese": "Hóa dược",
+    "domain": "medical"
+  },
+  {
+    "english": "structure-activity relationship",
+    "vietnamese": "SAR",
+    "domain": "medical"
+  },
+  {
+    "english": "antidepressant",
+    "vietnamese": "Thuốc chống trầm cảm",
+    "domain": "medical"
+  },
+  {
+    "english": "euthanasia",
+    "vietnamese": "An tử",
+    "domain": "medical"
+  },
+  {
+    "english": "mental disorder",
+    "vietnamese": "Bệnh tâm thần",
+    "domain": "medical"
+  },
+  {
+    "english": "assisted reproductive technology",
+    "vietnamese": "Công nghệ hỗ trợ sinh sản",
+    "domain": "medical"
+  },
+  {
+    "english": "henrietta lacks",
+    "vietnamese": "Henrietta Lacks",
+    "domain": "medical"
+  },
+  {
+    "english": "hippocrates",
+    "vietnamese": "Hippocrates",
+    "domain": "medical"
+  },
+  {
+    "english": "jack kevorkian",
+    "vietnamese": "Jack Kevorkian",
+    "domain": "medical"
+  },
+  {
+    "english": "hippocratic oath",
+    "vietnamese": "Lời thề Hippocrates",
+    "domain": "medical"
+  },
+  {
+    "english": "eugenics",
+    "vietnamese": "Thuyết ưu sinh",
+    "domain": "medical"
+  },
+  {
+    "english": "unethical human experimentation in the united states",
+    "vietnamese": "Thí nghiệm vô nhân đạo trên người tại Hoa Kỳ",
+    "domain": "medical"
+  },
+  {
+    "english": "male egg",
+    "vietnamese": "Trứng đực",
+    "domain": "medical"
+  }
+]

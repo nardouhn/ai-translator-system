@@ -1,0 +1,35 @@
+# System Files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Data & Databases (Large files)
+VectorDB_Gemini/
+model_offload/
+merge_offload/
+*.index
+*.faiss
+*.pkl
+*.zip
+*.rar
+*.7z
+*.pdf
+*.xlsx
+
+# Models & Outputs
+outputs/
+checkpoint-*/
+
+# Specific large files in data/
+data/raw_resources/
+data/medical/medical_context.json
+data/raw_resources/medical_context.csv
+data/raw_resources/clean_dataset.csv

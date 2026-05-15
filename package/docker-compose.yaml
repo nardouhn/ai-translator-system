@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  translator-api:
+    build: .
+    container_name: ai-translator-service
+    ports:
+      - "8000:8000"
+    volumes:
+      # Gắn thư mục mô hình từ bên ngoài vào để không cần copy nặng
+      - ../outputs/completed_model_mlx:/app/model
+      # Gắn database để dữ liệu cache/tri thức được lưu lại bền vững
+      - ./VectorDB_Gemini:/app/VectorDB_Gemini
+    environment:
+      - MODEL_PATH=/app/model
+      - DB_PATH=/app/VectorDB_Gemini
+      - ENABLE_KAFKA=true
+      - KAFKA_SERVERS=kafka:9092
+      - KAFKA_TOPIC=translation_updates
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
