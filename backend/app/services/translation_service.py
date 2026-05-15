@@ -101,10 +101,10 @@ async def stream_translate_text(
             logger.warning(f"🔴 CACHE MISS for chunk: '{cleaned_chunk[:20]}...'. Calling Kaggle...")
             try:
                 translated_chunk = await translate_chunk_async(chunk, domain_str)
-                if translated_chunk is None or translated_chunk == chunk:
-                    logger.error(f"Chunk {i} translation returned identical text, treating as failure.")
-                    from fastapi import HTTPException
-                    raise HTTPException(status_code=502, detail="Translation API returned identical source text.")
+                if translated_chunk is None:
+                    translated_chunk = chunk
+                elif translated_chunk == chunk:
+                    logger.warning(f"Chunk {i} translation returned identical text, keeping it.")
                 
                 yield f"data: {json.dumps({'chunk': translated_chunk})}\n\n"
                 final_translated_chunks.append(translated_chunk)
