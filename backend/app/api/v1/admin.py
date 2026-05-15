@@ -1,12 +1,16 @@
 """
-Admin API Router
-----------------
+Admin API Router – v2
+=====================
 Endpoints dành riêng cho Admin Dashboard (CMS).
 Tất cả routes đều yêu cầu ADMIN_API_KEY hợp lệ.
 
-Bảo mật: truyền key qua một trong hai cách:
-  - Header:  Authorization: Bearer <ADMIN_API_KEY>
-  - Header:  X-API-Key: <ADMIN_API_KEY>
+Bảo mật – truyền key qua một trong hai header:
+  Authorization: Bearer <ADMIN_API_KEY>
+  X-API-Key: <ADMIN_API_KEY>
+
+Endpoints:
+  GET  /api/admin/stats        → Thống kê tổng hợp
+  POST /api/admin/clear-cache  → Xóa toàn bộ Redis cache
 """
 
 from __future__ import annotations
@@ -16,10 +20,10 @@ import logging
 import redis.asyncio as aioredis
 from fastapi import APIRouter, Depends, HTTPException, Security, status
 from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import func, select
+from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import File, Logs, StatusEnum
+from app.db.models import File, Logs, RequestTypeEnum, Session, StatusEnum
 from app.db.session import get_async_db
 from app.settings import settings
 
@@ -39,15 +43,12 @@ async def verify_admin_key(
     x_api_key: str | None = Security(_api_key_header),
 ) -> None:
     """
-    Dependency: kiểm tra ADMIN_API_KEY.
-    Chấp nhận token từ:
-      - Authorization: Bearer <token>
-      - X-API-Key: <token>
+    Dependency kiểm tra ADMIN_API_KEY.
+    Ưu tiên: Authorization: Bearer → X-API-Key.
     """
     expected = settings.admin_api_key
 
     if not expected:
-        # Chưa cấu hình key → chặn toàn bộ để tránh lộ dữ liệu
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="ADMIN_API_KEY chưa được cấu hình trên server.",
@@ -77,34 +78,60 @@ async def verify_admin_key(
 )
 async def get_admin_stats(db: AsyncSession = Depends(get_async_db)):
     """
-    Trả về:
-    - **total_files_translated**: tổng số file có status = 'success' trong bảng `file`
-    - **total_tokens_consumed**: hiện tại schema chưa lưu tokens_used nên trả về 0.
-      👉 Khi bảng có cột đó, thay bằng: `select(func.sum(YourModel.tokens_used))`
+    Trả về các chỉ số:
+
+    - **total_texts_translated** – logs có request_type='text' & status='success'
+    - **total_files_translated** – logs có request_type='file' & status='success'
+    - **total_data_processed_mb** – SUM(file.file_size) của file status='success', đổi sang MB
+    - **total_sessions** – tổng số dòng trong bảng session
+    - **error_rate_percent** – % dòng logs có status != 'success' trên tổng logs
     """
     try:
-        # ── Đếm file đã dịch thành công ────────────────────────────────────
-        # Bảng: file  |  Cột trạng thái: status  |  Giá trị cần đếm: 'success'
-        stmt_files = select(func.count(File.file_id)).where(
+        # ── 1. Tổng bản dịch văn bản thành công ─────────────────────────────
+        stmt_texts = select(func.count(Logs.log_id)).where(
+            Logs.request_type == RequestTypeEnum.text,
+            Logs.status == StatusEnum.success,
+        )
+        total_texts: int = (await db.execute(stmt_texts)).scalar_one() or 0
+
+        # ── 2. Tổng file đã dịch thành công ──────────────────────────────────
+        stmt_files = select(func.count(Logs.log_id)).where(
+            Logs.request_type == RequestTypeEnum.file,
+            Logs.status == StatusEnum.success,
+        )
+        total_files: int = (await db.execute(stmt_files)).scalar_one() or 0
+
+        # ── 3. Tổng dữ liệu đã xử lý (MB) ───────────────────────────────────
+        # SUM(file_size) bytes → đổi sang MB (1 MB = 1_048_576 bytes)
+        stmt_size = select(func.sum(File.file_size)).where(
             File.status == StatusEnum.success
         )
-        result_files = await db.execute(stmt_files)
-        total_files: int = result_files.scalar_one() or 0
+        total_bytes: int = (await db.execute(stmt_size)).scalar_one() or 0
+        total_mb = round(total_bytes / 1_048_576, 2)
 
-        # ── Tổng tokens đã dùng ────────────────────────────────────────────
-        # TODO: Schema hiện tại (Logs) chưa có cột tokens_used.
-        #       Khi thêm cột vào model, thay đoạn này:
-        #
-        #   from app.db.models import Logs
-        #   stmt_tokens = select(func.sum(Logs.tokens_used))
-        #   result_tokens = await db.execute(stmt_tokens)
-        #   total_tokens: int = result_tokens.scalar_one() or 0
-        #
-        total_tokens: int = 0  # placeholder – thay thế khi có cột tokens_used
+        # ── 4. Tổng số sessions ───────────────────────────────────────────────
+        stmt_sessions = select(func.count(Session.session_id))
+        total_sessions: int = (await db.execute(stmt_sessions)).scalar_one() or 0
+
+        # ── 5. Tỷ lệ lỗi (%) ─────────────────────────────────────────────────
+        # error_rate = count(logs WHERE status != 'success') / count(*) * 100
+        stmt_error = select(
+            func.count(Logs.log_id).label("total"),
+            func.sum(
+                case((Logs.status != StatusEnum.success, 1), else_=0)
+            ).label("errors"),
+        )
+        error_row = (await db.execute(stmt_error)).one()
+        total_logs: int = error_row.total or 0
+        error_count: int = int(error_row.errors or 0)
+        error_rate = round((error_count / total_logs * 100), 2) if total_logs > 0 else 0.0
 
         return {
+            "total_texts_translated": total_texts,
             "total_files_translated": total_files,
-            "total_tokens_consumed": total_tokens,
+            "total_data_processed_mb": total_mb,
+            "total_sessions": total_sessions,
+            "error_rate_percent": error_rate,
         }
 
     except Exception as exc:
@@ -120,16 +147,15 @@ async def get_admin_stats(db: AsyncSession = Depends(get_async_db)):
 # ---------------------------------------------------------------------------
 @router.post(
     "/clear-cache",
-    summary="Xóa toàn bộ Redis cache",
+    summary="Xóa toàn bộ Redis cache (Upstash)",
     dependencies=[Depends(verify_admin_key)],
 )
 async def clear_redis_cache():
     """
-    Kết nối đến Upstash Redis và thực hiện FLUSHDB để xóa toàn bộ keys
-    trong database hiện tại (database 0 theo mặc định của REDIS_URL).
+    Kết nối Upstash Redis qua redis.asyncio và gọi FLUSHDB.
 
-    Nếu muốn chỉ xóa theo prefix (an toàn hơn), dùng pattern SCAN + DEL:
-        async for key in redis_client.scan_iter("prefix:*"):
+    Nếu muốn chỉ xóa theo prefix (an toàn hơn), thay bằng:
+        async for key in redis_client.scan_iter("cache:*"):
             await redis_client.delete(key)
     """
     redis_client: aioredis.Redis | None = None
@@ -141,10 +167,13 @@ async def clear_redis_cache():
             socket_connect_timeout=5,
         )
 
-        # Xóa toàn bộ keys trong DB hiện tại
-        await redis_client.flushdb(asynchronous=True)
+        # Ping trước khi xóa để chắc chắn kết nối OK
+        await redis_client.ping()
 
-        logger.info("Admin đã xóa toàn bộ Redis cache.")
+        # FLUSHDB xóa toàn bộ keys trong database hiện tại
+        await redis_client.flushdb()
+
+        logger.info("Admin: đã xóa toàn bộ Redis cache.")
         return {"status": "success", "message": "Redis cache cleared successfully"}
 
     except Exception as exc:
