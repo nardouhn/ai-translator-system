@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 from app.api.v1.file_translate import router as file_translate_router
 from app.api.v1.translate import router as translate_router
 from app.api.v1.health import router as health_router
+from app.api.v1.admin import router as admin_router
 
 app = FastAPI()
 
@@ -31,6 +32,7 @@ app.add_middleware(
 app.include_router(translate_router, prefix="/api/v1")
 app.include_router(file_translate_router, prefix="/api/v1")
 app.include_router(health_router, prefix="/api/v1")
+app.include_router(admin_router, prefix="/api")
 
 
 @app.get("/")

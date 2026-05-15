@@ -1,0 +1,6 @@
+services:
+  ai_translator_admin.api_client:
+    class: Drupal\ai_translator_admin\Services\FastApiClient
+    arguments:
+      - '@http_client'
+      - '@config.factory'

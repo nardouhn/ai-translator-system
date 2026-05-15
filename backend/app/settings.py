@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     r2_secret_access_key: str | None = os.getenv("R2_SECRET_ACCESS_KEY")
     r2_endpoint_url: str | None = os.getenv("R2_ENDPOINT_URL")
     r2_bucket_name: str | None = os.getenv("R2_BUCKET_NAME")
+    admin_api_key: str = os.getenv("ADMIN_API_KEY", "")
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

@@ -1,0 +1,233 @@
+/**
+ * @file
+ * Shared admin stylesheet for the ai_translator_admin module.
+ *
+ * Scoped to BEM blocks prefixed with `ait-` (AI Translator) to avoid
+ * collisions with Drupal core admin theme styles (Claro / Gin).
+ */
+
+/* ── Custom font import ─────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ── CSS custom properties (design tokens) ─────────────────────────────── */
+:root {
+  --ait-font:           'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  /* Palette */
+  --ait-color-bg:       #f8fafc;
+  --ait-color-surface:  #ffffff;
+  --ait-color-border:   #e2e8f0;
+  --ait-color-text:     #0f172a;
+  --ait-color-muted:    #64748b;
+  --ait-color-accent:   #6366f1;
+  --ait-color-success:  #16a34a;
+  --ait-color-warning:  #d97706;
+  --ait-color-danger:   #dc2626;
+
+  /* Source column highlight */
+  --ait-source-bg:      #f0f9ff;
+  --ait-source-border:  #bae6fd;
+
+  /* Translated column highlight */
+  --ait-trans-bg:       #f0fdf4;
+  --ait-trans-border:   #bbf7d0;
+
+  /* Empty cell */
+  --ait-empty-bg:       #fef9c3;
+  --ait-empty-color:    #a16207;
+
+  --ait-radius:         10px;
+  --ait-shadow:         0 2px 14px rgba(0, 0, 0, .07);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FILE AUDIT PAGE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Page header ─────────────────────────────────────────────────────────── */
+.ait-audit__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .75rem;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #f1f5f9;
+  border-radius: var(--ait-radius);
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--ait-shadow);
+  font-family: var(--ait-font);
+}
+
+.ait-audit__header-meta {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+
+.ait-audit__badge {
+  background: rgba(255,255,255,.12);
+  border-radius: 6px;
+  padding: .2rem .65rem;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+}
+
+.ait-audit__file-id {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: .95rem;
+  background: rgba(99, 102, 241, .25);
+  border: 1px solid rgba(99, 102, 241, .45);
+  border-radius: 5px;
+  padding: .15rem .55rem;
+  color: #c7d2fe;
+}
+
+.ait-audit__back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  font-size: .82rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-decoration: none;
+  padding: .35rem .85rem;
+  border-radius: 6px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  transition: background .15s, color .15s;
+}
+.ait-audit__back-btn:hover {
+  background: rgba(255,255,255,.16);
+  color: #f1f5f9;
+}
+
+/* ── Summary bar ─────────────────────────────────────────────────────────── */
+.ait-audit__summary {
+  font-family: var(--ait-font);
+  font-size: .88rem;
+  color: var(--ait-color-muted);
+  background: var(--ait-color-surface);
+  border: 1px solid var(--ait-color-border);
+  border-left: 4px solid var(--ait-color-accent);
+  border-radius: 8px;
+  padding: .7rem 1.1rem;
+  margin-bottom: 1rem;
+}
+.ait-audit__summary strong {
+  color: var(--ait-color-text);
+  font-weight: 700;
+}
+
+/* ── Comparison table ────────────────────────────────────────────────────── */
+.ait-audit__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--ait-color-border);
+  border-radius: var(--ait-radius);
+  overflow: hidden;          /* clips the rounded corners */
+  box-shadow: var(--ait-shadow);
+  font-family: var(--ait-font);
+  font-size: .88rem;
+  background: var(--ait-color-surface);
+}
+
+/* Column widths */
+.ait-audit__table col,
+.ait-audit__th--order       { width: 6%; }
+.ait-audit__th--source      { width: 47%; }
+.ait-audit__th--translated  { width: 47%; }
+
+/* Header row */
+.ait-audit__table thead th,
+.ait-audit__table > thead > tr > th {
+  background: #1e293b;
+  color: #f1f5f9;
+  font-weight: 700;
+  font-size: .78rem;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  padding: .85rem 1rem;
+  border-bottom: 2px solid rgba(255,255,255,.08);
+  text-align: left;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Zebra striping */
+.ait-audit__table tbody tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+.ait-audit__table tbody tr:hover td {
+  background-color: #eff6ff;
+  transition: background .1s;
+}
+
+/* All body cells */
+.ait-audit__table tbody td {
+  padding: .9rem 1rem;
+  vertical-align: top;
+  line-height: 1.6;
+  border-bottom: 1px solid var(--ait-color-border);
+  color: var(--ait-color-text);
+}
+.ait-audit__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Order cell — centred, subtle */
+.ait-audit__cell--order {
+  text-align: center !important;
+  font-weight: 700;
+  color: var(--ait-color-accent) !important;
+  font-size: .9rem;
+}
+
+/* Source cell */
+.ait-audit__cell--source {
+  background-color: var(--ait-source-bg) !important;
+  border-right: 2px solid var(--ait-source-border) !important;
+}
+
+/* Translated cell — success tint */
+.ait-audit__cell--translated {
+  background-color: var(--ait-trans-bg) !important;
+}
+
+/* Empty translation cell — warning tint */
+.ait-audit__cell--empty {
+  background-color: var(--ait-empty-bg) !important;
+  color: var(--ait-empty-color) !important;
+  font-style: italic;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+.ait-audit__empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--ait-color-surface);
+  border: 2px dashed var(--ait-color-border);
+  border-radius: var(--ait-radius);
+  color: var(--ait-color-muted);
+  font-family: var(--ait-font);
+}
+.ait-audit__empty-icon {
+  display: block;
+  font-size: 2.5rem;
+  margin-bottom: .75rem;
+}
+
+/* ── Footer note ─────────────────────────────────────────────────────────── */
+.ait-audit__footer-note {
+  margin-top: .9rem;
+  font-size: .78rem;
+  color: var(--ait-color-muted);
+  font-family: var(--ait-font);
+  font-style: italic;
+}

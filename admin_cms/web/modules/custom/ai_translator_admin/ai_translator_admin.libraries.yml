@@ -1,0 +1,7 @@
+admin_styles:
+  version: VERSION
+  css:
+    theme:
+      css/admin-styles.css: {}
+  dependencies:
+    - core/drupal

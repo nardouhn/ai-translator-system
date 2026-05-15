@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # 1. Drupal Admin CMS
+  drupal:
+    image: drupal:10-apache
+    ports:
+      - "8080:80"
+    volumes:
+      # Mount thư mục code module của má vào trong container
+      - ./admin_cms/web/modules/custom/ai_translator_admin:/opt/drupal/web/modules/custom/ai_translator_admin
+    depends_on:
+      - drupal_db
+      - backend
+
+  # 2. Database nhỏ xíu (MariaDB) chỉ để nuôi thằng Drupal
+  drupal_db:
+    image: mariadb:10.11
+    environment:
+      - MYSQL_DATABASE=drupal
+      - MYSQL_USER=drupal
+      - MYSQL_PASSWORD=drupal
+      - MYSQL_ROOT_PASSWORD=root
+
+  # 3. Backend FastAPI của má (Trái tim hệ thống)
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Credentials thật của team - đồng bộ từ cloud_credentials_for_team.txt
+      - DATABASE_URL=postgresql://postgres.smdtowmvszolnvvxxjwn:superbase0213@aws-1-ap-south-1.pooler.supabase.com:5432/postgres
+      - REDIS_URL=rediss://default:gQAAAAAAAUpgAAIgcDEyMzdiN2FjMjhhMWE0ODU2OTMyMmQwYzAyNDY2ZDI5MQ@touching-drake-84576.upstash.io:6379
+      - R2_ACCESS_KEY_ID=b8ac73b15848f49b5828b993fea01d84
+      - R2_SECRET_ACCESS_KEY=cbe0b271e0fbafe463ac06d8347be90608204534331fd11704edc0f26d324cfe
+      - R2_ENDPOINT_URL=https://55478826db360e38aaafc88679b0c713.r2.cloudflarestorage.com
+      - R2_BUCKET_NAME=translator-assets
+      - PORT=8000
