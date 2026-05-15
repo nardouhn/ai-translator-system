@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Renders the AI Translator Admin dashboard.
  *
  * Fetches live statistics from the FastAPI backend (/api/admin/stats) and
- * displays them as a styled stat card grid using a render array with
+ * displays them as a styled 5-card stat grid using a render array with
  * attached inline CSS — no external theme template required.
  */
 class DashboardController extends ControllerBase {
@@ -47,28 +47,36 @@ class DashboardController extends ControllerBase {
    * Builds and returns the dashboard render array.
    *
    * Fetches /api/admin/stats from the FastAPI backend. If the request
-   * fails (NULL response or non-200 status), graceful fallback values are
-   * displayed and an error message is shown in the Drupal messenger.
+   * fails (NULL response or non-200 status), graceful fallback values (0)
+   * are displayed and a Drupal messenger error is shown.
    *
    * @return array
    *   A Drupal render array.
    */
   public function build(): array {
-    // --------------------------------------------------------------------------
-    // 1. Fetch stats from the FastAPI backend.
-    // --------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // 1. Default / fallback values — all five metrics.
+    // -------------------------------------------------------------------------
     $stats = [
-      'total_tokens' => 0,
-      'total_files'  => 0,
+      'total_texts_translated'   => 0,
+      'total_files_translated'   => 0,
+      'total_data_processed_mb'  => 0.0,
+      'total_sessions'           => 0,
+      'error_rate_percent'       => 0.0,
     ];
     $fetch_error = FALSE;
 
+    // -------------------------------------------------------------------------
+    // 2. Call FastAPI backend.
+    //    FastApiClient::request() reads base_url & api_key from module config
+    //    and injects "Authorization: Bearer <key>" automatically.
+    // -------------------------------------------------------------------------
     $response = $this->apiClient->request('GET', '/api/admin/stats');
 
     if ($response === NULL) {
       $fetch_error = TRUE;
       $this->messenger()->addError(
-        $this->t('Could not reach the FastAPI backend. Displaying last known or default values.')
+        $this->t('Could not reach the FastAPI backend. Displaying default values.')
       );
     }
     elseif ($response->getStatusCode() !== 200) {
@@ -80,24 +88,30 @@ class DashboardController extends ControllerBase {
       );
     }
     else {
-      $body = (string) $response->getBody();
+      $body    = (string) $response->getBody();
       $decoded = json_decode($body, TRUE);
+
       if (is_array($decoded)) {
-        $stats['total_tokens'] = (int) ($decoded['total_tokens'] ?? 0);
-        $stats['total_files']  = (int) ($decoded['total_files'] ?? 0);
+        $stats['total_texts_translated']  = (int)   ($decoded['total_texts_translated']  ?? 0);
+        $stats['total_files_translated']  = (int)   ($decoded['total_files_translated']  ?? 0);
+        $stats['total_data_processed_mb'] = (float) ($decoded['total_data_processed_mb'] ?? 0.0);
+        $stats['total_sessions']          = (int)   ($decoded['total_sessions']           ?? 0);
+        $stats['error_rate_percent']      = (float) ($decoded['error_rate_percent']       ?? 0.0);
       }
     }
 
-    // --------------------------------------------------------------------------
-    // 2. Format numbers for display.
-    // --------------------------------------------------------------------------
-    $formatted_tokens = number_format($stats['total_tokens']);
-    $formatted_files  = number_format($stats['total_files']);
+    // -------------------------------------------------------------------------
+    // 3. Format numbers for display.
+    // -------------------------------------------------------------------------
+    $fmt_texts    = number_format($stats['total_texts_translated']);
+    $fmt_files    = number_format($stats['total_files_translated']);
+    $fmt_mb       = number_format($stats['total_data_processed_mb'], 2) . ' MB';
+    $fmt_sessions = number_format($stats['total_sessions']);
+    $fmt_error    = number_format($stats['error_rate_percent'], 2) . '%';
 
-    // --------------------------------------------------------------------------
-    // 3. Build the render array.
-    //    Inline CSS keeps this self-contained without a .libraries.yml entry.
-    // --------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // 4. Build the render array.
+    // -------------------------------------------------------------------------
     $build = [];
 
     // Inline stylesheet — scoped to .ai-dashboard so it does not leak.
@@ -136,11 +150,14 @@ class DashboardController extends ControllerBase {
       ];
     }
 
-    // Stat card grid.
+    // 5-card stat grid.
     $build['dashboard']['stats_grid'] = [
       '#markup' => '<div class="ai-dashboard__grid">'
-        . $this->renderStatCard('🗂️', 'Total Files Translated', $formatted_files, 'files')
-        . $this->renderStatCard('🔤', 'Total Tokens Consumed', $formatted_tokens, 'tokens')
+        . $this->renderStatCard('📝', 'Texts Translated', $fmt_texts,    'texts')
+        . $this->renderStatCard('📁', 'Files Translated',  $fmt_files,    'files')
+        . $this->renderStatCard('💾', 'Data Processed',    $fmt_mb,       'data')
+        . $this->renderStatCard('👥', 'Total Sessions',    $fmt_sessions, 'sessions')
+        . $this->renderStatCard('⚠️', 'Error Rate',        $fmt_error,    'errors')
         . '</div>',
     ];
 
@@ -169,13 +186,13 @@ class DashboardController extends ControllerBase {
    * Returns an HTML string for a single statistic card.
    *
    * @param string $icon
-   *   An emoji or short icon string.
+   *   An emoji icon.
    * @param string $label
    *   The human-readable metric label.
    * @param string $value
-   *   The formatted value to display prominently.
+   *   The formatted value to display prominently (already includes unit if any).
    * @param string $modifier
-   *   A BEM modifier class appended to the card element.
+   *   A BEM modifier class appended to the card element (texts|files|data|sessions|errors).
    *
    * @return string
    *   HTML markup for the card.
@@ -197,8 +214,15 @@ class DashboardController extends ControllerBase {
   /**
    * Returns the scoped inline CSS for the dashboard.
    *
-   * Using inline CSS ensures the dashboard looks correct regardless of the
-   * active Drupal admin theme (Claro, Gin, Seven, etc.).
+   * Inline CSS keeps the dashboard self-contained across different Drupal
+   * admin themes (Claro, Gin, Seven, etc.).
+   *
+   * Color palette per card modifier:
+   *   --texts    : Indigo  #7c3aed
+   *   --files    : Blue    #0284c7
+   *   --data     : Green   #16a34a
+   *   --sessions : Amber   #d97706
+   *   --errors   : Red     #dc2626
    *
    * @return string
    *   Raw CSS text.
@@ -208,7 +232,7 @@ class DashboardController extends ControllerBase {
 /* ── AI Translator Admin Dashboard ─────────────────────────────────────── */
 .ai-dashboard {
   font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  max-width: 900px;
+  max-width: 1000px;
   padding: 0 0 2rem;
 }
 
@@ -252,10 +276,10 @@ class DashboardController extends ControllerBase {
   font-weight: 500;
 }
 
-/* Stat card grid */
+/* Stat card grid — 5 cards, responsive */
 .ai-dashboard__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
   gap: 1.25rem;
   margin-bottom: 1.75rem;
 }
@@ -263,7 +287,7 @@ class DashboardController extends ControllerBase {
 .ai-dashboard__card {
   background: #ffffff;
   border-radius: 12px;
-  padding: 1.75rem 1.5rem;
+  padding: 1.75rem 1.25rem;
   text-align: center;
   box-shadow: 0 2px 12px rgba(0,0,0,.08);
   border-top: 4px solid transparent;
@@ -273,8 +297,13 @@ class DashboardController extends ControllerBase {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(0,0,0,.13);
 }
-.ai-dashboard__card--files  { border-top-color: #6366f1; }
-.ai-dashboard__card--tokens { border-top-color: #0ea5e9; }
+
+/* Per-card accent colours */
+.ai-dashboard__card--texts    { border-top-color: #7c3aed; }  /* Indigo — Text */
+.ai-dashboard__card--files    { border-top-color: #0284c7; }  /* Blue   — File */
+.ai-dashboard__card--data     { border-top-color: #16a34a; }  /* Green  — MB   */
+.ai-dashboard__card--sessions { border-top-color: #d97706; }  /* Amber  — Sessions */
+.ai-dashboard__card--errors   { border-top-color: #dc2626; }  /* Red    — Error rate */
 
 .ai-dashboard__card-icon {
   font-size: 2.25rem;
@@ -282,7 +311,7 @@ class DashboardController extends ControllerBase {
   line-height: 1;
 }
 .ai-dashboard__card-value {
-  font-size: 2.4rem;
+  font-size: 2.1rem;
   font-weight: 800;
   color: #0f172a;
   letter-spacing: -1px;
@@ -290,7 +319,7 @@ class DashboardController extends ControllerBase {
 }
 .ai-dashboard__card-label {
   margin-top: .4rem;
-  font-size: .8rem;
+  font-size: .78rem;
   font-weight: 600;
   color: #64748b;
   text-transform: uppercase;
