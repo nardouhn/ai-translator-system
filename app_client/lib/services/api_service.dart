@@ -57,7 +57,7 @@ class ApiService {
       
       request.body = jsonEncode(bodyData);
 
-      final streamedResponse = await request.send().timeout(const Duration(seconds: 30));
+      final streamedResponse = await request.send().timeout(const Duration(seconds: 120));
 
       final responseSessionId = streamedResponse.headers['x-session-id'];
       if (responseSessionId != null && responseSessionId.isNotEmpty) {

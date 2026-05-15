@@ -18,7 +18,7 @@ def get_shared_client() -> httpx.AsyncClient:
     global _shared_client
     if _shared_client is None or _shared_client.is_closed:
         _shared_client = httpx.AsyncClient(
-            timeout=httpx.Timeout(120.0),
+            timeout=httpx.Timeout(300.0),
             limits=httpx.Limits(max_connections=5, max_keepalive_connections=5)
         )
     return _shared_client
@@ -79,7 +79,7 @@ async def translate_with_provider(
                     return translated, "custom-ai"
                     
                 except (httpx.TimeoutException, httpx.RequestError) as e:
-                    logger.error(f"Lỗi TIMEOUT / NETWORK: {e}")
+                    logger.error(f"Lỗi TIMEOUT / NETWORK: {type(e).__name__} - {e}")
                     if attempt < max_retries:
                         backoff = 2 ** (attempt + 1)
                         logger.warning(f"Translation attempt {attempt + 1} failed for chunk. Retrying in {backoff}s... Error: {e}")
