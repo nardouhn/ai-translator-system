@@ -10,9 +10,14 @@ async def check_rate_limit(session_id: str):
     redis_client = get_async_redis()
     key = f"rate_limit:{session_id}"
 
-    current_count = await redis_client.incr(key)
-    if current_count == 1:
-        await redis_client.expire(key, RATE_LIMIT_WINDOW_SECONDS)
+    # Atomic INCR + EXPIRE via pipeline — prevents key living forever if server
+    # crashes between the two commands (race condition fix).
+    async with redis_client.pipeline(transaction=False) as pipe:
+        pipe.incr(key)
+        pipe.expire(key, RATE_LIMIT_WINDOW_SECONDS)
+        results = await pipe.execute()
+
+    current_count = results[0]
 
     if current_count > RATE_LIMIT_PER_MINUTE:
         raise HTTPException(

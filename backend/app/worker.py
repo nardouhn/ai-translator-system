@@ -62,7 +62,7 @@ async def process_file_translation(ctx, file_id: int, file_path: str, source_lan
             async def _do_translate_batch(texts: list[str]) -> list[str]:
                 if not texts:
                     return []
-                translated_texts, _ = await translate_batch_with_provider(texts, source_lang, target_lang, domain or "General")
+                translated_texts, _ = await translate_batch_with_provider(texts, domain or "General")
                 for orig, tr in zip(texts, translated_texts):
                     segments_list.append({
                         "source_text": orig,
