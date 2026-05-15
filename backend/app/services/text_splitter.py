@@ -1,6 +1,6 @@
 import re
 
-def split_text_into_chunks(text: str, max_chars: int = 350) -> list[str]:
+def split_text_into_chunks(text: str, max_chars: int = 1500) -> list[str]:
     """
     Split text into chunks using semantic splitting (paragraphs, sentences, etc.)
     with a strict maximum character limit.
