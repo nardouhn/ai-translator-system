@@ -36,11 +36,8 @@ async def translate_with_provider(
         client = get_shared_client()
         for attempt in range(max_retries + 1):
                 try:
+                    # Không tự ý đổi tên domain nữa để đồng bộ với API Model
                     api_domain = domain.lower()
-                    if api_domain == "technical":
-                        api_domain = "it"
-                    elif api_domain == "economic":
-                        api_domain = "finance"
                         
                     payload = {
                         "text": source_text,
