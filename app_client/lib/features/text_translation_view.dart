@@ -44,7 +44,6 @@ class _TextTranslationViewState extends State<TextTranslationView> {
   bool _isListening = false;
   bool _speechAvailable = false;
 
-  Timer? _debounce;
 
   @override
   void initState() {
@@ -55,18 +54,13 @@ class _TextTranslationViewState extends State<TextTranslationView> {
   }
 
   void _onInputChanged() {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 1000), () {
-      final text = _inputController.text;
-      if (text.trim().isNotEmpty) {
-        _handleTranslate();
-      } else if (text.isEmpty) {
-        setState(() {
-          _outputText = '';
-          _errorMessage = '';
-        });
-      }
-    });
+    final text = _inputController.text;
+    if (text.isEmpty) {
+      setState(() {
+        _outputText = '';
+        _errorMessage = '';
+      });
+    }
   }
 
   void _initSpeech() async {
@@ -152,7 +146,6 @@ class _TextTranslationViewState extends State<TextTranslationView> {
 
   @override
   void dispose() {
-    _debounce?.cancel();
     flutterTts.stop();
     _speech.stop();
     _inputController.removeListener(_onInputChanged);
