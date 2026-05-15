@@ -55,9 +55,43 @@ class StorageService:
                 return None
 
     @staticmethod
-    async def get_presigned_url(object_key: str, expires_in: int = 3600) -> Optional[str]:
+    async def upload_translated_file(object_key: str, file_bytes: bytes, original_filename: str) -> bool:
+        """
+        Uploads the translated file to Cloudflare R2 with the correct ContentType.
+        """
+        if not settings.r2_bucket_name or not settings.r2_access_key_id:
+            logger.error("R2 credentials not configured.")
+            return False
+
+        ext = original_filename.rsplit('.', 1)[-1].lower() if '.' in original_filename else ''
+        content_type_map = {
+            'txt': 'text/plain; charset=utf-8',
+            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'pdf': 'application/pdf',
+        }
+        content_type = content_type_map.get(ext, 'application/octet-stream')
+
+        session = aioboto3.Session()
+        async with session.client(**StorageService.get_s3_client_args()) as s3_client:
+            try:
+                await s3_client.put_object(
+                    Bucket=settings.r2_bucket_name,
+                    Key=object_key,
+                    Body=file_bytes,
+                    ContentType=content_type,
+                    ContentDisposition=f'attachment; filename="{original_filename}"',
+                )
+                logger.info(f"Successfully uploaded translated file {object_key} to R2")
+                return True
+            except Exception as e:
+                logger.error(f"Failed to upload translated file to R2: {str(e)}")
+                return False
+
+    @staticmethod
+    async def get_presigned_url(object_key: str, expires_in: int = 3600, download_filename: str | None = None) -> Optional[str]:
         """
         Generates a presigned URL for secure access to the file.
+        Passing download_filename will add Content-Disposition: attachment so browsers auto-download.
         """
         if not settings.r2_bucket_name or not settings.r2_access_key_id:
             logger.error("R2 credentials not configured.")
@@ -66,12 +100,15 @@ class StorageService:
         session = aioboto3.Session()
         async with session.client(**StorageService.get_s3_client_args()) as s3_client:
             try:
+                params = {
+                    'Bucket': settings.r2_bucket_name,
+                    'Key': object_key,
+                }
+                if download_filename:
+                    params['ResponseContentDisposition'] = f'attachment; filename="{download_filename}"'
                 url = await s3_client.generate_presigned_url(
                     'get_object',
-                    Params={
-                        'Bucket': settings.r2_bucket_name,
-                        'Key': object_key
-                    },
+                    Params=params,
                     ExpiresIn=expires_in
                 )
                 return url

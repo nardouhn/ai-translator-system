@@ -142,7 +142,10 @@ async def file_translate_status(
         if file_row.file_path:
             try:
                 # file_row.file_path should now hold the R2 object key (e.g. translated file key)
-                presigned_url = await StorageService.get_presigned_url(file_row.file_path)
+                presigned_url = await StorageService.get_presigned_url(
+                        file_row.file_path,
+                        download_filename=os.path.basename(file_row.file_path).split('/', 1)[-1] if '/' in (file_row.file_path or '') else file_row.original_filename
+                    )
                 response_data["file_url"] = presigned_url
                 # Maintain backward compatibility if needed, or just return empty b64
                 response_data["file_content_b64"] = ""

@@ -230,14 +230,13 @@ async def process_file_translation(
             if b64_data:
                 translated_file_content = base64.b64decode(b64_data)
                 
-                async with session.client(**StorageService.get_s3_client_args()) as s3_client:
-                    await s3_client.put_object(
-                        Bucket=settings.r2_bucket_name,
-                        Key=translated_file_key,
-                        Body=translated_file_content
-                    )
-                
-                file_row.file_path = translated_file_key
+                uploaded = await StorageService.upload_translated_file(
+                    object_key=translated_file_key,
+                    file_bytes=translated_file_content,
+                    original_filename=safe_filename
+                )
+                if uploaded:
+                    file_row.file_path = translated_file_key
 
             # Save segments asynchronously
             from app.services.translation_service import map_domain_to_id
