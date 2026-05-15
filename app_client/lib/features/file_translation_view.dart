@@ -133,11 +133,29 @@ class _FileTranslationViewState extends State<FileTranslationView> {
       Map<String, dynamic> statusResult = {};
       bool isSuccess = false;
 
+      int consecutiveErrors = 0;
+
       // Poll until success or failure (timeout after ~1200 seconds for large files)
       for (int i = 0; i < 600; i++) {
-        await Future.delayed(const Duration(seconds: 2));
+        // Tự động giãn thời gian delay để tiết kiệm pin: 
+        // 20 lần đầu (40s) chờ 2s, sau đó chờ 5s.
+        int delaySeconds = (i < 20) ? 2 : 5;
+        await Future.delayed(Duration(seconds: delaySeconds));
+        
         if (!mounted) return;
-        statusResult = await ApiService.checkFileStatus(fileId);
+        
+        try {
+          statusResult = await ApiService.checkFileStatus(fileId);
+          consecutiveErrors = 0; // Reset counter on success
+        } catch (e) {
+          consecutiveErrors++;
+          if (consecutiveErrors > 15) {
+            throw Exception('Mất kết nối mạng quá lâu. Vui lòng kiểm tra lại Internet.');
+          }
+          debugPrint('Network error during polling (attempt $consecutiveErrors/15): $e');
+          continue; // Skip the rest of the loop and try again later
+        }
+
         final statusStr = statusResult['status'];
         final progressVal = statusResult['progress'] ?? 0;
         

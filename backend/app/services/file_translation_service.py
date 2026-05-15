@@ -88,54 +88,51 @@ async def process_file_translation(
                 if not texts:
                     return []
                 
-                total = len(texts)
-                logger.info(f"File Translation: Found {total} chunks to translate.")
+                from app.services.text_splitter import split_text_into_chunks
+                from app.services.cache_service import MODEL_VERSION
                 
-                # BATCH MGET Check from Upstash
-                cached_results = await mget_cached_translations(domain_str, texts)
+                logger.info(f"File Translation: Found {len(texts)} paragraphs to process.")
                 
+                # --- BƯỚC 1: Chuẩn bị tất cả sub-chunks TRƯỚC khi gọi bất kỳ API nào ---
+                # Mỗi paragraph được cắt thành sub-chunks (<=600 chars), ta build 1 flat list
+                # để batch MGET 1 lần duy nhất, cực kỳ hiệu quả.
+                paragraph_sub_chunks: list[list[str]] = []
+                all_sub_chunks_flat: list[str] = []
+                
+                for chunk in texts:
+                    if not chunk.strip():
+                        paragraph_sub_chunks.append([chunk])
+                    else:
+                        sub_chunks = split_text_into_chunks(chunk, max_chars=600)
+                        paragraph_sub_chunks.append(sub_chunks)
+                        all_sub_chunks_flat.extend([sc for sc in sub_chunks if sc.strip()])
+                
+                # --- BƯỚC 2: Batch MGET TẤT CẢ sub-chunks trong 1 lần duy nhất ---
+                logger.info(f"Batch MGET {len(all_sub_chunks_flat)} sub-chunks from Redis...")
+                all_cached = await mget_cached_translations(domain_str, all_sub_chunks_flat)
+                
+                # --- BƯỚC 3: Dịch từng paragraph, tra cứu cache trước, gọi Kaggle nếu miss ---
                 translated_texts = []
                 newly_translated = {}
-                
                 last_progress_update = 0
+                total = len(texts)
                 
-                for idx, chunk in enumerate(texts):
-                    # Empty check
+                for idx, (chunk, sub_chunks) in enumerate(zip(texts, paragraph_sub_chunks)):
                     if not chunk.strip():
                         translated_texts.append(chunk)
-                        continue
-                        
-                    from app.services.cache_service import strictly_normalize_text
-                    cleaned_chunk = strictly_normalize_text(chunk)
-                    cached_val = cached_results.get(chunk)
-                    
-                    debug_hash = __import__('hashlib').sha256(cleaned_chunk.encode("utf-8")).hexdigest()
-                    logger.debug(f"File Cache Key: translate:v5:{domain_str}:en:vi:{debug_hash} | Text: '{cleaned_chunk[:20]}'")
-                    
-                    if cached_val is not None:
-                        logger.info(f"🟢 CACHE HIT for chunk {idx+1}/{total}: '{cleaned_chunk[:20]}...'")
-                        translated_texts.append(cached_val)
                     else:
-                        logger.warning(f"🔴 CACHE MISS for chunk {idx+1}/{total}: '{cleaned_chunk[:20]}...'. Calling Kaggle...")
-                        
-                        from app.services.text_splitter import split_text_into_chunks
-                        # Chẻ nhỏ đoạn văn dài thành các sub-chunk (600 ký tự) để Kaggle không bị timeout
-                        sub_chunks = split_text_into_chunks(chunk, max_chars=600)
-                        
                         tr_parts = []
                         for sc in sub_chunks:
                             if not sc.strip():
                                 tr_parts.append(sc)
                                 continue
                             
-                            # Kiểm tra cache cho từng sub-chunk
-                            sc_cleaned = strictly_normalize_text(sc)
-                            sc_cached = await mget_cached_translations(domain_str, [sc])
-                            sc_val = sc_cached.get(sc)
-                            
-                            if sc_val is not None:
-                                tr_parts.append(sc_val)
+                            cached_val = all_cached.get(sc)
+                            if cached_val is not None:
+                                logger.info(f"🟢 CACHE HIT sub-chunk: '{sc[:30]}'")
+                                tr_parts.append(cached_val)
                             else:
+                                logger.warning(f"🔴 CACHE MISS sub-chunk: '{sc[:30]}'. Calling Kaggle...")
                                 sc_tr = await translate_chunk_async(sc, domain_str)
                                 tr_parts.append(sc_tr)
                                 if not sc_tr.startswith("[ERROR") and not sc_tr.startswith("[TIMEOUT") and not sc_tr.startswith("[FAILED"):
@@ -143,31 +140,27 @@ async def process_file_translation(
                         
                         tr = "".join(tr_parts) if tr_parts else chunk
                         translated_texts.append(tr)
-                        
-                        # Cache toàn bộ câu văn gốc nếu cần (chỉ khi không có lỗi)
-                        if not tr.startswith("[ERROR") and not tr.startswith("[TIMEOUT") and not tr.startswith("[FAILED"):
-                            newly_translated[chunk] = tr
                     
                     segments_list.append({
                         "source_text": chunk,
                         "translated_text": translated_texts[-1]
                     })
                     
-                    # Batch Update Progress in Upstash
+                    # Update progress
                     current_pct = int(((idx + 1) / total) * 100)
                     if (idx + 1) % 10 == 0 or (current_pct - last_progress_update) >= 5 or (idx + 1) == total:
                         await _update_progress(idx + 1, total)
                         last_progress_update = current_pct
-                        
-                    # Periodically save cache to Upstash to prevent total loss on crash
-                    if len(newly_translated) >= 10:
-                        asyncio.create_task(mset_cached_translations(domain_str, newly_translated))
-                        newly_translated.clear()
-                        
-                # Save any remaining newly translated chunks to Cache
-                if newly_translated:
-                    asyncio.create_task(mset_cached_translations(domain_str, newly_translated))
                     
+                    # Flush cache mỗi 10 entries mới để không mất data khi crash
+                    if len(newly_translated) >= 10:
+                        asyncio.create_task(mset_cached_translations(domain_str, newly_translated.copy()))
+                        newly_translated.clear()
+                
+                # Flush cache còn lại
+                if newly_translated:
+                    asyncio.create_task(mset_cached_translations(domain_str, newly_translated.copy()))
+                
                 return translated_texts
 
             async def _do_translate(text: str) -> str:
