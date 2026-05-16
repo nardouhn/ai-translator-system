@@ -124,8 +124,6 @@ class _FileTranslationViewState extends State<FileTranslationView> {
         filePath: _selectedFilePath,
         fileBytes: _selectedFileBytes,
         fileName: _selectedFileName,
-        sourceLang: _selectedSourceLang,
-        targetLang: _selectedTargetLang,
         domain: _selectedDomain,
       );
 

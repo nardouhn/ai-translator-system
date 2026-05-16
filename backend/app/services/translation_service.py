@@ -6,7 +6,7 @@ from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session as DBSession
 
 from app.db.models import Domain, DomainNameEnum, Translation
-from app.services.cache_service import get_cached_translation, set_cached_translation, mget_cached_translations, mset_cached_translations
+from app.services.cache_service import mget_cached_translations, mset_cached_translations, strictly_normalize_text, MODEL_VERSION
 from app.services.translator_provider import translate_with_provider, translate_chunk_async
 from app.services.text_splitter import split_text_into_chunks
 
@@ -85,46 +85,93 @@ async def stream_translate_text(
     final_translated_chunks = []
     newly_translated_mapping = {}
     provider = "custom-ai"
-    
+
+    # ── Helper: ghi log thất bại vào DB ────────────────────────────────────
+    def _log_failure(reason: str):
+        from app.db.models import Logs, StatusEnum, RequestTypeEnum
+        from datetime import datetime, timezone
+        try:
+            completed_time = datetime.now(timezone.utc).replace(tzinfo=None)
+            log_record = Logs(
+                session_id=session_id,
+                request_type=RequestTypeEnum.text,
+                translation_id=None,
+                status=StatusEnum.failed,
+                request_time=request_time,
+                completed_time=completed_time,
+            )
+            db.add(log_record)
+            db.commit()
+            logger.info(f"📝 Logged failed translation to DB. Reason: {reason}")
+        except Exception as db_err:
+            logger.error(f"Failed to write failure log to DB: {db_err}")
+
     for i, chunk in enumerate(chunks):
-        from app.services.cache_service import strictly_normalize_text
         cleaned_chunk = strictly_normalize_text(chunk)
+
+        # Chunk chỉ toàn invisible chars → sau normalize thành rỗng → bỏ qua, không gửi AI
+        if not cleaned_chunk:
+            logger.debug(f"Chunk {i} is empty after normalization, skipping.")
+            continue
+
         cached_val = cached_results.get(chunk)
-        debug_hash = __import__('hashlib').sha256(cleaned_chunk.encode("utf-8")).hexdigest()
-        logger.debug(f"Text Cache Key: translate:v5:{domain_str}:en:vi:{debug_hash} | Text: '{cleaned_chunk[:20]}'")
-        
+        debug_hash = hashlib.sha256(cleaned_chunk.encode("utf-8")).hexdigest()
+        logger.debug(f"Text Cache Key: translate:{MODEL_VERSION}:{domain_str}:en:vi:{debug_hash} | Text: '{cleaned_chunk[:20]}'")
+
         if cached_val is not None:
             logger.info(f"🟢 CACHE HIT for chunk: '{cleaned_chunk[:20]}...'")
             yield f"data: {json.dumps({'chunk': cached_val})}\n\n"
             final_translated_chunks.append(cached_val)
         else:
-            logger.warning(f"🔴 CACHE MISS for chunk: '{cleaned_chunk[:20]}...'. Calling Kaggle...")
+            logger.warning(f"🔴 CACHE MISS for chunk: '{cleaned_chunk[:20]}...'. Calling AI...")
             try:
-                translated_chunk = await translate_chunk_async(chunk, domain_str)
-                if translated_chunk is None:
-                    translated_chunk = chunk
-                elif translated_chunk == chunk:
+                # Gửi text đã normalize cho AI để tránh invisible chars làm model bị lỗi
+                translated_chunk = await translate_chunk_async(cleaned_chunk, domain_str)
+
+                # --- Kiểm tra kết quả thất bại từ AI ---
+                _FAIL_PREFIXES = ("[ERROR", "[TIMEOUT]", "[FAILED]")
+                if translated_chunk is None or translated_chunk.strip() == "":
+                    reason = "AI trả về kết quả rỗng (empty output)"
+                    logger.error(f"❌ Translation FAILED (chunk {i}): {reason}")
+                    _log_failure(reason)
+                    yield f"data: {json.dumps({'error': f'Translation failed: {reason}'})}\n\n"
+                    return  # Dừng stream, không lưu cache
+
+                if any(translated_chunk.startswith(p) for p in _FAIL_PREFIXES):
+                    # Trích xuất lý do từ prefix: "[ERROR: HTTP 429] original text..."
+                    reason = translated_chunk.split("]")[0] + "]" if "]" in translated_chunk else translated_chunk[:80]
+                    logger.error(f"❌ Translation FAILED (chunk {i}): {reason}")
+                    _log_failure(reason)
+                    yield f"data: {json.dumps({'error': f'Translation failed: {reason}'})}\n\n"
+                    return  # Dừng stream, không lưu cache
+
+                if translated_chunk == cleaned_chunk:
                     logger.warning(f"Chunk {i} translation returned identical text, keeping it.")
-                
+
                 yield f"data: {json.dumps({'chunk': translated_chunk})}\n\n"
                 final_translated_chunks.append(translated_chunk)
+                # Lưu cache với key là chunk gốc (để MGET lookup đúng)
                 newly_translated_mapping[chunk] = translated_chunk
-                
+
                 if i < len(chunks) - 1:
                     await asyncio.sleep(1)
             except Exception as e:
-                logger.error(f"Chunk {i} translation failed: {e}")
-                # We yield an error event so the client knows
-                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+                reason = str(e)
+                logger.error(f"Chunk {i} translation raised exception: {reason}")
+                _log_failure(reason)
+                yield f"data: {json.dumps({'error': reason})}\n\n"
                 return
 
+    # ── Helper: ghi log thất bại vào DB ────────────────────────────────────
+    # (đã được định nghĩa ở trên trước vòng lặp)
+
     translated_text = "".join(final_translated_chunks)
-    
-    # 6. Update Cache (MSET) in background
+
+    # 6. Update Cache (MSET) in background — chỉ khi có kết quả thành công
     if newly_translated_mapping:
         asyncio.create_task(mset_cached_translations(domain_str, newly_translated_mapping))
 
-    # 7. Database Logging
+    # 7. Database Logging — lưu bản dịch + log success
     def save_to_db():
         existing_translation = db_check_result.get("existing_translation")
         final_trans_id = None
@@ -163,20 +210,20 @@ async def stream_translate_text(
         else:
             if existing_translation:
                 final_trans_id = getattr(existing_translation, "id", getattr(existing_translation, "trans_id", None))
-                
+
         return final_trans_id
 
     final_trans_id = await run_in_threadpool(save_to_db)
-    
-    # Log operations to DB before closing
+
+    # Log success
     def log_operations():
         from app.db.models import Logs, StatusEnum, RequestTypeEnum
         from datetime import datetime, timezone
         completed_time = datetime.now(timezone.utc).replace(tzinfo=None)
-        log_status = getattr(StatusEnum, "cache_hit", StatusEnum.success) if len(newly_translated_mapping) == 0 else StatusEnum.success
+        log_status = StatusEnum.success
         log_record = Logs(
             session_id=session_id,
-            request_type=getattr(RequestTypeEnum, "text", "text"),
+            request_type=RequestTypeEnum.text,
             translation_id=final_trans_id,
             status=log_status,
             request_time=request_time,

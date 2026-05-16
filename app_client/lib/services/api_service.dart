@@ -30,8 +30,6 @@ class ApiService {
 
   static Future<void> translateTextStream({
     required String text,
-    required String sourceLang,
-    required String targetLang,
     String? domain,
     required void Function(String chunk) onProgress,
   }) async {
@@ -48,8 +46,6 @@ class ApiService {
 
       final bodyData = {
         'text': text,
-        'source_lang': sourceLang,
-        'target_lang': targetLang,
       };
       if (domain != null) {
         bodyData['domain'] = domain.toLowerCase();
@@ -115,8 +111,6 @@ class ApiService {
     String? filePath,
     Uint8List? fileBytes,
     String? fileName,
-    required String sourceLang,
-    required String targetLang,
     required String domain,
   }) async {
     try {
@@ -129,8 +123,6 @@ class ApiService {
         request.headers['X-Session-ID'] = sessionId!;
       }
 
-      request.fields['source_lang'] = sourceLang;
-      request.fields['target_lang'] = targetLang;
       request.fields['domain'] = domain.toLowerCase();
 
       if (kIsWeb) {

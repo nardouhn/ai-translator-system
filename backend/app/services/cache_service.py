@@ -16,24 +16,6 @@ def generate_cache_key(domain: str, text: str) -> str:
     text_hash = hashlib.sha256(cleaned_text.encode("utf-8")).hexdigest()
     return f"translate:{MODEL_VERSION}:{domain.strip().lower()}:en:vi:{text_hash}"
 
-async def get_cached_translation(domain: str, text: str) -> str | None:
-    if len(text) > 5000:
-        return None
-
-    redis_client = get_async_redis()
-    key = generate_cache_key(domain, text)
-    cached_value = await redis_client.get(key)
-    if cached_value:
-        return cached_value
-    return None
-
-async def set_cached_translation(domain: str, text: str, translated_text: str) -> None:
-    if len(text) > 5000:
-        return
-
-    redis_client = get_async_redis()
-    key = generate_cache_key(domain, text)
-    await redis_client.setex(key, CACHE_TTL_SECONDS, translated_text)
 
 async def mget_cached_translations(domain: str, chunks: list[str]) -> dict[str, str | None]:
     if not chunks:

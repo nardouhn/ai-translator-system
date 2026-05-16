@@ -28,3 +28,15 @@ services:
   #   http://localhost:8080/admin/config/ai-translator/settings
   #   FastAPI Base URL = https://ai-translator-system-production.up.railway.app
   #   API Key          = hle25zepezevide
+
+  # 4. Superset Analytics Dashboard
+  superset:
+    build:
+      context: ./using_superset/superset
+    ports:
+      - "8088:8088"
+    volumes:
+      - ./using_superset/superset_config/superset_config.py:/app/pythonpath/superset_config.py
+      - ./using_superset/superset_home:/app/superset_home
+      - ./using_superset/superset_config/auto_import.py:/app/auto_import.py
+    command: bash -c "python /app/auto_import.py & gunicorn --bind 0.0.0.0:8088 --worker-class gthread --threads 20 --timeout 60 --limit-request-line 0 --limit-request-field_size 0 'superset.app:create_app()'"

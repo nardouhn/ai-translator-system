@@ -132,11 +132,25 @@ async def process_file_translation(
                                 logger.info(f"🟢 CACHE HIT sub-chunk: '{sc[:30]}'")
                                 tr_parts.append(cached_val)
                             else:
-                                logger.warning(f"🔴 CACHE MISS sub-chunk: '{sc[:30]}'. Calling Kaggle...")
+                                logger.warning(f"🔴 CACHE MISS sub-chunk: '{sc[:30]}'. Calling AI...")
                                 sc_tr = await translate_chunk_async(sc, domain_str)
+
+                                # --- Kiểm tra thất bại: raise để file bị đánh dấu failed ---
+                                _FAIL_PREFIXES = ("[ERROR", "[TIMEOUT]", "[FAILED]")
+                                if sc_tr is None or sc_tr.strip() == "":
+                                    raise Exception(
+                                        f"AI trả về kết quả rỗng cho đoạn: '{sc[:60]}...'"
+                                    )
+                                if any(sc_tr.startswith(p) for p in _FAIL_PREFIXES):
+                                    reason = sc_tr.split("]")[0] + "]" if "]" in sc_tr else sc_tr[:80]
+                                    raise Exception(
+                                        f"AI thất bại với lý do '{reason}' cho đoạn: '{sc[:60]}...'"
+                                    )
+
                                 tr_parts.append(sc_tr)
-                                if not sc_tr.startswith("[ERROR") and not sc_tr.startswith("[TIMEOUT") and not sc_tr.startswith("[FAILED"):
-                                    newly_translated[sc] = sc_tr
+                                # Chỉ lưu cache khi dịch thành công
+                                newly_translated[sc] = sc_tr
+
                         
                         tr = "".join(tr_parts) if tr_parts else chunk
                         translated_texts.append(tr)

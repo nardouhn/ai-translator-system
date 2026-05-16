@@ -221,8 +221,6 @@ class _TextTranslationViewState extends State<TextTranslationView> {
 
       await ApiService.translateTextStream(
         text: inputText,
-        sourceLang: _selectedSourceLang,
-        targetLang: _selectedTargetLang,
         domain: _selectedDomain,
         onProgress: (chunk) {
           if (mounted) {
