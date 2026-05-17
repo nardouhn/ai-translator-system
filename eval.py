@@ -3,22 +3,23 @@ import torch
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-from sklearn.model_selection import train_test_split
 from unsloth import FastLanguageModel
 import sacrebleu
 from evaluate import load
 import re
 
 from config import *
+from model import load_base_model, load_lora_checkpoint
+from dataset import prepare_raw_data
 from promp import chatml_prompt
 
 
 # ==============================================================================
-# 1. RECREATE TEST SET (Keep seed 3407 like training)
+# 1. PREPARE TEST DATA (Using shared prepare_raw_data from dataset.py)
 # ==============================================================================
 def prepare_test_data(test_size_limit=500):
     """
-    Recreate test set with same seed as training
+    Prepare test set from shared dataset split
     
     Args:
         test_size_limit: Limit number of test samples (None for all)
@@ -27,25 +28,7 @@ def prepare_test_data(test_size_limit=500):
         test_df: Test dataframe
     """
     print("1️⃣ Preparing test dataset...")
-    df_all = pd.read_csv(DATA_PATH)
-    df_all = df_all.dropna(subset=['en', 'vi', 'domain'])
-    df_all = df_all.drop_duplicates(subset=["en", "vi"])
-
-    def custom_sampling(group):
-        if len(group) > MAX_PER_DOMAIN:
-            return group.sample(MAX_PER_DOMAIN, random_state=SEED)
-        return group
-
-    df_sampled = df_all.groupby("domain", group_keys=False).apply(custom_sampling)
-    df_sampled = df_sampled.reset_index(drop=True)
-
-    # Split to get test set (10%)
-    train_valid_df, test_df = train_test_split(
-        df_sampled,
-        test_size=0.10,
-        stratify=df_sampled['domain'],
-        random_state=SEED
-    )
+    _, _, test_df = prepare_raw_data()
     
     if test_size_limit:
         test_df = test_df.head(test_size_limit)

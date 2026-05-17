@@ -3,12 +3,18 @@ import torch
 import gc
 from unsloth import FastLanguageModel
 from peft import PeftModel
+from config import *
 
 def setup_environment():
     """Setup CUDA environment and cleanup VRAM"""
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     os.environ["HF_HUB_OFFLINE"] = "1"
     os.environ["UNSLOTH_DISABLE_STATS"] = "0"
+    
+    # Remove distributed training env vars
+    for var in ["WORLD_SIZE", "RANK", "LOCAL_RANK"]:
+        if var in os.environ:
+            del os.environ[var]
     
     gc.collect()
     torch.cuda.empty_cache()
@@ -21,6 +27,7 @@ def load_base_model(path, max_seq_length):
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=path,
         max_seq_length=max_seq_length,
+        dtype=None,
         load_in_4bit=True,
         local_files_only=True,
     )
@@ -32,12 +39,21 @@ def load_base_model(path, max_seq_length):
     return model, tokenizer
 
 
-def initialize_lora_for_training(model):
-    """Initialize LoRA for training from scratch"""
-    print("🎯 Initializing LoRA for fresh training...")
-    model = FastLanguageModel.for_training(model)
+def setup_lora_from_scratch(model):
+    """Setup LoRA configuration from scratch for training"""
+    print("🎯 Setting up LoRA configuration...")
+    model = FastLanguageModel.get_peft_model(
+        model,
+        r=LORA_R,
+        target_modules=LORA_TARGET_MODULES,
+        lora_alpha=LORA_ALPHA,
+        lora_dropout=LORA_DROPOUT,
+        bias=LORA_BIAS,
+        use_gradient_checkpointing="unsloth",
+        random_state=SEED,
+    )
     model.print_trainable_parameters()
-    print("✅ LoRA initialized for training")
+    print("✅ LoRA setup complete")
     return model
 
 
