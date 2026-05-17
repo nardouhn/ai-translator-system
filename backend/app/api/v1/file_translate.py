@@ -122,8 +122,12 @@ async def file_translate_status(
     }
     
     # Read progress from Upstash Redis
+    redis_client = get_async_redis()
+    
+    # 🟢 Báo cho Background Task biết là Frontend vẫn còn kết nối
+    await redis_client.setex(f"file_ping:{file_id}", 45, "alive")
+    
     if response_data["status"] == StatusEnum.processing.value or response_data["status"] == "processing":
-        redis_client = get_async_redis()
         progress_val = await redis_client.get(f"job_progress:{file_id}")
         response_data["progress"] = int(progress_val) if progress_val else 0
     elif response_data["status"] == StatusEnum.success.value or response_data["status"] == "success":

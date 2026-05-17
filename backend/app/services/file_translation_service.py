@@ -118,6 +118,12 @@ async def process_file_translation(
                 total = len(texts)
                 
                 for idx, (chunk, sub_chunks) in enumerate(zip(texts, paragraph_sub_chunks)):
+                    # 🟢 KIỂM TRA FRONTEND TIMEOUT
+                    if idx > 0: # Bỏ qua chunk đầu tiên vì có thể chưa kịp ping
+                        is_alive = await redis_client.get(f"file_ping:{file_id}")
+                        if not is_alive:
+                            raise Exception("FRONTEND_TIMEOUT: Ứng dụng đã ngắt kết nối (Timeout). Ngừng dịch file để giải phóng GPU.")
+
                     if not chunk.strip():
                         translated_texts.append(chunk)
                     else:
