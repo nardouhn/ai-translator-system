@@ -1,4 +1,4 @@
-# AI Translator System 🚀
+# AI Translator System 
 
 Dự án Hệ thống Dịch thuật AI (AI Translator) đa nền tảng, hỗ trợ dịch thuật theo thời gian thực (Realtime Text Translation) và dịch tài liệu giữ nguyên định dạng (Document Translation). Dự án được thiết kế theo tiêu chuẩn Production với khả năng xử lý bất đồng bộ, chịu tải cao và quản lý tài nguyên linh hoạt.
 
@@ -17,7 +17,7 @@ Dự án Hệ thống Dịch thuật AI (AI Translator) đa nền tảng, hỗ t
 
 ---
 
-## ✨ Tính năng Nổi bật (Core Features)
+##  Tính năng Nổi bật (Core Features)
 
 1. **Dịch Văn Bản Thời Gian Thực (Streaming SSE):** Trải nghiệm dịch thuật mượt mà trả về từng chữ như ChatGPT, hỗ trợ Debounce và tự động khôi phục (Auto-Resume) khi gián đoạn mạng. Hỗ trợ Nhập liệu bằng Giọng nói (STT) và Đọc kết quả (TTS).
 2. **Dịch Tài Liệu Nguyên Bản (Document Translation):** Xử lý các tệp lớn (PDF, DOCX, TXT) dưới dạng Background Task. Giữ nguyên 100% định dạng, layout chữ, in đậm/nghiêng sau khi dịch.
@@ -27,7 +27,7 @@ Dự án Hệ thống Dịch thuật AI (AI Translator) đa nền tảng, hỗ t
 
 ---
 
-## 🛠 Công nghệ Sử dụng (Tech Stack)
+##  Công nghệ Sử dụng (Tech Stack)
 
 ### **Frontend**
 - **Framework:** Flutter (Web & Mobile)
@@ -46,7 +46,7 @@ Dự án Hệ thống Dịch thuật AI (AI Translator) đa nền tảng, hỗ t
 
 ---
 
-## 🏗 Thiết kế Hệ thống Tổng thể (System Architecture)
+##  Thiết kế Hệ thống Tổng thể (System Architecture)
 
 Sơ đồ dưới đây mô tả luồng dữ liệu của toàn bộ hệ thống, kết nối từ Client (App/Web), qua Backend xử lý bất đồng bộ, và cuối cùng giao tiếp với **Mô hình AI kết hợp Hệ thống RAG (Retrieval-Augmented Generation)** do nhóm tự phát triển.
 
