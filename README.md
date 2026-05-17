@@ -2,7 +2,7 @@
 
 Dự án Hệ thống Dịch thuật AI (AI Translator) đa nền tảng, hỗ trợ dịch thuật theo thời gian thực (Realtime Text Translation) và dịch tài liệu giữ nguyên định dạng (Document Translation). Dự án được thiết kế theo tiêu chuẩn Production với khả năng xử lý bất đồng bộ, chịu tải cao và quản lý tài nguyên linh hoạt.
 - Link flutter web deploy từ cloudfare page: https://damp-pond-ffbe.tuyetnhun8.workers.dev
-- Có deploy app android trong drive : 
+- Có deploy app android trong drive : app_release.apk trong link drive "https://drive.google.com/drive/folders/16qZMX77VWCJorqtmzxd-ERpFmh-NCJc8?fbclid=IwY2xjawR2ncdleHRuA2FlbQIxMABicmlkETFyakVQNDdOMlVCTGdCVFFOc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHmf7bp2BhfSRQhLj1rFAdY5xWoP8bWOcQBa_BcLNOuC-Q8dTjXCA9oV3f7uG_aem_fmG0AYwe6ryP03U2D8VStw"
 ---
 
 ## 👥 Đội ngũ Phát triển
@@ -31,7 +31,7 @@ Dự án Hệ thống Dịch thuật AI (AI Translator) đa nền tảng, hỗ t
 ##  Công nghệ Sử dụng (Tech Stack)
 
 ### **Frontend**
-- **Framework:** Flutter (Web & Mobile)
+- **Framework:** Flutter (Web & Mobile APP) (Android app)
 - **Networking:** `http` package, Server-Sent Events (SSE), Multipart File Upload.
 - **State Management:** Stateful UI, Lifecycle Observer (Xử lý chạy nền).
 
