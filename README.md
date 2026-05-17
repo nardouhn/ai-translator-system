@@ -42,7 +42,7 @@ Dự án Hệ thống Dịch thuật AI (AI Translator) đa nền tảng, hỗ t
 - **Storage:** Cloudflare R2 (S3-compatible)
 
 ### **AI & Deployment**
-- **AI Model:** Custom LLM Endpoint (Kaggle GPU + Ngrok)
+- **AI Model:** Custom LLM Endpoint 
 - **Deployment:** Railway.app, Docker
 
 ---
