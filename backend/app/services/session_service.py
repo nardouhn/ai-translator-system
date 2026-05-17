@@ -23,3 +23,7 @@ class SessionService:
         db.add(session_row)
         db.commit()
         return session_id
+
+    @staticmethod
+    def get_session(db: ORMSession, session_id: str) -> Session | None:
+        return db.get(Session, session_id)
