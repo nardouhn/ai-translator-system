@@ -1,0 +1,14 @@
+.*
+!/.dockerignore
+qwen25_7b_merged/
+results.zip
+VectorDB.zip
+VectorDB/
+outputs/
+data/
+package_enterprise/
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.DS_Store
