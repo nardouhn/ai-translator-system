@@ -1,0 +1,2398 @@
+[
+  {
+    "english": "Macroeconomics",
+    "vietnamese": "Kinh tế học vĩ mô"
+  },
+  {
+    "english": "microeconomics",
+    "vietnamese": "kinh tế học vi mô"
+  },
+  {
+    "english": "aggregate measures",
+    "vietnamese": "chỉ tiêu cộng hưởng"
+  },
+  {
+    "english": "output",
+    "vietnamese": "tổng sản phẩm"
+  },
+  {
+    "english": "gross domestic product (GDP)",
+    "vietnamese": "thu nhập quốc nội (GDP)"
+  },
+  {
+    "english": "national income",
+    "vietnamese": "thu nhập quốc gia"
+  },
+  {
+    "english": "unemployment",
+    "vietnamese": "việc làm"
+  },
+  {
+    "english": "inflation",
+    "vietnamese": "lạm phát"
+  },
+  {
+    "english": "business cycle",
+    "vietnamese": "chu kỳ kinh tế"
+  },
+  {
+    "english": "long-term economic growth",
+    "vietnamese": "tăng trưởng kinh tế bền vững"
+  },
+  {
+    "english": "Keynesian economics",
+    "vietnamese": "chủ nghĩa Keynes"
+  },
+  {
+    "english": "Keynesian school",
+    "vietnamese": "trường phái Keynes chính thống"
+  },
+  {
+    "english": "Okun's law",
+    "vietnamese": "Luật Okun"
+  },
+  {
+    "english": "structural or natural rate of unemployment",
+    "vietnamese": "tỷ lệ thất nghiệp cấu trúc hoặc tự nhiên"
+  },
+  {
+    "english": "search unemployment",
+    "vietnamese": "thất nghiệp tìm kiếm"
+  },
+  {
+    "english": "frictional unemployment",
+    "vietnamese": "thất nghiệp ma sát"
+  },
+  {
+    "english": "efficiency wage models",
+    "vietnamese": "mô hình lương hiệu quả"
+  },
+  {
+    "english": "trade unions",
+    "vietnamese": "hội đoàn công nhân"
+  },
+  {
+    "english": "legal minimum wages",
+    "vietnamese": "lương tối thiểu pháp"
+  },
+  {
+    "english": "deflation",
+    "vietnamese": "thâm缩"
+  },
+  {
+    "english": "general equilibrium theory",
+    "vietnamese": "công lý chung"
+  },
+  {
+    "english": "partial equilibrium theory",
+    "vietnamese": "công lý phân đoạn"
+  },
+  {
+    "english": "utility maximization problem (UMP)",
+    "vietnamese": "vấn đề tối ưu hóa lợi ích (UMP)"
+  },
+  {
+    "english": "local non-satiation (LNS)",
+    "vietnamese": "địa phương không no (LNS)"
+  },
+  {
+    "english": "consumer theory",
+    "vietnamese": "lý thuyết người tiêu dùng"
+  },
+  {
+    "english": "production theory",
+    "vietnamese": "lý thuyết sản xuất"
+  },
+  {
+    "english": "market structure",
+    "vietnamese": "cấu trúc thị trường"
+  },
+  {
+    "english": "perfect competition",
+    "vietnamese": "cạnh tranh hoàn hảo"
+  },
+  {
+    "english": "monopolistic competition",
+    "vietnamese": "cạnh tranh độc quyền"
+  },
+  {
+    "english": "oligopoly",
+    "vietnamese": "oligopoly"
+  },
+  {
+    "english": "factor markets",
+    "vietnamese": "thị trường yếu tố sản xuất"
+  },
+  {
+    "english": "public role in the market economy",
+    "vietnamese": "vai trò của Chính phủ trong nền kinh tế thị trường"
+  },
+  {
+    "english": "welfare economics",
+    "vietnamese": "kinh tế phúc lợi"
+  },
+  {
+    "english": "market failure",
+    "vietnamese": "thất bại của thị trường"
+  },
+  {
+    "english": "ceteris paribus",
+    "vietnamese": "ceteris paribus"
+  },
+  {
+    "english": "marginal analysis",
+    "vietnamese": "phân tích biên tế"
+  },
+  {
+    "english": "supply and demand",
+    "vietnamese": "cung và cầu"
+  },
+  {
+    "english": "utility maximization problem",
+    "vietnamese": "vấn đề tối ưu hóa lợi ích"
+  },
+  {
+    "english": "macroeconomics",
+    "vietnamese": "kinh tế học vi mô"
+  },
+  {
+    "english": "utility-maximizing process",
+    "vietnamese": "quá trình tối đa hóa lợi ích"
+  },
+  {
+    "english": "budget constraint",
+    "vietnamese": "ràng buộc ngân sách"
+  },
+  {
+    "english": "consumption set",
+    "vietnamese": "cơ sở tiêu dùng"
+  },
+  {
+    "english": "scarce resources",
+    "vietnamese": "thuộc tính khan hiếm"
+  },
+  {
+    "english": "allocation decisions",
+    "vietnamese": "quyết định phân bổ"
+  },
+  {
+    "english": "micro-dynamic",
+    "vietnamese": "micro-dinamik"
+  },
+  {
+    "english": "macro-dynamic",
+    "vietnamese": "macro-dinamik"
+  },
+  {
+    "english": "micro-dynamics",
+    "vietnamese": "micro-dinamik"
+  },
+  {
+    "english": "production",
+    "vietnamese": "thuật ngữ sản xuất"
+  },
+  {
+    "english": "inputs",
+    "vietnamese": "thuật ngữ đầu vào"
+  },
+  {
+    "english": "outputs",
+    "vietnamese": "thuật ngữ đầu ra"
+  },
+  {
+    "english": "cost-of-production theory of value",
+    "vietnamese": "lý thuyết giá dựa trên chi phí sản xuất"
+  },
+  {
+    "english": "fiscal policy",
+    "vietnamese": "chính sách tài khóa"
+  },
+  {
+    "english": "monetary policy",
+    "vietnamese": "chính sách lưu thông tiền tệ"
+  },
+  {
+    "english": "money supply",
+    "vietnamese": "cung tiền"
+  },
+  {
+    "english": "interest rate targeting",
+    "vietnamese": "hướng tới mục tiêu lãi suất"
+  },
+  {
+    "english": "inflation targeting",
+    "vietnamese": "hướng tới mục tiêu lạm phát"
+  },
+  {
+    "english": "fixed exchange rate system",
+    "vietnamese": "hệ thống tỷ giá hối đoái cố định"
+  },
+  {
+    "english": "money supply strategy",
+    "vietnamese": "strategi tổng cung tiền"
+  },
+  {
+    "english": "open market operations",
+    "vietnamese": "nghiệp vụ thị trường mở"
+  },
+  {
+    "english": "reserve requirements",
+    "vietnamese": "tỷ lệ dự trữ bắt buộc"
+  },
+  {
+    "english": "forward guidance",
+    "vietnamese": "truyền thông chiến lược"
+  },
+  {
+    "english": "Taylor rule",
+    "vietnamese": "Quy luật Taylor"
+  },
+  {
+    "english": "recredit",
+    "vietnamese": "công cụ tái cấp vốn"
+  },
+  {
+    "english": "credit policy",
+    "vietnamese": "chính sách tín dụng"
+  },
+  {
+    "english": "monetary aggregates",
+    "vietnamese": "tổng cung tiền"
+  },
+  {
+    "english": "mixed policy",
+    "vietnamese": "chính sách tổng hợp"
+  },
+  {
+    "english": "gold standard",
+    "vietnamese": "chế độ vàng"
+  },
+  {
+    "english": "fixed exchange rate",
+    "vietnamese": "tỷ giá hối đoái cố định"
+  },
+  {
+    "english": "monetary supply target",
+    "vietnamese": "mục tiêu cung tiền"
+  },
+  {
+    "english": "inflation targeting",
+    "vietnamese": "mục tiêu lạm phát"
+  },
+  {
+    "english": "bailout",
+    "vietnamese": "bẫy thanh khoản"
+  },
+  {
+    "english": "IS-LM model",
+    "vietnamese": "mô hình IS-LM"
+  },
+  {
+    "english": "monetarist",
+    "vietnamese": "chủ nghĩa tiền tệ"
+  },
+  {
+    "english": "Mundell-Fleming model",
+    "vietnamese": "mô hình Mundell-Fleming"
+  },
+  {
+    "english": "inflation targeting",
+    "vietnamese": "cân nhắc lạm phát"
+  },
+  {
+    "english": "gross domestic product",
+    "vietnamese": "tổng sản phẩm nội địa"
+  },
+  {
+    "english": "GDP",
+    "vietnamese": "tổng sản phẩm quốc nội"
+  },
+  {
+    "english": "consumption",
+    "vietnamese": "tiêu dùng"
+  },
+  {
+    "english": "investment",
+    "vietnamese": "đầu tư"
+  },
+  {
+    "english": "government purchases",
+    "vietnamese": "chi tiêu chính phủ"
+  },
+  {
+    "english": "net exports",
+    "vietnamese": "xuất khẩu ròng"
+  },
+  {
+    "english": "wage",
+    "vietnamese": "tiền lương"
+  },
+  {
+    "english": "rent",
+    "vietnamese": "tiền cho thuê tài sản"
+  },
+  {
+    "english": "interest",
+    "vietnamese": "tiền lãi"
+  },
+  {
+    "english": "profit",
+    "vietnamese": "lợi nhuận"
+  },
+  {
+    "english": "value added",
+    "vietnamese": "giá trị gia tăng"
+  },
+  {
+    "english": "net domestic product",
+    "vietnamese": "tổng sản phẩm nội địa"
+  },
+  {
+    "english": "national gross domestic product",
+    "vietnamese": "national gross domestic product"
+  },
+  {
+    "english": "regional (or provincial) gross domestic product",
+    "vietnamese": "tổng sản phẩm nội địa của địa phương"
+  },
+  {
+    "english": "purchasing power parity",
+    "vietnamese": "mức giá mua hàng"
+  },
+  {
+    "english": "gross national product",
+    "vietnamese": "tổng sản phẩm quốc gia"
+  },
+  {
+    "english": "gross national income",
+    "vietnamese": "tổng thu nhập quốc gia"
+  },
+  {
+    "english": "Human Development Index",
+    "vietnamese": "chỉ số phát triển con người"
+  },
+  {
+    "english": "Better Life Index",
+    "vietnamese": "chỉ số cuộc sống tốt đẹp"
+  },
+  {
+    "english": "gross national product (GNP)",
+    "vietnamese": "thô quốc gia (GNP)"
+  },
+  {
+    "english": "gross domestic product (GDP)",
+    "vietnamese": "thô nội địa (GDP)"
+  },
+  {
+    "english": "value added",
+    "vietnamese": "giá trị tăng thêm"
+  },
+  {
+    "english": "production approach",
+    "vietnamese": "phương pháp sản xuất"
+  },
+  {
+    "english": "income approach",
+    "vietnamese": "phương pháp thu nhập"
+  },
+  {
+    "english": "expenditure approach",
+    "vietnamese": "phương pháp chi tiêu"
+  },
+  {
+    "english": "GDP at current prices",
+    "vietnamese": "GDP theo giá hiện hành"
+  },
+  {
+    "english": "GDP at constant prices",
+    "vietnamese": "GDP theo giá cố định"
+  },
+  {
+    "english": "GDP per capita",
+    "vietnamese": "GDP bình quân đầu người"
+  },
+  {
+    "english": "consumer expenditure",
+    "vietnamese": "chi tiêu của các cá nhân (hộ gia đình)"
+  },
+  {
+    "english": "investment by firms",
+    "vietnamese": "đầu tư của các doanh nghiệp"
+  },
+  {
+    "english": "government expenditure",
+    "vietnamese": "chi tiêu của chính quyền"
+  },
+  {
+    "english": "gross value added",
+    "vietnamese": "giá trị gia tăng brutto"
+  },
+  {
+    "english": "consumer price index",
+    "vietnamese": "chỉ số giá tiêu dùng (CPI)"
+  },
+  {
+    "english": "Laspeyres index",
+    "vietnamese": "chỉ số giảm phát tổng sản phẩm trong nước (GDP deflator)"
+  },
+  {
+    "english": "price index",
+    "vietnamese": "chỉ số giá"
+  },
+  {
+    "english": "market basket",
+    "vietnamese": "giỏ hàng hóa đại diện"
+  },
+  {
+    "english": "Laspeyres",
+    "vietnamese": "Laspeyres"
+  },
+  {
+    "english": "weight",
+    "vietnamese": "quyền số"
+  },
+  {
+    "english": "sub-index",
+    "vietnamese": "chỉ số con"
+  },
+  {
+    "english": "sub-sub-index",
+    "vietnamese": "chỉ số con con"
+  },
+  {
+    "english": "elementary aggregate",
+    "vietnamese": "elementary aggregate (giá của các mặt hàng cụ thể)"
+  },
+  {
+    "english": "price-reference month",
+    "vietnamese": "thời kỳ gốc"
+  },
+  {
+    "english": "fixed-weight index",
+    "vietnamese": "chỉ số giá tiêu dùng có trọng số cố định"
+  },
+  {
+    "english": "price revalidation",
+    "vietnamese": "phục định giá"
+  },
+  {
+    "english": "supply and demand",
+    "vietnamese": "cung - cầu"
+  },
+  {
+    "english": "supply curve",
+    "vietnamese": "đường cong cung"
+  },
+  {
+    "english": "demand curve",
+    "vietnamese": "đường cong cầu"
+  },
+  {
+    "english": "constant-elasticity demand function",
+    "vietnamese": "hàm số cầu có độ co giãn không đổi"
+  },
+  {
+    "english": "isoelastic demand function",
+    "vietnamese": "hàm số cầu có độ co giãn không đổi"
+  },
+  {
+    "english": "log-log demand function",
+    "vietnamese": "hàm số cầu log-log"
+  },
+  {
+    "english": "loglinear demand function",
+    "vietnamese": "hàm số cầu loglinear"
+  },
+  {
+    "english": "demand schedule",
+    "vietnamese": "danh sách cầu"
+  },
+  {
+    "english": "Veblen goods",
+    "vietnamese": "hàng Veblen"
+  },
+  {
+    "english": "Giffen goods",
+    "vietnamese": "hàng Giffen"
+  },
+  {
+    "english": "income effect",
+    "vietnamese": "hiệu ứng thu nhập"
+  },
+  {
+    "english": "monopsony",
+    "vietnamese": "monopsony"
+  },
+  {
+    "english": "demand curve",
+    "vietnamese": "đường cong cung"
+  },
+  {
+    "english": "equilibrium quantity",
+    "vietnamese": "số lượng cân bằng"
+  },
+  {
+    "english": "supply",
+    "vietnamese": "cung"
+  },
+  {
+    "english": "market expectations",
+    "vietnamese": "mức mong đợi của thị trường"
+  },
+  {
+    "english": "complementary goods",
+    "vietnamese": "hàng bổ sung"
+  },
+  {
+    "english": "substitute goods",
+    "vietnamese": "hàng thay thế"
+  },
+  {
+    "english": "technological progress",
+    "vietnamese": "thành tựu công nghệ"
+  },
+  {
+    "english": "supply curve shifts",
+    "vietnamese": "đường cong cung dịch chuyển"
+  },
+  {
+    "english": "partial equilibrium",
+    "vietnamese": "cân bằng bộ phận"
+  },
+  {
+    "english": "opportunity cost",
+    "vietnamese": "chi phí cơ hội"
+  },
+  {
+    "english": "Ricardian model",
+    "vietnamese": "Mô hình Ricardo"
+  },
+  {
+    "english": "Keynesian economics",
+    "vietnamese": "Kinh tế học Keynes"
+  },
+  {
+    "english": "Macroeconomics",
+    "vietnamese": "Kinh tế vĩ mô"
+  },
+  {
+    "english": "partial equilibrium theory",
+    "vietnamese": "lý thuyết cân bằng riêng"
+  },
+  {
+    "english": "supply and demand curves",
+    "vietnamese": "đường cong cung và cầu"
+  },
+  {
+    "english": "general equilibrium theory",
+    "vietnamese": "lý thuyết cân bằng tổng thể"
+  },
+  {
+    "english": "Quantity theory of money",
+    "vietnamese": "lý thuyết số lượng tiền tệ"
+  },
+  {
+    "english": "classical theory of the interest rate",
+    "vietnamese": "lý thuyết lãi suất cổ điển"
+  },
+  {
+    "english": "wage",
+    "vietnamese": "lương"
+  },
+  {
+    "english": "marginal product",
+    "vietnamese": "tổng sản lượng biên"
+  },
+  {
+    "english": "paradox of thrift",
+    "vietnamese": "trái ngang tiết kiệm"
+  },
+  {
+    "english": "underconsumption",
+    "vietnamese": "thiếu tiêu dùng"
+  },
+  {
+    "english": "aggregate demand",
+    "vietnamese": "cầu tổng hợp"
+  },
+  {
+    "english": "potential output",
+    "vietnamese": "thông số sản xuất tiềm năng"
+  },
+  {
+    "english": "underconsumptionist",
+    "vietnamese": "thuyết thiếu tiêu dùng"
+  },
+  {
+    "english": "effective demand",
+    "vietnamese": "cầu hiệu quả"
+  },
+  {
+    "english": "multiplier",
+    "vietnamese": "hệ số nhân"
+  },
+  {
+    "english": "General Theory",
+    "vietnamese": "Lý thuyết chung"
+  },
+  {
+    "english": "Stockholm school",
+    "vietnamese": "Trường học Stockholm"
+  },
+  {
+    "english": "monetarism",
+    "vietnamese": "chủ nghĩa tiền tệ"
+  },
+  {
+    "english": "monetary phenomenon",
+    "vietnamese": "hiện tượng tiền tệ"
+  },
+  {
+    "english": "Behavioral economics",
+    "vietnamese": "Kinh tế học hành vi"
+  },
+  {
+    "english": "behavioral economics",
+    "vietnamese": "hành vi kinh tế"
+  },
+  {
+    "english": "bounded rationality",
+    "vietnamese": "lý thuyết hạn chế tính hợp lý"
+  },
+  {
+    "english": "prospect theory",
+    "vietnamese": "lý thuyết góc nhìn"
+  },
+  {
+    "english": "Kahneman and Tversky",
+    "vietnamese": "Kahneman và Tversky"
+  },
+  {
+    "english": "prospect theory",
+    "vietnamese": "lý thuyết triển vọng"
+  },
+  {
+    "english": "nudge theory",
+    "vietnamese": "lý thuyết nudging"
+  },
+  {
+    "english": "herd behavior",
+    "vietnamese": "hành vi theo đàn"
+  },
+  {
+    "english": "loss aversion",
+    "vietnamese": "thất vọng về mất mát"
+  },
+  {
+    "english": "recency bias",
+    "vietnamese": "thiên vị recency"
+  },
+  {
+    "english": "confirmation bias",
+    "vietnamese": "thiên vị xác nhận"
+  },
+  {
+    "english": "familiarity bias",
+    "vietnamese": "thiên vị sự quen thuộc"
+  },
+  {
+    "english": "status quo bias",
+    "vietnamese": "thiên vị tình trạng hiện tại"
+  },
+  {
+    "english": "endowment effect",
+    "vietnamese": "hiệu ứng sở hữu"
+  },
+  {
+    "english": "behavioral finance",
+    "vietnamese": "kinh tế học hành vi"
+  },
+  {
+    "english": "behavioral game theory",
+    "vietnamese": "trò chơi hành vi"
+  },
+  {
+    "english": "international trade",
+    "vietnamese": "thương mại quốc tế"
+  },
+  {
+    "english": "food miles",
+    "vietnamese": "quãng đường di chuyển thực phẩm"
+  },
+  {
+    "english": "carbon emissions",
+    "vietnamese": "thải khí nhà kính"
+  },
+  {
+    "english": "local employment",
+    "vietnamese": "lao động địa phương"
+  },
+  {
+    "english": "labor rights",
+    "vietnamese": "quyền lao động"
+  },
+  {
+    "english": "wages",
+    "vietnamese": "lương"
+  },
+  {
+    "english": "automation",
+    "vietnamese": "tự động hóa"
+  },
+  {
+    "english": "resource security",
+    "vietnamese": "an ninh nguồn lực"
+  },
+  {
+    "english": "water",
+    "vietnamese": "nước"
+  },
+  {
+    "english": "energy",
+    "vietnamese": "năng lượng"
+  },
+  {
+    "english": "land",
+    "vietnamese": "đất"
+  },
+  {
+    "english": "ecotariffs",
+    "vietnamese": "thuế môi trường"
+  },
+  {
+    "english": "trade",
+    "vietnamese": "thương mại"
+  },
+  {
+    "english": "exports",
+    "vietnamese": "thương mại xuất khẩu"
+  },
+  {
+    "english": "imports",
+    "vietnamese": "thương mại nhập khẩu"
+  },
+  {
+    "english": "tariffs",
+    "vietnamese": "thuế nhập khẩu"
+  },
+  {
+    "english": "trade barriers",
+    "vietnamese": "rào cản thương mại"
+  },
+  {
+    "english": "customs",
+    "vietnamese": "hải quan"
+  },
+  {
+    "english": "quantitative restrictions",
+    "vietnamese": "hạn ngạch lượng"
+  },
+  {
+    "english": "technical barriers to trade",
+    "vietnamese": "rào cản kỹ thuật đối với thương mại"
+  },
+  {
+    "english": "investment barriers",
+    "vietnamese": "rào cản đầu tư"
+  },
+  {
+    "english": "administrative measures",
+    "vietnamese": "thuật toán hành chính"
+  },
+  {
+    "english": "temporary safeguard measures",
+    "vietnamese": "thuật toán bảo vệ tạm thời"
+  },
+  {
+    "english": "public finance",
+    "vietnamese": "tài chính công"
+  },
+  {
+    "english": "market failure",
+    "vietnamese": "thất bại thị trường"
+  },
+  {
+    "english": "public goods",
+    "vietnamese": "hàng hóa công cộng"
+  },
+  {
+    "english": "externalities",
+    "vietnamese": "ngoại ứng"
+  },
+  {
+    "english": "government failure",
+    "vietnamese": "sự thất bại của chính phủ"
+  },
+  {
+    "english": "Diamond-Mirrlees separation",
+    "vietnamese": "tách Diamond-Mirrlees"
+  },
+  {
+    "english": "cost-benefit analysis",
+    "vietnamese": "tính toán các chi phí lợi ích"
+  },
+  {
+    "english": "public debt",
+    "vietnamese": "nợ công"
+  },
+  {
+    "english": "private finance",
+    "vietnamese": "tài chính tư nhân"
+  },
+  {
+    "english": "public finance",
+    "vietnamese": "kinh tế công"
+  },
+  {
+    "english": "public expenditure",
+    "vietnamese": "chi tiêu công"
+  },
+  {
+    "english": "public revenue",
+    "vietnamese": "thu nhập công"
+  },
+  {
+    "english": "government consumption",
+    "vietnamese": "chi tiêu của chính phủ"
+  },
+  {
+    "english": "government investment",
+    "vietnamese": "đầu tư của chính phủ"
+  },
+  {
+    "english": "transfer payments",
+    "vietnamese": "thuộc tính chi tiêu"
+  },
+  {
+    "english": "government operations",
+    "vietnamese": "công việc của chính phủ"
+  },
+  {
+    "english": "income distribution",
+    "vietnamese": "phân phối thu nhập"
+  },
+  {
+    "english": "Seigniorage",
+    "vietnamese": "Seigniorage"
+  },
+  {
+    "english": "general government",
+    "vietnamese": "Tổ chức chính phủ chung"
+  },
+  {
+    "english": "econometrics",
+    "vietnamese": "kinh tế lượng"
+  },
+  {
+    "english": "regression analysis",
+    "vietnamese": "phân tích hồi quy"
+  },
+  {
+    "english": "time series",
+    "vietnamese": "chuỗi thời gian"
+  },
+  {
+    "english": "cross-sectional analysis",
+    "vietnamese": "dữ liệu chéo"
+  },
+  {
+    "english": "panel data",
+    "vietnamese": "dữ liệu mảng"
+  },
+  {
+    "english": "Two-Stage Least Squares (2SLS)",
+    "vietnamese": "Two-Stage Least Squares (2SLS)"
+  },
+  {
+    "english": "Three-Stage Least Squares (3SLS)",
+    "vietnamese": "Three-Stage Least Squares (3SLS)"
+  },
+  {
+    "english": "Method of Moments",
+    "vietnamese": "phương pháp момент"
+  },
+  {
+    "english": "Generalized Method of Moments (GMM)",
+    "vietnamese": "Generalized Method of Moments (GMM)"
+  },
+  {
+    "english": "stock market",
+    "vietnamese": "thị trường chứng khoán"
+  },
+  {
+    "english": "equity market",
+    "vietnamese": "thị trường chứng khoán"
+  },
+  {
+    "english": "share market",
+    "vietnamese": "thị trường chứng khoán"
+  },
+  {
+    "english": "stock",
+    "vietnamese": "cổ phiếu"
+  },
+  {
+    "english": "equity stock",
+    "vietnamese": "cổ phiếu"
+  },
+  {
+    "english": "stock exchange",
+    "vietnamese": "sàn giao dịch chứng khoán"
+  },
+  {
+    "english": "market capitalization",
+    "vietnamese": "vốn hóa thị trường"
+  },
+  {
+    "english": "public stock exchange",
+    "vietnamese": "sàn giao dịch chứng khoán đại chúng"
+  },
+  {
+    "english": "equity crowdfunding",
+    "vietnamese": "đầu tư cộng đồng"
+  },
+  {
+    "english": "over the counter",
+    "vietnamese": "qua quầy"
+  },
+  {
+    "english": "stockbroker",
+    "vietnamese": "người môi giới chứng khoán"
+  },
+  {
+    "english": "trading floor",
+    "vietnamese": "sàn giao dịch"
+  },
+  {
+    "english": "open outcry",
+    "vietnamese": "trái phiếu"
+  },
+  {
+    "english": "electronic trading",
+    "vietnamese": "giao dịch điện tử"
+  },
+  {
+    "english": "Market",
+    "vietnamese": "Thị trường"
+  },
+  {
+    "english": "market participants",
+    "vietnamese": "các bên tham gia thị trường"
+  },
+  {
+    "english": "directly purchase stock",
+    "vietnamese": "đầu tư vào chứng khoán trực tiếp"
+  },
+  {
+    "english": "exchange rate",
+    "vietnamese": "tỷ giá hối đoái"
+  },
+  {
+    "english": "retail exchange market",
+    "vietnamese": "thị trường giao dịch ngoại hối lẻ"
+  },
+  {
+    "english": "interbank markets",
+    "vietnamese": "thị trường liên ngân hàng"
+  },
+  {
+    "english": "spot contract rate",
+    "vietnamese": "hối đoái giao ngay"
+  },
+  {
+    "english": "bid–ask spread",
+    "vietnamese": "khoảng cách giữa giá mua và giá bán"
+  },
+  {
+    "english": "retail foreign exchange trading",
+    "vietnamese": "thị trường giao dịch ngoại hối lẻ"
+  },
+  {
+    "english": "fixed currency",
+    "vietnamese": "tiền tệ cố định"
+  },
+  {
+    "english": "variable currency",
+    "vietnamese": "tiền tệ biến đổi"
+  },
+  {
+    "english": "direct quotation",
+    "vietnamese": "trích dẫn trực tiếp"
+  },
+  {
+    "english": "indirect quotation",
+    "vietnamese": "trích dẫn gián tiếp"
+  },
+  {
+    "english": "pip",
+    "vietnamese": "pip (đơn vị nhỏ nhất trong tỷ giá hối đoái)"
+  },
+  {
+    "english": "pip",
+    "vietnamese": "pip"
+  },
+  {
+    "english": "Buying rate",
+    "vietnamese": "Tỷ giá mua"
+  },
+  {
+    "english": "Selling rate",
+    "vietnamese": "Tỷ giá bán"
+  },
+  {
+    "english": "Middle rate",
+    "vietnamese": "Tỷ giá trung tâm"
+  },
+  {
+    "english": "Spot exchange rate",
+    "vietnamese": "Tỷ giá giao ngay"
+  },
+  {
+    "english": "Forward exchange rate",
+    "vietnamese": "Tỷ giá chuyển tiền"
+  },
+  {
+    "english": "Basic rate",
+    "vietnamese": "Tỷ giá cơ bản"
+  },
+  {
+    "english": "Cross rate",
+    "vietnamese": "Tỷ giá chéo"
+  },
+  {
+    "english": "Market rate",
+    "vietnamese": "Tỷ giá hối đoái dựa trên thị trường"
+  },
+  {
+    "english": "real exchange rate",
+    "vietnamese": "tỷ giá hiệu quả"
+  },
+  {
+    "english": "Real Exchange Rate",
+    "vietnamese": "Tỷ giá hối đoái thực tế"
+  },
+  {
+    "english": "Fundamental Equilibrium Exchange Rate (FEER)",
+    "vietnamese": "Tỷ Giá Hối Đổi Đủ Đắn"
+  },
+  {
+    "english": "Behavioural Equilibrium Exchange Rate (BEER)",
+    "vietnamese": "Tỷ Giá Hối Đổi Hành Vi"
+  },
+  {
+    "english": "Nominal Effective Exchange Rate (NEER)",
+    "vietnamese": "Tỷ Giá Hối Đổi Trong Giá"
+  },
+  {
+    "english": "Real Effective Exchange Rate (REER)",
+    "vietnamese": "Tỷ Giá Hối Đổi Trong Giá Thật"
+  },
+  {
+    "english": "Parallel exchange rate",
+    "vietnamese": "Tỷ Giá Hối Đổi Song Song"
+  },
+  {
+    "english": "Uncovered interest rate parity model",
+    "vietnamese": "Mô hình đồng nhất lãi suất không bao phủ"
+  },
+  {
+    "english": "consumer price index (CPI)",
+    "vietnamese": "chỉ số giá tiêu dùng (CPI)"
+  },
+  {
+    "english": "purchasing power",
+    "vietnamese": "sức mua"
+  },
+  {
+    "english": "demand shocks",
+    "vietnamese": "các cú sốc về nhu cầu"
+  },
+  {
+    "english": "supply shocks",
+    "vietnamese": "các cú sốc về nguồn cung"
+  },
+  {
+    "english": "liquidity trap",
+    "vietnamese": "thảm họa thanh khoản"
+  },
+  {
+    "english": "nominal wage rigidity",
+    "vietnamese": "cứng nhắc về lương thực"
+  },
+  {
+    "english": "central bank",
+    "vietnamese": "nhà băng trung ương"
+  },
+  {
+    "english": "interest rates",
+    "vietnamese": "hạn lãi suất"
+  },
+  {
+    "english": "open market operations",
+    "vietnamese": "thao tác thị trường mở"
+  },
+  {
+    "english": "labor market",
+    "vietnamese": "thị trường lao động"
+  },
+  {
+    "english": "liquidity",
+    "vietnamese": "thanh khoản"
+  },
+  {
+    "english": "inflation rate",
+    "vietnamese": "tỷ lệ lạm phát"
+  },
+  {
+    "english": "gold",
+    "vietnamese": "vàng"
+  },
+  {
+    "english": "deposits",
+    "vietnamese": "tiền gửi"
+  },
+  {
+    "english": "inflation expectations",
+    "vietnamese": "mức kỳ vọng lạm phát"
+  },
+  {
+    "english": "monetary policy",
+    "vietnamese": "chính sách tiền tệ"
+  },
+  {
+    "english": "deflation",
+    "vietnamese": "thâm缩flation"
+  },
+  {
+    "english": "disinflation",
+    "vietnamese": "giảm tốc độ lạm phát"
+  },
+  {
+    "english": "hyperinflation",
+    "vietnamese": "lạm phát phi mã"
+  },
+  {
+    "english": "stagflation",
+    "vietnamese": "thất thang"
+  },
+  {
+    "english": "reflation",
+    "vietnamese": "thúc lạm phát"
+  },
+  {
+    "english": "house price inflation",
+    "vietnamese": "lạm phát giá nhà"
+  },
+  {
+    "english": "energy inflation",
+    "vietnamese": "lạm phát năng lượng"
+  },
+  {
+    "english": "fiat currency",
+    "vietnamese": "tiền tệ không có giá trị nội tại"
+  },
+  {
+    "english": "commodity money",
+    "vietnamese": "tiền hàng hóa"
+  },
+  {
+    "english": "lump sum infusions of gold or silver",
+    "vietnamese": "làn sóng đột ngột của vàng và bạc"
+  },
+  {
+    "english": "lump sum infusions of gold or silver into an economy",
+    "vietnamese": "làn sóng đột ngột của vàng và bạc vào một nền kinh tế"
+  },
+  {
+    "english": "lump sum infusions of gold or silver to an economy",
+    "vietnamese": "làn sóng đột ngột của vàng và bạc vào nền kinh tế"
+  },
+  {
+    "english": "CPI",
+    "vietnamese": "chỉ số giá tiêu dùng (CPI)"
+  },
+  {
+    "english": "price revolution",
+    "vietnamese": "thay đổi giá"
+  },
+  {
+    "english": "inflationary cycle",
+    "vietnamese": "hàm lạm phát"
+  },
+  {
+    "english": "deflationary period",
+    "vietnamese": "thời kỳ giảm giá"
+  },
+  {
+    "english": "price level",
+    "vietnamese": "mức giá"
+  },
+  {
+    "english": "labor cost",
+    "vietnamese": "chi phí lao động"
+  },
+  {
+    "english": "labor productivity",
+    "vietnamese": "hiệu suất lao động"
+  },
+  {
+    "english": "hyperinflation",
+    "vietnamese": "lạm phát siêu"
+  },
+  {
+    "english": "basic inflation rate",
+    "vietnamese": "lạm phát cơ bản"
+  },
+  {
+    "english": "PPI",
+    "vietnamese": "chỉ số giá sản xuất (PPI)"
+  },
+  {
+    "english": "Personal Consumption Expenditures Price Index (PCEPI)",
+    "vietnamese": "Chỉ số giá chi tiêu cá nhân (PCEPI)"
+  },
+  {
+    "english": "GDP deflator",
+    "vietnamese": "Chỉ số giá trị sản xuất quốc dân (GDP deflator)"
+  },
+  {
+    "english": "Core inflation",
+    "vietnamese": "Lạm phát cơ bản"
+  },
+  {
+    "english": "Producer Price Index (PPI)",
+    "vietnamese": "Chỉ số giá xuất xưởng (PPI)"
+  },
+  {
+    "english": "Employment Cost Index (ECI)",
+    "vietnamese": "Chỉ số chi phí lao động (ECI)"
+  },
+  {
+    "english": "Retail Prices Index (RPI)",
+    "vietnamese": "Chỉ số giá lẻ (RPI)"
+  },
+  {
+    "english": "Producer price index",
+    "vietnamese": "Chỉ số giá xuất xưởng"
+  },
+  {
+    "english": "Core price indices",
+    "vietnamese": "Chỉ số giá cơ bản"
+  },
+  {
+    "english": "GDP deflator",
+    "vietnamese": "Chỉ số điều chỉnh GDP"
+  },
+  {
+    "english": "Regional inflation",
+    "vietnamese": "Lạm phát khu vực"
+  },
+  {
+    "english": "Historical inflation",
+    "vietnamese": "Lạm phát lịch sử"
+  },
+  {
+    "english": "Asset price inflation",
+    "vietnamese": "Lạm phát giá tài sản"
+  },
+  {
+    "english": "Big Mac Index",
+    "vietnamese": "Chỉ số Big Mac"
+  },
+  {
+    "english": "Jollof index",
+    "vietnamese": "Chỉ số Jollof"
+  },
+  {
+    "english": "Inflation expectations",
+    "vietnamese": "Các kỳ vọng lạm phát"
+  },
+  {
+    "english": "real bills doctrine",
+    "vietnamese": "lý thuyết thực đơn"
+  },
+  {
+    "english": "Phillips curve",
+    "vietnamese": "đường cong Phi-líp"
+  },
+  {
+    "english": "Phillips curve",
+    "vietnamese": "Đường Phillips"
+  },
+  {
+    "english": "monetary base",
+    "vietnamese": "đại lượng tiền tệ cơ bản"
+  },
+  {
+    "english": "sellers' inflation",
+    "vietnamese": "lạm phát do người bán"
+  },
+  {
+    "english": "Government debt",
+    "vietnamese": "Nợ công"
+  },
+  {
+    "english": "Hyperinflation",
+    "vietnamese": "Viễn thông"
+  },
+  {
+    "english": "Mundell–Tobin effect",
+    "vietnamese": "hiệu ứng Mundell–Tobin"
+  },
+  {
+    "english": "disinflation",
+    "vietnamese": "thiểu phát"
+  },
+  {
+    "english": "deflationary spiral",
+    "vietnamese": "xoắn ốc giảm phát"
+  },
+  {
+    "english": "IS–LM model",
+    "vietnamese": "sơ đồ AD-AS"
+  },
+  {
+    "english": "debt obligations",
+    "vietnamese": "trách nhiệm nợ"
+  },
+  {
+    "english": "stagflation",
+    "vietnamese": "đình lạm"
+  },
+  {
+    "english": "hyperinflation",
+    "vietnamese": "siêu lạm phát"
+  },
+  {
+    "english": "monetary inflation",
+    "vietnamese": "lạm phát tiền tệ"
+  },
+  {
+    "english": "lira",
+    "vietnamese": "rúp"
+  },
+  {
+    "english": "peso boliviano",
+    "vietnamese": "peso boliviano"
+  },
+  {
+    "english": "boliviano",
+    "vietnamese": "boliviano"
+  },
+  {
+    "english": "Real Plan",
+    "vietnamese": "Chương trình Real"
+  },
+  {
+    "english": "Fabian currency",
+    "vietnamese": "Fabi"
+  },
+  {
+    "english": "gold yuan",
+    "vietnamese": "tiền vàng"
+  },
+  {
+    "english": "assignat",
+    "vietnamese": "assignat"
+  },
+  {
+    "english": "franc",
+    "vietnamese": "franc"
+  },
+  {
+    "english": "chervonets",
+    "vietnamese": "chervonets"
+  },
+  {
+    "english": "dinar",
+    "vietnamese": "dinar"
+  },
+  {
+    "english": "novi dinar",
+    "vietnamese": "novi dinar"
+  },
+  {
+    "english": "inflation",
+    "vietnamese": "siêu lạm phát"
+  },
+  {
+    "english": "negative interest rate policy",
+    "vietnamese": "chính sách lãi suất âm"
+  },
+  {
+    "english": "negative interest",
+    "vietnamese": "lãi suất âm"
+  },
+  {
+    "english": "open market",
+    "vietnamese": "thị trường mở"
+  },
+  {
+    "english": "liquidity preference",
+    "vietnamese": "lưu ý về sở thích"
+  },
+  {
+    "english": "nominal interest rate",
+    "vietnamese": "lãi suất danh nghĩa"
+  },
+  {
+    "english": "real interest rate",
+    "vietnamese": "lãi suất thực"
+  },
+  {
+    "english": "negative interest rate",
+    "vietnamese": "lãi suất âm"
+  },
+  {
+    "english": "debt crisis",
+    "vietnamese": "khủng hoảng nợ công"
+  },
+  {
+    "english": "Eurozone",
+    "vietnamese": "khu vực đồng euro"
+  },
+  {
+    "english": "deflation",
+    "vietnamese": "tan vỡ"
+  },
+  {
+    "english": "forced saving",
+    "vietnamese": "tài chính áp chế"
+  },
+  {
+    "english": "Freigeld",
+    "vietnamese": "tiền tự do"
+  },
+  {
+    "english": "Freiwirtschaft",
+    "vietnamese": "nền kinh tế tự do"
+  },
+  {
+    "english": "balance of payments",
+    "vietnamese": "cán cân thanh toán"
+  },
+  {
+    "english": "current account",
+    "vietnamese": "cán cân vãng lai"
+  },
+  {
+    "english": "capital account",
+    "vietnamese": "cán cân luồng vốn"
+  },
+  {
+    "english": "official reserve account",
+    "vietnamese": "cán cân tài trợ chính thức"
+  },
+  {
+    "english": "balance of international payments",
+    "vietnamese": "cán cân thanh toán quốc tế"
+  },
+  {
+    "english": "current account",
+    "vietnamese": "tài khoản vãng lai"
+  },
+  {
+    "english": "capital and financial account",
+    "vietnamese": "tài khoản vốn"
+  },
+  {
+    "english": "mercantilism",
+    "vietnamese": "thương nghiệp bảo hộ"
+  },
+  {
+    "english": "balance of payments crises",
+    "vietnamese": "khủng hoảng cán cân thanh toán"
+  },
+  {
+    "english": "liquidity trap",
+    "vietnamese": "bẫy thanh khoản"
+  },
+  {
+    "english": "liquidity trap",
+    "vietnamese": "khoảng trapped về thanh khoản"
+  },
+  {
+    "english": "Quantitative easing",
+    "vietnamese": "Nới lỏng định lượng"
+  },
+  {
+    "english": "bank run",
+    "vietnamese": "đột biến rút tiền gửi"
+  },
+  {
+    "english": "financial crisis",
+    "vietnamese": "khủng hoảng tài chính"
+  },
+  {
+    "english": "primary market",
+    "vietnamese": "thị trường chính"
+  },
+  {
+    "english": "secondary market",
+    "vietnamese": "thị trường thứ cấp"
+  },
+  {
+    "english": "money market",
+    "vietnamese": "thị trường tiền tệ"
+  },
+  {
+    "english": "underwriting",
+    "vietnamese": "hạ bảo hiểm"
+  },
+  {
+    "english": "pension funds",
+    "vietnamese": "quỹ hưu trí"
+  },
+  {
+    "english": "hedge funds",
+    "vietnamese": "quỹ đầu cơ"
+  },
+  {
+    "english": "sovereign wealth funds",
+    "vietnamese": "quỹ tài sản quốc gia"
+  },
+  {
+    "english": "stock markets",
+    "vietnamese": "thị trường chứng khoán"
+  },
+  {
+    "english": "bond markets",
+    "vietnamese": "thị trường trái phiếu"
+  },
+  {
+    "english": "money market instruments",
+    "vietnamese": "công cụ nợ"
+  },
+  {
+    "english": "short-term loans",
+    "vietnamese": "vốn ngắn hạn"
+  },
+  {
+    "english": "interbank lending",
+    "vietnamese": "lending giữa các ngân hàng"
+  },
+  {
+    "english": "commercial paper",
+    "vietnamese": "kế hoạch thương mại"
+  },
+  {
+    "english": "repurchase agreements",
+    "vietnamese": "hợp đồng tái bán"
+  },
+  {
+    "english": "London Interbank Offered Rate (LIBOR)",
+    "vietnamese": "Tỷ lệ cung cấp giữa các ngân hàng London (LIBOR)"
+  },
+  {
+    "english": "money market funds",
+    "vietnamese": "quỹ tiền tệ"
+  },
+  {
+    "english": "federal funds",
+    "vietnamese": "tiền liên bang"
+  },
+  {
+    "english": "asset-backed commercial paper (ABCP)",
+    "vietnamese": "chứng chỉ thương mại dựa trên tài sản (ABCP)"
+  },
+  {
+    "english": "commercial bank money",
+    "vietnamese": "tiền của ngân hàng thương mại"
+  },
+  {
+    "english": "fiat money",
+    "vietnamese": "tiền pháp định"
+  },
+  {
+    "english": "fiduciary money",
+    "vietnamese": "tiền tín thác"
+  },
+  {
+    "english": "money market securities",
+    "vietnamese": "chứng khoán tiền tệ"
+  },
+  {
+    "english": "money market fund",
+    "vietnamese": "quỹ tiền tệ"
+  },
+  {
+    "english": "game theory",
+    "vietnamese": "lý thuyết trò chơi"
+  },
+  {
+    "english": "mixed-strategy equilibria",
+    "vietnamese": "điểm cân bằng của sách lược hỗn hợp"
+  },
+  {
+    "english": "two-person zero-sum games",
+    "vietnamese": "trò chơi có tổng bằng không của hai người"
+  },
+  {
+    "english": "Nash equilibrium",
+    "vietnamese": "cân bằng Nash"
+  },
+  {
+    "english": "cooperative games",
+    "vietnamese": "trò chơi hợp tác"
+  },
+  {
+    "english": "Prisoner's dilemma",
+    "vietnamese": "Prisoner's dilemma"
+  },
+  {
+    "english": "non-cooperative game theory",
+    "vietnamese": "trò chơi không hợp tác"
+  },
+  {
+    "english": "asymmetric games",
+    "vietnamese": "trò chơi bất đối xứng"
+  },
+  {
+    "english": "symmetric games",
+    "vietnamese": "trò chơi đối xứng"
+  },
+  {
+    "english": "zero-sum games",
+    "vietnamese": "trò chơi tổng bằng không"
+  },
+  {
+    "english": "non-zero-sum games",
+    "vietnamese": "trò chơi tổng khác không"
+  },
+  {
+    "english": "simultaneous games",
+    "vietnamese": "trò chơi đồng thời"
+  },
+  {
+    "english": "sequential games",
+    "vietnamese": "trò chơi tuần tự"
+  },
+  {
+    "english": "perfect information",
+    "vietnamese": "thông tin hoàn hảo"
+  },
+  {
+    "english": "imperfect information",
+    "vietnamese": "thông tin không hoàn hảo"
+  },
+  {
+    "english": "Bayesian game",
+    "vietnamese": "trò chơi dài vô tận"
+  },
+  {
+    "english": "complete information",
+    "vietnamese": "thông tin đầy đủ"
+  },
+  {
+    "english": "characteristic function form",
+    "vietnamese": "hình thức hàm đặc trưng"
+  },
+  {
+    "english": "noncooperative games",
+    "vietnamese": "trò chơi không hợp tác"
+  },
+  {
+    "english": "solution concept",
+    "vietnamese": "quy念游戏理论概念"
+  },
+  {
+    "english": "extensive form",
+    "vietnamese": "hình thức mở rộng"
+  },
+  {
+    "english": "Nash equilibrium",
+    "vietnamese": "điều hòa Nash"
+  },
+  {
+    "english": "chemical game theory",
+    "vietnamese": "lý thuyết trò chơi hóa học"
+  },
+  {
+    "english": "knowlecules",
+    "vietnamese": "knowlecules (một thuật ngữ trong hóa học trò chơi)"
+  },
+  {
+    "english": "rationality",
+    "vietnamese": "thông minh"
+  },
+  {
+    "english": "evolutionary game theory",
+    "vietnamese": "lý thuyết trò chơi tiến hóa"
+  },
+  {
+    "english": "bounded rationality",
+    "vietnamese": "tính thông minh giới hạn"
+  },
+  {
+    "english": "centipede game",
+    "vietnamese": "trò chơi con kiến"
+  },
+  {
+    "english": "guess 2/3 of the average game",
+    "vietnamese": "trò chơi đoán 2/3 trung bình"
+  },
+  {
+    "english": "dictator game",
+    "vietnamese": "trò chơi độc tài"
+  },
+  {
+    "english": "fictitious play dynamics",
+    "vietnamese": "động lực giả tưởng"
+  },
+  {
+    "english": "rational behavior",
+    "vietnamese": "hành vi hợp lý"
+  },
+  {
+    "english": "prescriptive or normative analysis",
+    "vietnamese": "phân tích quy phạm hoặc quy định"
+  },
+  {
+    "english": "n-person games",
+    "vietnamese": "trò chơi n người"
+  },
+  {
+    "english": "partition function form",
+    "vietnamese": "hàm phân chia"
+  },
+  {
+    "english": "Stag Hunt",
+    "vietnamese": "Trò chơi con nai"
+  },
+  {
+    "english": "Unto Others: The Evolution and Psychology of Unselfish Behavior",
+    "vietnamese": "Unto Others: Sự tiến hóa và tâm lý của hành vi không ích kỷ"
+  },
+  {
+    "english": "Stag Hunt and the Evolution of Social Structure",
+    "vietnamese": "Trò chơi con nai và sự tiến hóa của cấu trúc xã hội"
+  },
+  {
+    "english": "game theory",
+    "vietnamese": "số học trò chơi"
+  },
+  {
+    "english": "Nash equilibrium",
+    "vietnamese": "Giải Nash"
+  },
+  {
+    "english": "coalition-proof Nash equilibrium",
+    "vietnamese": "cân bằng Nash chống liên minh"
+  },
+  {
+    "english": "Generalized Nash equilibrium",
+    "vietnamese": "cân bằng Nash chung"
+  },
+  {
+    "english": "coupled constraints",
+    "vietnamese": "các ràng buộc liên kết"
+  },
+  {
+    "english": "concave games",
+    "vietnamese": "trò chơi lồi"
+  },
+  {
+    "english": "nonatomic games",
+    "vietnamese": "trò chơi không nguyên tử"
+  },
+  {
+    "english": "Pareto optimal",
+    "vietnamese": "optimal Pareto"
+  },
+  {
+    "english": "Nash equilibrium",
+    "vietnamese": "Điểm cân bằng"
+  },
+  {
+    "english": "Nash equilibrium",
+    "vietnamese": "điểm cân bằng Nash"
+  },
+  {
+    "english": "subgame perfect equilibrium",
+    "vietnamese": "thăng bằng subgame perfect"
+  },
+  {
+    "english": "Nash equilibrium",
+    "vietnamese": "thăng bằng Nash"
+  },
+  {
+    "english": "subgame",
+    "vietnamese": "subgame"
+  },
+  {
+    "english": "credible threat",
+    "vietnamese": "threat tin cậy"
+  },
+  {
+    "english": "non-credible threat",
+    "vietnamese": "threat không tin cậy"
+  },
+  {
+    "english": "dynamic inconsistency",
+    "vietnamese": "trái nghĩa động"
+  },
+  {
+    "english": "Kakutani fixed-point theorem",
+    "vietnamese": "định lý điểm bất động Kakutani"
+  },
+  {
+    "english": "Brouwer's fixed-point theorem",
+    "vietnamese": "định lý điểm bất động Brouwer"
+  },
+  {
+    "english": "best response",
+    "vietnamese": "trả lời tốt nhất"
+  },
+  {
+    "english": "strategy",
+    "vietnamese": "strategi"
+  },
+  {
+    "english": "player",
+    "vietnamese": "người chơi"
+  },
+  {
+    "english": "sequential game",
+    "vietnamese": "trò chơi theo thứ tự"
+  },
+  {
+    "english": "Nash's original proof",
+    "vietnamese": "công thức ban đầu của Nash"
+  },
+  {
+    "english": "proof",
+    "vietnamese": "công thức"
+  },
+  {
+    "english": "variant",
+    "vietnamese": "biến thể"
+  },
+  {
+    "english": "solution concept",
+    "vietnamese": "thể hiện giải pháp"
+  },
+  {
+    "english": "dynamic inconsistencies",
+    "vietnamese": "trái nghĩa động"
+  },
+  {
+    "english": "subgame perfect Nash equilibrium",
+    "vietnamese": "thăng bằng Nash subgame perfect"
+  },
+  {
+    "english": "Pareto improvement",
+    "vietnamese": "cải tiến Pareto"
+  },
+  {
+    "english": "Pareto efficiency",
+    "vietnamese": "Hiệu quả Pareto"
+  },
+  {
+    "english": "feasibility",
+    "vietnamese": "hiệu quả"
+  },
+  {
+    "english": "Pareto-efficient outcome",
+    "vietnamese": "kết quả Pareto hiệu quả"
+  },
+  {
+    "english": "first welfare theorem",
+    "vietnamese": "đệ nhất lý thuyết phúc lợi"
+  },
+  {
+    "english": "competitive market",
+    "vietnamese": "thị trường cạnh tranh"
+  },
+  {
+    "english": "Pareto optimum",
+    "vietnamese": "optimum Pareto"
+  },
+  {
+    "english": "second welfare theorem",
+    "vietnamese": "đệ nhị lý thuyết phúc lợi"
+  },
+  {
+    "english": "Greenwald–Stiglitz theorem",
+    "vietnamese": "lý thuyết Greenwald–Stiglitz"
+  },
+  {
+    "english": "multi-objective optimization",
+    "vietnamese": "quy hoạch đa mục tiêu"
+  },
+  {
+    "english": "Pareto order",
+    "vietnamese": "hệ thức Pareto"
+  },
+  {
+    "english": "externality",
+    "vietnamese": "ảnh hưởng ngoại lai"
+  },
+  {
+    "english": "negative externality",
+    "vietnamese": "ảnh hưởng ngoại lai tiêu cực"
+  },
+  {
+    "english": "positive externality",
+    "vietnamese": "ảnh hưởng ngoại lai tích cực"
+  },
+  {
+    "english": "Pigouvian tax",
+    "vietnamese": "thuế Pigou"
+  },
+  {
+    "english": "Pareto optimality",
+    "vietnamese": "tối ưu theo Pareto"
+  },
+  {
+    "english": "internalize",
+    "vietnamese": "nội bộ hóa ảnh hưởng ngoại lai"
+  },
+  {
+    "english": "moral hazard",
+    "vietnamese": "rủi ro đạo đức"
+  },
+  {
+    "english": "adverse selection",
+    "vietnamese": "lựa chọn trái ý"
+  },
+  {
+    "english": "adverse selection",
+    "vietnamese": "chọn lọc tiêu cực"
+  },
+  {
+    "english": "public good",
+    "vietnamese": "hàng hóa công cộng"
+  },
+  {
+    "english": "non-excludable",
+    "vietnamese": "không thể loại trừ"
+  },
+  {
+    "english": "non-rivalrous",
+    "vietnamese": "không cạnh tranh"
+  },
+  {
+    "english": "free-rider problem",
+    "vietnamese": "vấn đề kẻ đi xe không trả tiền"
+  },
+  {
+    "english": "club goods",
+    "vietnamese": "hàng hóa bán công cộng"
+  },
+  {
+    "english": "global public goods",
+    "vietnamese": "hàng hóa công cộng toàn cầu"
+  },
+  {
+    "english": "public utilities",
+    "vietnamese": "hàng hóa công cộng"
+  },
+  {
+    "english": "Lindahl tax",
+    "vietnamese": "hàng hóa công cộng thuần túy và không thuần túy"
+  },
+  {
+    "english": "Vickrey–Clarke–Groves mechanism",
+    "vietnamese": "Vickrey–Clarke–Groves mechanism"
+  },
+  {
+    "english": "Quadratic funding",
+    "vietnamese": "Quadratic funding"
+  },
+  {
+    "english": "lotteries",
+    "vietnamese": "xổ số"
+  },
+  {
+    "english": "private good",
+    "vietnamese": "hàng hóa tư nhân"
+  },
+  {
+    "english": "common-pool resource",
+    "vietnamese": "hàng hóa công cộng có thể loại trừ nhưng với phí tổn rất lớn"
+  },
+  {
+    "english": "club goods",
+    "vietnamese": "hàng hóa câu lạc bộ"
+  },
+  {
+    "english": "mixed good",
+    "vietnamese": "hàng hóa hỗn hợp"
+  },
+  {
+    "english": "non-excludability",
+    "vietnamese": "không loại trừ được"
+  },
+  {
+    "english": "public goods problem",
+    "vietnamese": "trái nguyệt của công cộng"
+  },
+  {
+    "english": "tragedy of the commons",
+    "vietnamese": "trái nguyệt của công cộng"
+  },
+  {
+    "english": "laissez-faire",
+    "vietnamese": "laissez-faire (Tự do Phóng nhiệm, Tự do kinh tế)"
+  },
+  {
+    "english": "marginal utility",
+    "vietnamese": "lợi ích cận biên"
+  },
+  {
+    "english": "diminishing marginal utility",
+    "vietnamese": "lợi ích cận biên giảm dần"
+  },
+  {
+    "english": "marginal analysis",
+    "vietnamese": "phân tích cận biên"
+  },
+  {
+    "english": "revealed preferences",
+    "vietnamese": "công thức hóa sở thích"
+  },
+  {
+    "english": "utils",
+    "vietnamese": "utils"
+  },
+  {
+    "english": "contemporary mainstream economic theory",
+    "vietnamese": "trí tuệ kinh tế đương đại chính thống"
+  },
+  {
+    "english": "paradox of water and diamonds",
+    "vietnamese": "nghịch lý giữa nước và kim cương"
+  },
+  {
+    "english": "marginal utility",
+    "vietnamese": "lợi ích biên"
+  },
+  {
+    "english": "price elasticity of demand",
+    "vietnamese": "độ co giãn của cầu theo giá"
+  },
+  {
+    "english": "elastic variable",
+    "vietnamese": "mức co giãn cao"
+  },
+  {
+    "english": "elasticity",
+    "vietnamese": "độ co giãn"
+  },
+  {
+    "english": "price elasticity of supply",
+    "vietnamese": "độ co giãn của cung theo giá"
+  },
+  {
+    "english": "cross-price elasticity",
+    "vietnamese": "độ co giãn của cầu theo giá chéo"
+  },
+  {
+    "english": "ε",
+    "vietnamese": "ε"
+  },
+  {
+    "english": "ε<sub>x,y</sub>",
+    "vietnamese": "ε<sub>x,y</sub>"
+  },
+  {
+    "english": "ε<sub>x</sub><sup>y</sup>",
+    "vietnamese": "E<sub>x</sub><sup>y</sup>"
+  },
+  {
+    "english": "tariff",
+    "vietnamese": "thuế quan"
+  },
+  {
+    "english": "free trade",
+    "vietnamese": "thương mại tự do"
+  },
+  {
+    "english": "globalization",
+    "vietnamese": "toàn cầu hóa"
+  },
+  {
+    "english": "globalization",
+    "vietnamese": "toàn cầu hoá"
+  },
+  {
+    "english": "embodied globalization",
+    "vietnamese": "tổng cầu vật chất"
+  },
+  {
+    "english": "economic globalization",
+    "vietnamese": "tự do hóa kinh tế"
+  },
+  {
+    "english": "archaic globalization",
+    "vietnamese": "arcaic toàn cầu hóa"
+  },
+  {
+    "english": "economic globalization",
+    "vietnamese": "kinh tế và thương mại"
+  },
+  {
+    "english": "economic globalization",
+    "vietnamese": "tổng thể toàn cầu hóa kinh tế"
+  },
+  {
+    "english": "globalization of production",
+    "vietnamese": "tổng thể sản xuất toàn cầu"
+  },
+  {
+    "english": "globalization of markets",
+    "vietnamese": "tổng thể thị trường toàn cầu"
+  },
+  {
+    "english": "multinational corporation",
+    "vietnamese": "doanh nghiệp đa quốc gia"
+  },
+  {
+    "english": "free-trade area",
+    "vietnamese": "khu vực thương mại tự do"
+  },
+  {
+    "english": "European Union",
+    "vietnamese": "Hội nghị thượng đỉnh châu Âu"
+  },
+  {
+    "english": "World Trade Organization (WTO)",
+    "vietnamese": "Tổ chức Thương mại Thế giới (WTO)"
+  },
+  {
+    "english": "General Agreement on Tariffs and Trade (GATT)",
+    "vietnamese": "Hiệp ước chung về thuế quan và mậu dịch (GATT)"
+  },
+  {
+    "english": "trade facilitation",
+    "vietnamese": "thúc đẩy thương mại"
+  },
+  {
+    "english": "global trade in services",
+    "vietnamese": "thương mại dịch vụ toàn cầu"
+  },
+  {
+    "english": "business process outsourcing",
+    "vietnamese": "nhuộm quá trình kinh doanh"
+  },
+  {
+    "english": "transnational fragmentation",
+    "vietnamese": "phân đoạn xuyên quốc gia"
+  },
+  {
+    "english": "cultural globalization",
+    "vietnamese": "cultural globalization"
+  },
+  {
+    "english": "cross-cultural communication",
+    "vietnamese": "giao tiếp văn hóa giữa các văn hóa"
+  },
+  {
+    "english": "cultural diffusion",
+    "vietnamese": "truyền bá văn hóa"
+  },
+  {
+    "english": "authentic",
+    "vietnamese": "thật sự"
+  },
+  {
+    "english": "protectionism",
+    "vietnamese": "chủ nghĩa bảo hộ"
+  },
+  {
+    "english": "anti-dumping laws",
+    "vietnamese": "chính sách chống phá giá"
+  },
+  {
+    "english": "direct subsidies",
+    "vietnamese": "trợ cấp trực tiếp"
+  },
+  {
+    "english": "export subsidies",
+    "vietnamese": "trợ cấp xuất khẩu"
+  },
+  {
+    "english": "exchange rate control",
+    "vietnamese": "kìm giữ tỷ giá"
+  },
+  {
+    "english": "international patent systems",
+    "vietnamese": "hệ thống sở hữu trí tuệ quốc tế"
+  },
+  {
+    "english": "Buy American Act",
+    "vietnamese": "Luật Mua hàng Mỹ"
+  },
+  {
+    "english": "protectionist",
+    "vietnamese": "chủ nghĩa bảo hộ mậu dịch"
+  },
+  {
+    "english": "tariff law",
+    "vietnamese": "Đạo luật thuế quan"
+  },
+  {
+    "english": "Smoot–Hawley Tariff Act",
+    "vietnamese": "Đạo luật thuế quan Smoot–Hawley Tariff Act (1930)"
+  },
+  {
+    "english": "trade war",
+    "vietnamese": "Chiến tranh thương mại"
+  },
+  {
+    "english": "dumping",
+    "vietnamese": "bán phá giá"
+  },
+  {
+    "english": "dumping",
+    "vietnamese": "phá giá"
+  },
+  {
+    "english": "Foreign Direct Investment",
+    "vietnamese": "Đầu tư trực tiếp nước ngoài"
+  },
+  {
+    "english": "FDI",
+    "vietnamese": "FDI"
+  },
+  {
+    "english": "foreign direct investment",
+    "vietnamese": "vốn đầu tư trực tiếp nước ngoài"
+  },
+  {
+    "english": "World Trade Organization",
+    "vietnamese": "Tổ chức Thương mại Thế giới"
+  },
+  {
+    "english": "Uruguay Round",
+    "vietnamese": "Vòng đàm phán Uruguay"
+  },
+  {
+    "english": "GATT 1994",
+    "vietnamese": "GATT 1994"
+  },
+  {
+    "english": "GATT 1947",
+    "vietnamese": "GATT 1947"
+  },
+  {
+    "english": "TRIPS",
+    "vietnamese": "TRAIP"
+  },
+  {
+    "english": "TRIMS",
+    "vietnamese": "TRIM"
+  },
+  {
+    "english": "GATS",
+    "vietnamese": "GATS"
+  },
+  {
+    "english": "dispute settlement",
+    "vietnamese": "giải quyết tranh chấp"
+  },
+  {
+    "english": "tariff 'ceiling-binding'",
+    "vietnamese": "mức ràng buộc trần thuế quan"
+  },
+  {
+    "english": "Doha Round",
+    "vietnamese": "Vòng đàm phán Doha"
+  },
+  {
+    "english": "Dispute Settlement Body",
+    "vietnamese": "Ban Giải quyết Tranh chấp"
+  },
+  {
+    "english": "Dispute Settlement Understanding (DSU)",
+    "vietnamese": "Hiểu biết về Giải quyết Tranh chấp (DSU)"
+  },
+  {
+    "english": "Trade-Related Aspects of Intellectual Property Rights (TRIPS)",
+    "vietnamese": "Các khía cạnh liên quan đến quyền sở hữu trí tuệ của thương mại (TRIPS)"
+  },
+  {
+    "english": "Trade Policy Review Mechanism (TPRM)",
+    "vietnamese": "Mekhanisme Đánh giá chính sách thương mại (TPRM)"
+  },
+  {
+    "english": "Technical Assistance",
+    "vietnamese": "Trợ giúp kỹ thuật"
+  },
+  {
+    "english": "International Monetary Fund (IMF)",
+    "vietnamese": "Quỹ Tiền tệ Quốc tế (IMF)"
+  },
+  {
+    "english": "International Bank for Reconstruction and Development (IBRD)",
+    "vietnamese": "Ngân hàng Reconstruct và Phát triển Quốc tế (IBRD)"
+  },
+  {
+    "english": "non-discrimination",
+    "vietnamese": "không phân biệt đối xử"
+  },
+  {
+    "english": "Trade Policy Review Mechanism (TPRM)",
+    "vietnamese": "Mekanism Xem xét Chính sách Thương mại (TPRM)"
+  },
+  {
+    "english": "Trade Policy Reviews",
+    "vietnamese": "Xem xét Chính sách Thương mại"
+  },
+  {
+    "english": "Trade Policy Review Body",
+    "vietnamese": "Ban Xem xét Chính sách Thương mại"
+  },
+  {
+    "english": "Ministerial Conference",
+    "vietnamese": "Hội nghị Thượng đỉnh"
+  },
+  {
+    "english": "General Council",
+    "vietnamese": "Hội đồng chung"
+  },
+  {
+    "english": "Trade Negotiations Committee",
+    "vietnamese": "Ban đàm phán Thương mại"
+  },
+  {
+    "english": "Trade in Services Council",
+    "vietnamese": "Hội đồng Thương mại Dịch vụ"
+  },
+  {
+    "english": "Trade-Related Aspects of Intellectual Property Rights (TRIPS)",
+    "vietnamese": "Các khía cạnh liên quan đến Sở hữu Trí tuệ (TRIPS)"
+  },
+  {
+    "english": "General Agreement on Tariffs and Trade (GATT)",
+    "vietnamese": "Hiệp định chung về Thuế quan và Thương mại (GATT)"
+  },
+  {
+    "english": "General Agreement on Trade in Services (GATS)",
+    "vietnamese": "Hiệp định chung về Thương mại Dịch vụ (GATS)"
+  },
+  {
+    "english": "Appellate Body",
+    "vietnamese": "Hội đồng phúc thẩm"
+  },
+  {
+    "english": "Multiparty Interim Appeal Arbitration Arrangement (MPIA)",
+    "vietnamese": "Hợp đồng phúc thẩm tạm thời đa bên (MPIA)"
+  },
+  {
+    "english": "Working Party",
+    "vietnamese": "Ban làm việc"
+  },
+  {
+    "english": "Accession",
+    "vietnamese": "Tham gia"
+  },
+  {
+    "english": "Working Party on the Accession of Kazakhstan",
+    "vietnamese": "Ban làm việc về quá trình tham gia của Kazakhstan"
+  },
+  {
+    "english": "Working Party on the Accession of Vanuatu",
+    "vietnamese": "Ban làm việc về quá trình tham gia của Vanuatu"
+  }
+]

@@ -1,0 +1,11 @@
+.*
+!/.dockerignore
+VectorDB/
+outputs/
+data/
+package_enterprise/
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.DS_Store

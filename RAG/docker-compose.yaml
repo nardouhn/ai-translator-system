@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  translator-api:
+    build: .
+    container_name: ai-translator-service
+    ports:
+      - "8000:8000"
+    volumes:
+      # Gắn thư mục mô hình từ bên ngoài vào để không cần copy nặng
+      - ../outputs/completed_model_mlx:/app/model
+      # Gắn database để dữ liệu cache/tri thức được lưu lại bền vững
+      - ./VectorDB:/app/VectorDB
+    environment:
+      - MODEL_PATH=Qwen/Qwen2.5-1.5B-Instruct
+      - DB_PATH=/app/VectorDB
+      - ENABLE_KAFKA=true
+      - KAFKA_SERVERS=kafka:9092
+      - KAFKA_TOPIC=translation_updates
+      - PYTHONUNBUFFERED=1
+      - GEMINI_API_KEY=AIzaSyDS_LyTxY-GKG9p-qFQTzq9T4v1DVvgKz0
+    restart: always
+    dns:
+      - 8.8.8.8
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    restart: always
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    restart: always
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  postgres:
+    image: postgres:13
+    container_name: airflow-postgres
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5433:5432"
+    restart: always
+
+  airflow-webserver:
+    build: .
+    container_name: airflow-webserver
+    depends_on:
+      - postgres
+      - kafka
+    environment:
+      - LOAD_EX=n
+      - EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__FERNET_KEY=6TVSgyImqInXE8iqQz11HnupTKaXhZGUiZDJHNKw0YM=
+      - AIRFLOW__WEBSERVER__SECRET_KEY=4f6067006253d424e58cf586a1cae445
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__DAGS_FOLDER=/app/airflow/dags
+      - KAFKA_SERVERS=kafka:9092
+      - MODEL_PATH=Qwen/Qwen2.5-1.5B-Instruct
+      - GEMINI_API_KEY=AIzaSyDS_LyTxY-GKG9p-qFQTzq9T4v1DVvgKz0
+    dns:
+      - 8.8.8.8
+    volumes:
+      - ./dags:/app/airflow/dags
+      - ./crawlers:/app/crawlers
+      - ./core:/app/core
+      - ../outputs/completed_model_mlx:/app/model
+    ports:
+      - "8080:8080"
+    command: bash -c "airflow db init && airflow users create --username admin --firstname admin --lastname admin --role Admin --email admin@example.com --password admin && airflow webserver"
+    restart: always
+
+  airflow-scheduler:
+    build: .
+    container_name: airflow-scheduler
+    depends_on:
+      - postgres
+      - kafka
+    environment:
+      - LOAD_EX=n
+      - EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__FERNET_KEY=6TVSgyImqInXE8iqQz11HnupTKaXhZGUiZDJHNKw0YM=
+      - AIRFLOW__WEBSERVER__SECRET_KEY=4f6067006253d424e58cf586a1cae445
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__DAGS_FOLDER=/app/airflow/dags
+      - KAFKA_SERVERS=kafka:9092
+      - MODEL_PATH=Qwen/Qwen2.5-1.5B-Instruct
+      - GEMINI_API_KEY=AIzaSyDS_LyTxY-GKG9p-qFQTzq9T4v1DVvgKz0
+    dns:
+      - 8.8.8.8
+    volumes:
+      - ./dags:/app/airflow/dags
+      - ./crawlers:/app/crawlers
+      - ./core:/app/core
+      - ../outputs/completed_model_mlx:/app/model
+    command: airflow scheduler
+    restart: always
+
+  kafka-indexer:
+    build: .
+    container_name: kafka-indexer
+    depends_on:
+      - kafka
+    environment:
+      - KAFKA_SERVERS=kafka:9092
+      - DB_PATH=/app/VectorDB
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./VectorDB:/app/VectorDB
+      - ./crawlers:/app/crawlers
+    command: python /app/crawlers/kafka_consumer_indexer.py
+    restart: always
