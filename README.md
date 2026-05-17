@@ -46,53 +46,80 @@ Dự án Hệ thống Dịch thuật AI (AI Translator) đa nền tảng, hỗ t
 
 ---
 
-##  Thiết kế Hệ thống Tổng thể (System Architecture)
+## Thiết kế Hệ thống Tổng thể (System Architecture)
 
-Sơ đồ dưới đây mô tả luồng dữ liệu của toàn bộ hệ thống, kết nối từ Client (App/Web), qua Backend xử lý bất đồng bộ, và cuối cùng giao tiếp với **Mô hình AI kết hợp Hệ thống RAG (Retrieval-Augmented Generation)** do nhóm tự phát triển.
+Sơ đồ dưới đây mô tả kiến trúc tổng thể của hệ thống AutoTrans, bao gồm luồng xử lý dữ liệu từ Client, Backend bất đồng bộ, tầng lưu trữ đám mây đến mô hình AI dịch thuật tích hợp RAG (Retrieval-Augmented Generation).
 
 ```mermaid
 graph TD
-    %% Client Layer
-    subgraph ClientLayer[1. Client Layer]
-        App[📱 Flutter Mobile App]
-        Web[🌐 Flutter Web]
+
+    %% =========================
+    %% CLIENT LAYER
+    %% =========================
+    subgraph ClientLayer["1. Client Layer"]
+        Mobile["📱 Flutter Mobile App"]
+        Web["🌐 Flutter Web"]
     end
 
-    %% Backend Layer
-    subgraph BackendLayer[2. Backend Layer (FastAPI)]
-        API[API Gateway & Endpoints]
-        BgTask[Background Workers]
+    %% =========================
+    %% BACKEND LAYER
+    %% =========================
+    subgraph BackendLayer["2. Backend Layer (FastAPI)"]
+        API["API Gateway<br/>Session Management<br/>HTTP / SSE"]
+        
+        TextService["Text Translation Service<br/>Streaming Translation"]
+        
+        FileWorker["File Translation Worker<br/>Batch Processing"]
     end
 
-    %% Data Layer
-    subgraph DataLayer[3. Data & Storage Layer]
-        Redis[(Upstash Redis\nCache & Trạng thái)]
-        Postgres[(Supabase PostgreSQL\nLogs & File Data)]
-        R2[(Cloudflare R2\nLưu trữ File)]
+    %% =========================
+    %% DATA LAYER
+    %% =========================
+    subgraph DataLayer["3. Data & Storage Layer"]
+        Redis["Upstash Redis<br/>Cache + Rate Limiting"]
+        
+        Postgres["Supabase PostgreSQL<br/>Logs + Metadata"]
+        
+        R2["Cloudflare R2<br/>File Storage"]
     end
 
-    %% Custom AI Layer
-    subgraph AILayer[4. Custom AI Layer (Team Build)]
-        RAG[🧠 Hệ thống RAG\n(Vector DB & Context)]
-        LLM[🤖 Custom Translation LLM\n(Kaggle GPU)]
+    %% =========================
+    %% AI LAYER
+    %% =========================
+    subgraph AILayer["4. External AI Layer"]
+        RAG["🧠 RAG System<br/>Vector Search + Context"]
+        
+        LLM["🤖 Custom Translation LLM<br/>Kaggle GPU"]
     end
 
-    %% Flow
-    App <==>|HTTP / SSE| API
+    %% =========================
+    %% CLIENT FLOW
+    %% =========================
+    Mobile <==>|HTTP / SSE| API
     Web <==>|HTTP / SSE| API
 
-    API <--> Redis
-    API <--> Postgres
-    API --> R2
-    
-    API -->|Nhiệm vụ nặng| BgTask
-    BgTask <--> Redis
-    BgTask <--> Postgres
-    BgTask <--> R2
+    %% =========================
+    %% INTERNAL BACKEND FLOW
+    %% =========================
+    API --> TextService
+    API --> FileWorker
 
-    API -.->|Dịch Text| RAG
-    BgTask -.->|Dịch Chunk File| RAG
-    
+    %% =========================
+    %% DATA FLOW
+    %% =========================
+    TextService <--> Redis
+    TextService <--> Postgres
+
+    FileWorker <--> Redis
+    FileWorker <--> Postgres
+    FileWorker <--> R2
+
+    %% =========================
+    %% AI FLOW
+    %% =========================
+    TextService -.->|Translate Text| RAG
+    FileWorker -.->|Translate File Chunks| RAG
+
     RAG <==>|Context Injection| LLM
 ```
 
