@@ -1,7 +1,8 @@
 # AI Translator System 
 
 Dự án Hệ thống Dịch thuật AI (AI Translator) đa nền tảng, hỗ trợ dịch thuật theo thời gian thực (Realtime Text Translation) và dịch tài liệu giữ nguyên định dạng (Document Translation). Dự án được thiết kế theo tiêu chuẩn Production với khả năng xử lý bất đồng bộ, chịu tải cao và quản lý tài nguyên linh hoạt.
-
+- Link flutter web deploy từ cloudfare page: https://damp-pond-ffbe.tuyetnhun8.workers.dev
+- Có deploy app android trong drive : 
 ---
 
 ## 👥 Đội ngũ Phát triển
@@ -12,7 +13,7 @@ Dự án Hệ thống Dịch thuật AI (AI Translator) đa nền tảng, hỗ t
 | **23001562** | Phạm Thị Minh Thư | BA, Tester |
 | **23001520** | Nguyễn Quốc Hiệu | Data Science |
 | **23001963** | Lê Thị Yến | AI Engineer |
-| **23001559** | Nguyễn Bảo Thạch | AI |
+| **23001559** | Nguyễn Bảo Thạch | AI RAG |
 | **23001543** | Nguyễn Tuyết Như | Fullstack Production |
 
 ---
