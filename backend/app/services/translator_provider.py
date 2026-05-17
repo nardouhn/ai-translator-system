@@ -6,7 +6,7 @@ from fastapi import HTTPException
 # Setup logger
 logger = logging.getLogger(__name__)
 
-CUSTOM_MODEL_URL = "https://liability-uncharted-identity.ngrok-free.dev/translate"
+CUSTOM_MODEL_URL = "http://34.126.182.8/translate"
 
 # Limit concurrent requests to the local AI model to avoid overloading
 # We use 2 to ensure stability with single GPU on Kaggle
