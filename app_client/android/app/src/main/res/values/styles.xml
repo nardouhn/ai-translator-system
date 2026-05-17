@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Theme applied to the Android Window while the process is starting when the OS's Dark Mode setting is off -->
+    <!-- Theme áp dụng khi app đang khởi động (OS ở Light Mode) -->
     <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
-        <!-- Show a splash screen on the activity. Automatically removed when
-             the Flutter engine draws its first frame -->
+        <!-- Hiển thị splash screen, tự động xóa khi Flutter vẽ frame đầu tiên -->
         <item name="android:windowBackground">@drawable/launch_background</item>
+        <!-- ✅ Fix lỗi Surface bị thu hồi khi app ở background trên MIUI/Xiaomi -->
+        <!-- Khi windowIsTranslucent=true, hệ thống cố render nền trong suốt → crash -->
+        <item name="android:windowIsTranslucent">false</item>
     </style>
-    <!-- Theme applied to the Android Window as soon as the process has started.
-         This theme determines the color of the Android Window while your
-         Flutter UI initializes, as well as behind your Flutter UI while its
-         running.
 
-         This Theme is only used starting with V2 of Flutter's Android embedding. -->
+    <!-- Theme áp dụng ngay sau khi process khởi động xong -->
+    <!-- Xác định màu nền Android Window trong khi Flutter UI đang khởi tạo -->
+    <!-- Chỉ dùng từ Flutter Android embedding V2 trở lên -->
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
+        <!-- ✅ Fix lỗi Surface bị thu hồi khi app ở background trên MIUI/Xiaomi -->
+        <item name="android:windowIsTranslucent">false</item>
     </style>
 </resources>

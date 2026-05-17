@@ -43,7 +43,12 @@ async def translate_with_provider(
                         "text": source_text,
                         "domain": api_domain
                     }
-                    response = await client.post(CUSTOM_MODEL_URL, json=payload)
+                    
+                    # ✅ Ép timeout 55s ở Backend để bảo vệ GPU
+                    response = await asyncio.wait_for(
+                        client.post(CUSTOM_MODEL_URL, json=payload),
+                        timeout=55.0
+                    )
                     
                     if response.status_code >= 400:
                         error_msg = f"HTTP {response.status_code}"
@@ -78,6 +83,22 @@ async def translate_with_provider(
                     
                     return translated, "custom-ai"
                     
+                except asyncio.TimeoutError:
+                    logger.error("BACKEND TIMEOUT: Gọi Model AI tốn quá 55s.")
+                    if attempt < max_retries:
+                        backoff = 2 ** (attempt + 1)
+                        logger.warning(f"Translation attempt {attempt + 1} failed for chunk. Retrying in {backoff}s...")
+                        await asyncio.sleep(backoff) 
+                        continue
+                    else:
+                        logger.error(f"Translation failed after {max_retries + 1} attempts due to 55s timeout.")
+                        return f"[TIMEOUT] {source_text}", "custom-ai"
+                        
+                except asyncio.CancelledError:
+                    # 🟢 Bắt tín hiệu ngắt kết nối từ Frontend
+                    logger.warning("CLIENT DISCONNECT: Frontend đã ngắt kết nối/timeout! Tự động dừng gọi Model và nhả GPU.")
+                    raise  # Bắt buộc raise lại để Uvicorn và Semaphore dọn dẹp
+
                 except (httpx.TimeoutException, httpx.RequestError) as e:
                     logger.error(f"Lỗi TIMEOUT / NETWORK: {type(e).__name__} - {e}")
                     if attempt < max_retries:

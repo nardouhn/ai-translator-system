@@ -29,7 +29,8 @@ class FileTranslationView extends StatefulWidget {
   State<FileTranslationView> createState() => _FileTranslationViewState();
 }
 
-class _FileTranslationViewState extends State<FileTranslationView> {
+class _FileTranslationViewState extends State<FileTranslationView>
+    with WidgetsBindingObserver {
   final List<Map<String, dynamic>> _activeQueue = [];
   bool _isDragging = false;
   bool _isTranslating = false;
@@ -40,6 +41,39 @@ class _FileTranslationViewState extends State<FileTranslationView> {
   String _selectedDomain = 'General';
   final String _selectedSourceLang = 'en';
   final String _selectedTargetLang = 'vi';
+
+  // Cờ theo dõi app có đang ở background không
+  // Dùng để tạm dừng polling khi app bị ẩn xuống nền
+  bool _appInBackground = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Đăng ký lắng nghe vòng đời app
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    // Hủy đăng ký khi widget bị xóa khỏi cây widget
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // Callback tự động được gọi khi trạng thái app thay đổi
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      // App vào nền: bật cờ để polling loop tự dừng lại
+      debugPrint('[FileTranslation] App PAUSED → tạm dừng polling');
+      _appInBackground = true;
+    } else if (state == AppLifecycleState.resumed) {
+      // App quay lại foreground: tắt cờ để polling tiếp tục
+      debugPrint('[FileTranslation] App RESUMED → tiếp tục polling');
+      _appInBackground = false;
+    }
+  }
 
   Future<void> _pickFile() async {
     try {
@@ -140,7 +174,15 @@ class _FileTranslationViewState extends State<FileTranslationView> {
         int delaySeconds = (i < 20) ? 2 : 5;
         await Future.delayed(Duration(seconds: delaySeconds));
         
+        // ✅ Thoát ngay nếu widget đã bị dispose
         if (!mounted) return;
+
+        // ✅ Nếu app đang ở background, bỏ qua lượt poll này
+        // Tránh gọi setState và render UI khi Surface đã bị thu hồi
+        if (_appInBackground) {
+          debugPrint('[FileTranslation] App ở background, bỏ qua poll #$i');
+          continue;
+        }
         
         try {
           statusResult = await ApiService.checkFileStatus(fileId);
@@ -156,6 +198,10 @@ class _FileTranslationViewState extends State<FileTranslationView> {
 
         final statusStr = statusResult['status'];
         final progressVal = statusResult['progress'] ?? 0;
+
+        // ✅ Kiểm tra mounted LẦN NỮA sau khi await checkFileStatus
+        // (vì widget có thể bị dispose trong lúc đợi response)
+        if (!mounted) return;
         
         setState(() {
           _activeQueue.last['progress'] = progressVal / 100.0;

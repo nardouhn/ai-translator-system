@@ -27,7 +27,8 @@ class TextTranslationView extends StatefulWidget {
   State<TextTranslationView> createState() => _TextTranslationViewState();
 }
 
-class _TextTranslationViewState extends State<TextTranslationView> {
+class _TextTranslationViewState extends State<TextTranslationView>
+    with WidgetsBindingObserver {
   final TextEditingController _inputController = TextEditingController();
   bool _isLoading = false;
   String _outputText = '';
@@ -44,10 +45,15 @@ class _TextTranslationViewState extends State<TextTranslationView> {
   bool _isListening = false;
   bool _speechAvailable = false;
 
+  // ✅ Thêm biến ghi nhớ trạng thái
+  bool _appInBackground = false;
+  bool _wasTranslating = false;
 
   @override
   void initState() {
     super.initState();
+    // Đăng ký lắng nghe vòng đời app
+    WidgetsBinding.instance.addObserver(this);
     _initTts();
     _initSpeech();
     _inputController.addListener(_onInputChanged);
@@ -146,11 +152,52 @@ class _TextTranslationViewState extends State<TextTranslationView> {
 
   @override
   void dispose() {
+    // Hủy đăng ký observer khi widget bị xóa
+    WidgetsBinding.instance.removeObserver(this);
     flutterTts.stop();
     _speech.stop();
     _inputController.removeListener(_onInputChanged);
     _inputController.dispose();
     super.dispose();
+  }
+
+  // Callback tự động được gọi khi trạng thái app thay đổi
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      _appInBackground = true;
+      // ✅ 1. Gán _wasTranslating bằng với trạng thái dịch hiện tại
+      _wasTranslating = _isLoading;
+
+      // App vào nền: dừng TTS và micro ngay lập tức
+      // Tránh giữ lock audio khi app không cần dùng
+      debugPrint('[TextTranslation] App PAUSED → dừng TTS và micro. Đang dịch: $_wasTranslating');
+      flutterTts.stop();
+      if (_isListening) {
+        _speech.stop();
+        if (mounted) setState(() => _isListening = false);
+      }
+      if (mounted) {
+        setState(() {
+          _isSpeakingSource = false;
+          _isSpeakingTarget = false;
+        });
+      }
+    } else if (state == AppLifecycleState.resumed) {
+      _appInBackground = false;
+      // App quay lại: chỉ log, không cần restart gì vì TTS/speech init một lần
+      debugPrint('[TextTranslation] App RESUMED → sẵn sàng');
+
+      // ✅ 2. Tự động gọi lại hàm dịch nếu trước đó đang dịch dở dang
+      if (_wasTranslating) {
+        debugPrint('[TextTranslation] Tự động Resume dịch thuật...');
+        // Đặt lại cờ để tránh loop
+        _wasTranslating = false;
+        // Gọi lại hàm dịch
+        _handleTranslate();
+      }
+    }
   }
 
   void _handleMicPressed() async {
@@ -234,10 +281,25 @@ class _TextTranslationViewState extends State<TextTranslationView> {
       if (_outputText.isNotEmpty) {
         await LocalCacheService.saveTranslation(inputText, _selectedTargetLang, _selectedDomain, _outputText);
       }
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false; // Thành công thì tắt loading
+        });
+      }
     } catch (e) {
       if (!mounted) return;
+      
+      // ✅ 3. Bỏ qua lỗi ảo nếu app đang ở background
+      if (_appInBackground) {
+        debugPrint('[TextTranslation] Mạng ngắt do app vào nền. Chờ resume...');
+        // Thoát ngay, KHÔNG tắt _isLoading để didChangeAppLifecycleState còn bắt được
+        return; 
+      }
+
       setState(() {
         _errorMessage = 'Translation failed. Please try again.';
+        _isLoading = false; // Lỗi thật -> tắt loading
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -245,12 +307,6 @@ class _TextTranslationViewState extends State<TextTranslationView> {
           backgroundColor: Colors.redAccent,
         ),
       );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
     }
   }
 

@@ -34,6 +34,13 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- ✅ Tắt Impeller renderer trên Android -->
+        <!-- Fix lỗi: GrallocTestAlloc: Invalid color format / Invalid BufferDescriptorInfo -->
+        <!-- Thường xảy ra trên máy MIUI/Xiaomi khi app từ background quay lại -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false" />
     </application>
 
     <queries>
