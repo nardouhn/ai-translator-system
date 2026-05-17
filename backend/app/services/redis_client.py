@@ -19,8 +19,4 @@ def get_async_redis() -> Redis:
         redis_pool = ConnectionPool.from_url(redis_url, **kwargs)
         
     return Redis(connection_pool=redis_pool)
-
-# To maintain backward compatibility if other parts import get_redis
-# We provide the async version. If there are sync usages, they need to be refactored to await.
-def get_redis() -> Redis:
-    return get_async_redis()
+

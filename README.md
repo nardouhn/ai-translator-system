@@ -1,112 +1,147 @@
-# 🚀 AI Translator System - Full Stack Demo
+# AI Translator System 🚀
 
-Hệ thống dịch thuật AI chuyên nghiệp tích hợp **Custom AI Model (Qwen)**, **FastAPI Backend**, **Redis Caching** và **Flutter UI**. Hệ thống hỗ trợ dịch văn bản và dịch tài liệu (.pdf, .docx, .txt) với khả năng xử lý song song và tối ưu hóa GPU.
-
----
-
-## 🛠 Yêu cầu hệ thống (Prerequisites)
-
-Trước khi bắt đầu, hãy đảm bảo máy bạn đã cài đặt:
-- **Docker & Docker Compose** (Để chạy Database & Cache)
-- **Python 3.10+** (Cho Backend)
-- **Flutter SDK** (Cho Frontend)
-- **Git**
+Dự án Hệ thống Dịch thuật AI (AI Translator) đa nền tảng, hỗ trợ dịch thuật theo thời gian thực (Realtime Text Translation) và dịch tài liệu giữ nguyên định dạng (Document Translation). Dự án được thiết kế theo tiêu chuẩn Production với khả năng xử lý bất đồng bộ, chịu tải cao và quản lý tài nguyên linh hoạt.
 
 ---
 
-## 🏗 Bước 1: Khởi chạy Hạ tầng (Docker)
+## 👥 Đội ngũ Phát triển
 
-Hệ thống sử dụng PostgreSQL để lưu trữ dữ liệu và Redis để cache bản dịch.
-
-1. Mở Terminal tại thư mục gốc của dự án.
-2. Chạy lệnh:
-   ```bash
-   docker-compose up -d
-   ```
-3. Kiểm tra các container đang chạy:
-   ```bash
-   docker ps
-   ```
-   *Bạn sẽ thấy các dịch vụ `postgres` (port 5432) và `redis` (port 6379) đang hoạt động.*
+| Mã Sinh Viên | Họ và Tên | Vai Trò (Nhiệm vụ) |
+| :--- | :--- | :--- |
+| **23001534** | Nguyễn Tiến Lưỡng | Leader, Admin |
+| **23001562** | Phạm Thị Minh Thư | BA, Tester |
+| **23001520** | Nguyễn Quốc Hiệu | Data Science |
+| **23001963** | Lê Thị Yến | AI Engineer |
+| **23001559** | Nguyễn Bảo Thạch | AI |
+| **23001543** | Nguyễn Tuyết Như | Fullstack Production |
 
 ---
 
-## 🐍 Bước 2: Thiết lập Backend (FastAPI)
+## ✨ Tính năng Nổi bật (Core Features)
 
-1. Di chuyển vào thư mục backend:
-   ```bash
-   cd backend
-   ```
-2. Tạo môi trường ảo và cài đặt thư viện:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-3. Cấu hình file `.env` (Nếu chưa có, hãy tạo file `.env` dựa trên `.env.example`):
-   ```env
-   DATABASE_URL=postgresql://admin:password123@localhost:5432/ai_translator
-   REDIS_URL=redis://localhost:6379/0
-   ```
-4. Chạy Migration để tạo cấu trúc bảng Database:
-   ```bash
-   alembic upgrade head
-   ```
-5. Khởi chạy Backend Server:
-   ```bash
-   python -m uvicorn app.main:app --reload
-   ```
-   *Backend sẽ chạy tại: http://127.0.0.1:8000*
+1. **Dịch Văn Bản Thời Gian Thực (Streaming SSE):** Trải nghiệm dịch thuật mượt mà trả về từng chữ như ChatGPT, hỗ trợ Debounce và tự động khôi phục (Auto-Resume) khi gián đoạn mạng. Hỗ trợ Nhập liệu bằng Giọng nói (STT) và Đọc kết quả (TTS).
+2. **Dịch Tài Liệu Nguyên Bản (Document Translation):** Xử lý các tệp lớn (PDF, DOCX, TXT) dưới dạng Background Task. Giữ nguyên 100% định dạng, layout chữ, in đậm/nghiêng sau khi dịch.
+3. **Đa nền tảng (Cross-platform):** Hoạt động trơn tru trên cả nền tảng Web và thiết bị di động (Android/iOS) chỉ với một source code Flutter.
+4. **Quản lý Cache & Tối ưu Mạng:** Tích hợp Redis MGET Caching để lưu lại các đoạn đã dịch, giảm thiểu tối đa chi phí gọi AI và tăng tốc độ xử lý lên đến 80% với những tài liệu có độ trùng lặp cao.
+5. **Bảo vệ Hệ thống (Fault Tolerance):** Cơ chế Semaphore giới hạn GPU, tự động ngắt (Timeout) và nhả tài nguyên khi client mất kết nối để tránh sập (OOM) Server AI.
 
 ---
 
-## 📱 Bước 3: Thiết lập Frontend (Flutter)
+## 🛠 Công nghệ Sử dụng (Tech Stack)
 
-1. Mở một Terminal mới và di chuyển vào thư mục client:
-   ```bash
-   cd app_client
-   ```
-2. Lấy các gói phụ thuộc:
-   ```bash
-   flutter pub get
-   ```
-3. Chạy ứng dụng (Demo tốt nhất trên Chrome hoặc Desktop):
-   ```bash
-   flutter run -d chrome
-   ```
+### **Frontend**
+- **Framework:** Flutter (Web & Mobile)
+- **Networking:** `http` package, Server-Sent Events (SSE), Multipart File Upload.
+- **State Management:** Stateful UI, Lifecycle Observer (Xử lý chạy nền).
 
----
+### **Backend**
+- **Framework:** Python / FastAPI
+- **Database:** PostgreSQL (Supabase) + SQLAlchemy (Async ORM)
+- **Cache & PubSub:** Upstash Redis
+- **Storage:** Cloudflare R2 (S3-compatible)
 
-## 🤖 Bước 4: Kết nối AI Model (Kaggle/Ngrok)
-
-Dự án này sử dụng một Model AI tùy chỉnh chạy trên GPU (Kaggle).
-1. Đảm bảo Kaggle Server của bạn đang chạy và tunnel qua **Ngrok**.
-2. Cập nhật URL Ngrok mới nhất vào file:
-   - `backend/app/services/translator_provider.py` -> Biến `CUSTOM_MODEL_URL`.
+### **AI & Deployment**
+- **AI Model:** Custom LLM Endpoint (Kaggle GPU + Ngrok)
+- **Deployment:** Railway.app, Docker
 
 ---
 
-## 🌟 Các tính năng chính để Test Demo
+## 🏗 Thiết kế Hệ thống Tổng thể (System Architecture)
 
-1. **Dịch văn bản (Text Translation)**:
-   - Nhập văn bản tối đa 5000 ký tự.
-   - Chọn chuyên ngành (General, IT, Medical,...) để thấy sự khác biệt của AI Model.
-   - Kiểm tra tốc độ (Lần 2 dịch cùng nội dung sẽ rất nhanh nhờ Redis Cache).
+Sơ đồ dưới đây mô tả luồng dữ liệu của toàn bộ hệ thống, kết nối từ Client (App/Web), qua Backend xử lý bất đồng bộ, và cuối cùng giao tiếp với **Mô hình AI kết hợp Hệ thống RAG (Retrieval-Augmented Generation)** do nhóm tự phát triển.
 
-2. **Dịch File (File Translation)**:
-   - Upload file `.docx` hoặc `.pdf`.
-   - Hệ thống sẽ giữ nguyên định dạng file gốc và trả về file đã dịch.
-   - File dịch có thể tải về máy trực tiếp.
+```mermaid
+graph TD
+    %% Client Layer
+    subgraph ClientLayer[1. Client Layer]
+        App[📱 Flutter Mobile App]
+        Web[🌐 Flutter Web]
+    end
 
-3. **Chế độ Sáng/Tối (Dark/Light Mode)**: 
-   - Trải nghiệm UI hiện đại với hiệu ứng Glassmorphism.
+    %% Backend Layer
+    subgraph BackendLayer[2. Backend Layer (FastAPI)]
+        API[API Gateway & Endpoints]
+        BgTask[Background Workers]
+    end
+
+    %% Data Layer
+    subgraph DataLayer[3. Data & Storage Layer]
+        Redis[(Upstash Redis\nCache & Trạng thái)]
+        Postgres[(Supabase PostgreSQL\nLogs & File Data)]
+        R2[(Cloudflare R2\nLưu trữ File)]
+    end
+
+    %% Custom AI Layer
+    subgraph AILayer[4. Custom AI Layer (Team Build)]
+        RAG[🧠 Hệ thống RAG\n(Vector DB & Context)]
+        LLM[🤖 Custom Translation LLM\n(Kaggle GPU)]
+    end
+
+    %% Flow
+    App <==>|HTTP / SSE| API
+    Web <==>|HTTP / SSE| API
+
+    API <--> Redis
+    API <--> Postgres
+    API --> R2
+    
+    API -->|Nhiệm vụ nặng| BgTask
+    BgTask <--> Redis
+    BgTask <--> Postgres
+    BgTask <--> R2
+
+    API -.->|Dịch Text| RAG
+    BgTask -.->|Dịch Chunk File| RAG
+    
+    RAG <==>|Context Injection| LLM
+```
 
 ---
 
-## 📝 Lưu ý quan trọng
-- Nếu gặp lỗi `psycopg2`, hãy đảm bảo bạn đã cài `libpq-dev` (Linux) hoặc sử dụng `pip install psycopg2-binary`.
-- Giới hạn file upload hiện tại là **20MB**.
-- GPU trên Kaggle sẽ xử lý tuần tự (Serial) thông qua cơ chế `gpu_lock` để tránh lỗi tràn bộ nhớ (OOM).
+## 📂 Kiến trúc Dự án (Repository Structure)
+
+```text
+ai_trans_demo/
+├── app_client/                 # Mã nguồn Frontend (Flutter)
+│   ├── lib/
+│   │   ├── features/           # Các màn hình chính (Dịch Text, Dịch File)
+│   │   ├── services/           # Kết nối API, Local Cache
+│   │   └── widgets/            # Các UI Component dùng chung
+│   └── pubspec.yaml
+│
+├── backend/                    # Mã nguồn Backend (FastAPI)
+│   ├── app/
+│   │   ├── api/v1/             # Định nghĩa các Endpoints (REST & SSE)
+│   │   ├── db/                 # Models & Cấu hình Database
+│   │   ├── services/           # Xử lý Logic (Dịch, Background Tasks, Redis)
+│   │   └── main.py             # Entry point
+│   ├── alembic/                # Quản lý Database Migrations
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── ARCHITECTURE_DIAGRAM.md     # Sơ đồ Kiến trúc Hệ thống (PlantUML)
+└── CLASS_DIAGRAM.md            # Sơ đồ Lớp Hệ thống (PlantUML)
+```
 
 ---
-*Chúc bạn có trải nghiệm tuyệt vời với AI Translator!*
+
+## ⚙️ Hướng dẫn Cài đặt Môi trường (Local Setup)
+
+### 1. Backend (FastAPI)
+1. Di chuyển vào thư mục backend: `cd backend`
+2. Kích hoạt môi trường ảo (Virtual Environment): `python -m venv .venv` và `.venv\Scripts\activate` (Windows)
+3. Cài đặt thư viện: `pip install -r requirements.txt`
+4. Cấu hình file `.env` theo tệp `.env.example`.
+5. Chạy server: `uvicorn app.main:app --reload --port 8000`
+
+### 2. Frontend (Flutter)
+1. Di chuyển vào thư mục frontend: `cd app_client`
+2. Cài đặt các gói phụ thuộc: `flutter pub get`
+3. Cấu hình file `lib/services/api_service.dart` (Bật/tắt cờ `useLocalBackend`).
+4. Chạy ứng dụng:
+   - Môi trường Web: `flutter run -d chrome`
+   - Môi trường Mobile: `flutter run`
+
+---
+
+*Tài liệu được cập nhật mới nhất cho Phiên bản Production.*
