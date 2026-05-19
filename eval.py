@@ -211,17 +211,44 @@ def main(model_path=None, test_size_limit=500):
     print(f"🔹 TER Score   : {metrics['ter']:.2f} (<40 good)")
     print(f"🔹 ROUGE-L     : {metrics['rouge_l']:.2f}")
     print("=" * 60)
-    
-    # Optional: Save detailed results
-    # results_df = pd.DataFrame({
-    #     'Domain': domains,
-    #     'English': test_df['en'].tolist(),
-    #     'Reference': references,
-    #     'Prediction': predictions
-    # })
-    # results_df.to_csv("test_results.csv", index=False, encoding='utf-8-sig')
-    # print("✅ Detailed results saved to: test_results.csv")
-    
+
+    # Domain-level metrics
+    print("\n5. Đang tính metrics theo từng domain...")
+    df_eval = pd.DataFrame({
+        "domain": domains,
+        "pred": predictions,
+        "ref": references
+    })
+
+    rouge_metric = load("rouge")
+    domain_results = []
+
+    for domain, group in df_eval.groupby("domain"):
+        preds = group["pred"].tolist()
+        refs = group["ref"].tolist()
+
+        bleu = sacrebleu.corpus_bleu(preds, [refs])
+        chrf = sacrebleu.corpus_chrf(preds, [refs])
+        ter = sacrebleu.corpus_ter(preds, [refs])
+        rouge = rouge_metric.compute(predictions=preds, references=refs)
+
+        domain_results.append({
+            "domain": domain,
+            "count": len(group),
+            "bleu": bleu.score,
+            "chrf": chrf.score,
+            "ter": ter.score,
+            "rougeL": rouge["rougeL"] * 100
+        })
+
+    domain_df = pd.DataFrame(domain_results).sort_values("bleu", ascending=False)
+
+    print("\n" + "=" * 70)
+    print("📊 KẾT QUẢ THEO TỪNG DOMAIN")
+    print("=" * 70)
+    print(domain_df.to_string(index=False))
+    print("=" * 70)
+
     return metrics
 
 
