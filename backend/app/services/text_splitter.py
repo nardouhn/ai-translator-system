@@ -2,67 +2,68 @@ import re
 import math
 
 def split_text_into_chunks(text: str, max_chars: int = 1000) -> list[str]:
-    """
-    Cắt văn bản ưu tiên theo paragraph, sau đó theo câu (bảo toàn dấu câu).
-    Gom các câu lại đến mức dung lượng "tương đối" (target_length) thì ngắt.
-    """
-    if not text or not text.strip():
+    if not text:
         return []
 
-    # 1. Tách văn bản thành các đoạn (paragraph)
-    paragraphs = [p.strip() for p in re.split(r'\n+', text) if p.strip()]
+    # Việc bọc (\n+) trong ngoặc đơn giúp re.split KHÔNG vứt bỏ dấu xuống dòng
+    parts = re.split(r'(\n+)', text)
     chunks = []
 
-    for para in paragraphs:
-        if len(para) <= max_chars:
-            chunks.append(para)
+    for part in parts:
+        if not part:
+            continue
+            
+        # 1. Nếu part chỉ là khoảng trắng hoặc dấu xuống dòng -> Biến nó thành 1 chunk độc lập
+        if re.match(r'^[\s\n]+$', part):
+            chunks.append(part)
             continue
 
-        # 2. Tách đoạn dài thành các CÂU, giữ nguyên dấu câu (. ? ! ; ,)
-        parts = re.split(r'([.?!;,]\s+)', para)
+        # 2. Nếu đoạn văn ngắn hơn max_chars -> Giữ nguyên (không dùng .strip() để giữ khoảng trắng)
+        if len(part) <= max_chars:
+            chunks.append(part)
+            continue
+
+        # 3. Nếu đoạn văn dài hơn max_chars -> Tách theo câu
+        sentence_parts = re.split(r'([.?!;,]\s+)', part)
         sentences = []
         current_sentence = ""
-        for part in parts:
-            current_sentence += part
-            if re.match(r'^[.?!;,]\s+$', part) or part == parts[-1]:
-                if current_sentence.strip():
+        
+        for sp in sentence_parts:
+            current_sentence += sp
+            if re.match(r'^[.?!;,]\s+$', sp) or sp == sentence_parts[-1]:
+                if current_sentence:
                     sentences.append(current_sentence)
                 current_sentence = ""
         
-        # 3. Tính toán dung lượng "tương đối" (target)
+        # Cân bằng dung lượng các chunk con
         total_len = sum(len(s) for s in sentences)
+        if total_len == 0:
+            continue
+            
         num_chunks = math.ceil(total_len / max_chars)
         target_length = total_len / num_chunks 
         
         current_chunk = ""
         for sentence in sentences:
-            # Ngoại lệ: Câu không có dấu câu nào mà vẫn dài > 1000 ký tự -> Buộc cắt cứng
             if len(sentence) > max_chars:
                 if current_chunk:
-                    chunks.append(current_chunk.strip())
+                    chunks.append(current_chunk) # Không dùng .strip()
                     current_chunk = ""
                 for i in range(0, len(sentence), max_chars):
-                    chunks.append(sentence[i:i+max_chars].strip())
+                    chunks.append(sentence[i:i+max_chars])
                 continue
 
-            # Nếu cộng thêm câu này vào mà vượt max_chars (1000) -> Bắt buộc ngắt sớm
             if len(current_chunk) + len(sentence) > max_chars:
-                chunks.append(current_chunk.strip())
+                chunks.append(current_chunk)
                 current_chunk = sentence
             else:
                 current_chunk += sentence
-                
-                # MỚI: Chỉ cần chunk hiện tại đạt ngưỡng "tương đối" thì chốt sổ.
-                # Ví dụ: 1200 chia 2 -> target là 600.
-                # Đang có 400, cộng thêm 1 câu thành 800 (800 >= 600) -> Lập tức ngắt!
-                # Kết quả ra 2 chunk: 800 và 400, hoàn toàn không bị vỡ dấu câu.
                 if len(current_chunk) >= target_length:
-                    chunks.append(current_chunk.strip())
+                    chunks.append(current_chunk)
                     current_chunk = ""
 
-        # Đẩy nốt chunk cuối cùng vào danh sách
         if current_chunk:
-            chunks.append(current_chunk.strip())
+            chunks.append(current_chunk)
 
     return chunks
 
