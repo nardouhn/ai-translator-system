@@ -13,12 +13,14 @@ def split_text_into_chunks(text: str, max_chars: int = 1000) -> list[str]:
         if not part:
             continue
             
-        # 1. Nếu part chỉ là khoảng trắng hoặc dấu xuống dòng -> Biến nó thành 1 chunk độc lập
+        # 1. GIẢI PHÁP: Nếu part chỉ là khoảng trắng/xuống dòng 
+        # -> Cộng dồn vào chunk liền trước đó (nếu có) thay vì tạo chunk rỗng gây lỗi API
         if re.match(r'^[\s\n]+$', part):
-            chunks.append(part)
+            if chunks:
+                chunks[-1] += part
             continue
 
-        # 2. Nếu đoạn văn ngắn hơn max_chars -> Giữ nguyên (không dùng .strip() để giữ khoảng trắng)
+        # 2. Nếu đoạn văn ngắn hơn max_chars -> Giữ nguyên
         if len(part) <= max_chars:
             chunks.append(part)
             continue
@@ -34,7 +36,7 @@ def split_text_into_chunks(text: str, max_chars: int = 1000) -> list[str]:
                 if current_sentence:
                     sentences.append(current_sentence)
                 current_sentence = ""
-        
+
         # Cân bằng dung lượng các chunk con
         total_len = sum(len(s) for s in sentences)
         if total_len == 0:
@@ -42,12 +44,12 @@ def split_text_into_chunks(text: str, max_chars: int = 1000) -> list[str]:
             
         num_chunks = math.ceil(total_len / max_chars)
         target_length = total_len / num_chunks 
-        
+
         current_chunk = ""
         for sentence in sentences:
             if len(sentence) > max_chars:
                 if current_chunk:
-                    chunks.append(current_chunk) # Không dùng .strip()
+                    chunks.append(current_chunk)
                     current_chunk = ""
                 for i in range(0, len(sentence), max_chars):
                     chunks.append(sentence[i:i+max_chars])
@@ -65,7 +67,8 @@ def split_text_into_chunks(text: str, max_chars: int = 1000) -> list[str]:
         if current_chunk:
             chunks.append(current_chunk)
 
-    return chunks
+    # Chốt chặn cuối cùng: Lọc bỏ bất kỳ chunk nào không chứa chữ (chỉ để an toàn tuyệt đối)
+    return [chunk for chunk in chunks if chunk.strip()]
 
 def split_text(text: str, max_length: int = 1000) -> list[str]:
     return split_text_into_chunks(text, max_length)
