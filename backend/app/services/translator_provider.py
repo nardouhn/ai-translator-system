@@ -1,6 +1,7 @@
 import asyncio
 import httpx
 import logging
+import re
 from fastapi import HTTPException
 
 # Setup logger
@@ -95,7 +96,6 @@ async def translate_with_provider(
                 
     return f"[FAILED] {source_text}", "custom-ai"
 
-import re
 
 async def translate_chunk_async(
     source_text: str,
@@ -110,6 +110,7 @@ async def translate_chunk_async(
     translated, _ = await translate_with_provider(source_text, domain)
     return translated
 
+
 async def translate_batch_with_provider(
     texts: list[str],
     domain: str = "General",
@@ -117,17 +118,16 @@ async def translate_batch_with_provider(
     if not texts:
         return [], "custom-ai"
     
-    results = []
-    for i, t in enumerate(texts):
+    async def _process_chunk(t: str) -> str:
         if not t.strip():
-            results.append(t)
-            continue
-            
-        translated_text = await translate_chunk_async(t, domain)
-        results.append(translated_text)
+            return t
+        # translate_chunk_async sẽ gọi translate_with_provider 
+        # (trong đó đã có sẵn Semaphore(2) chặn số request đồng thời và sleep(2) làm mát GPU)
+        return await translate_chunk_async(t, domain)
+
+    # Chạy đồng thời tất cả các đoạn văn. 
+    # Semaphore ở trên sẽ tự động xếp hàng chúng thành từng cặp (2 request/lần)
+    tasks = [_process_chunk(t) for t in texts]
+    results = await asyncio.gather(*tasks)
         
-        # Sleep to let Kaggle server breathe
-        if i < len(texts) - 1:
-            await asyncio.sleep(1)
-            
-    return results, "custom-ai"
+    return list(results), "custom-ai"
