@@ -3,11 +3,13 @@ import asyncio
 import logging
 import json
 import re
+from datetime import datetime, timezone
 from fastapi import BackgroundTasks
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.orm import Session as DBSession
 
-from app.db.models import Domain, DomainNameEnum, Translation
+# Lưu ý: Cần import thêm Logs, StatusEnum, RequestTypeEnum từ app.db.models
+from app.db.models import Domain, DomainNameEnum, Translation, Logs, StatusEnum, RequestTypeEnum
 from app.services.cache_service import mget_cached_translations, mset_cached_translations, strictly_normalize_text, MODEL_VERSION
 from app.services.translator_provider import translate_with_provider, translate_chunk_async
 from app.services.text_splitter import split_text_into_chunks
@@ -53,16 +55,23 @@ def restore_formatting(original_chunk: str, translated_chunk: str) -> str:
     return leading_ws + translated_chunk + trailing_ws
 
 
+# ==============================================================================
+# HÀM 1: DÀNH CHO GIAO DIỆN TEXT / CHAT (STREAMING)
+# ==============================================================================
 async def stream_translate_text(
     db: DBSession,
     session_id: str,
     source_text: str,
     domain: str | None,
     background_tasks: BackgroundTasks,
-    request_time: __import__('datetime').datetime | None = None,
+    request_time: datetime | None = None,
     ip_address: str | None = None,
     auto_commit: bool = True,
 ):
+    """
+    Dịch văn bản và trả về dạng Server-Sent Events (SSE) cho UI.
+    Nếu gặp lỗi trong quá trình dịch, stream sẽ lập tức bị ngắt và trả về lỗi.
+    """
     domain_str = (domain or "general").strip().lower()
     domain_id_val = map_domain_to_id(domain_str)
 
@@ -72,9 +81,8 @@ async def stream_translate_text(
     hash_string = f"{domain_id_val}_{source_text}"
     text_hash = hashlib.sha256(hash_string.encode("utf-8")).hexdigest()
 
-    # 1. Check DB first (Synchronous operations wrapped in threadpool)
+    # 1. Check DB first
     def check_db():
-        # Check DB cache
         existing_translation = db.query(Translation).filter(
             Translation.text_hash == text_hash,
             Translation.domain_id == domain_id_val
@@ -102,7 +110,7 @@ async def stream_translate_text(
         yield f"data: {json.dumps({'chunk': ''})}\n\n"
         return
     
-    logger.info(f"Translating text (session: {session_id}): split into {len(chunks)} chunks.")
+    logger.info(f"[STREAM] Translating text (session: {session_id}): split into {len(chunks)} chunks.")
 
     # 3. Redis Batch Check (MGET)
     cached_results = await mget_cached_translations(domain_str, chunks)
@@ -111,10 +119,8 @@ async def stream_translate_text(
     newly_translated_mapping = {}
     provider = "custom-ai"
 
-    # ── Helper: ghi log thất bại vào DB ────────────────────────────────────
+    # Helper: ghi log thất bại vào DB
     def _log_failure(reason: str):
-        from app.db.models import Logs, StatusEnum, RequestTypeEnum
-        from datetime import datetime, timezone
         try:
             completed_time = datetime.now(timezone.utc).replace(tzinfo=None)
             log_record = Logs(
@@ -134,53 +140,41 @@ async def stream_translate_text(
     for i, chunk in enumerate(chunks):
         cleaned_chunk = strictly_normalize_text(chunk)
 
-        # Chunk chỉ toàn invisible chars/khoảng trắng/xuống dòng → trả về nguyên gốc
         if not cleaned_chunk:
-            logger.debug(f"Chunk {i} is empty after normalization, yielding original.")
             yield f"data: {json.dumps({'chunk': chunk})}\n\n"
             final_translated_chunks.append(chunk)
             continue
 
         cached_val = cached_results.get(chunk)
-        debug_hash = hashlib.sha256(cleaned_chunk.encode("utf-8")).hexdigest()
-        logger.debug(f"Text Cache Key: translate:{MODEL_VERSION}:{domain_str}:en:vi:{debug_hash} | Text: '{cleaned_chunk[:20]}'")
 
         if cached_val is not None:
-            logger.info(f"🟢 CACHE HIT for chunk: '{cleaned_chunk[:20]}...'")
             restored_cached_val = restore_formatting(chunk, cached_val)
             yield f"data: {json.dumps({'chunk': restored_cached_val})}\n\n"
             final_translated_chunks.append(restored_cached_val)
         else:
-            logger.warning(f"🔴 CACHE MISS for chunk: '{cleaned_chunk[:20]}...'. Calling AI...")
             try:
-                # Gửi text đã normalize cho AI để tránh invisible chars làm model bị lỗi
                 translated_chunk = await translate_chunk_async(cleaned_chunk, domain_str)
 
-                # --- Kiểm tra kết quả thất bại từ AI ---
+                # Kiểm tra lỗi từ AI
                 _FAIL_PREFIXES = ("[ERROR", "[TIMEOUT]", "[FAILED]")
                 if translated_chunk is None or translated_chunk.strip() == "":
                     reason = "AI trả về kết quả rỗng (empty output)"
                     logger.error(f"❌ Translation FAILED (chunk {i}): {reason}")
-                    _log_failure(reason)
+                    await run_in_threadpool(_log_failure, reason)
                     yield f"data: {json.dumps({'error': f'Translation failed: {reason}'})}\n\n"
-                    return  # Dừng stream, không lưu cache
+                    return  # DỪNG STREAM
 
                 if any(translated_chunk.startswith(p) for p in _FAIL_PREFIXES):
                     reason = translated_chunk.split("]")[0] + "]" if "]" in translated_chunk else translated_chunk[:80]
                     logger.error(f"❌ Translation FAILED (chunk {i}): {reason}")
-                    _log_failure(reason)
+                    await run_in_threadpool(_log_failure, reason)
                     yield f"data: {json.dumps({'error': f'Translation failed: {reason}'})}\n\n"
-                    return  # Dừng stream, không lưu cache
+                    return  # DỪNG STREAM
 
-                if translated_chunk == cleaned_chunk:
-                    logger.warning(f"Chunk {i} translation returned identical text, keeping it.")
-
-                # Khôi phục khoảng trắng/xuống dòng trước khi stream về client
                 restored_chunk = restore_formatting(chunk, translated_chunk)
                 yield f"data: {json.dumps({'chunk': restored_chunk})}\n\n"
                 final_translated_chunks.append(restored_chunk)
                 
-                # Lưu cache với key là chunk gốc, value là kết quả trả về trực tiếp từ AI (chưa thêm format)
                 newly_translated_mapping[chunk] = translated_chunk
 
                 if i < len(chunks) - 1:
@@ -189,19 +183,18 @@ async def stream_translate_text(
             except Exception as e:
                 reason = str(e)
                 logger.error(f"Chunk {i} translation raised exception: {reason}")
-                _log_failure(reason)
-                # Trả về nguyên gốc thay vì quăng lỗi nếu muốn ứng dụng chạy tiếp (tùy logic của bạn)
+                await run_in_threadpool(_log_failure, reason)
                 yield f"data: {json.dumps({'error': reason})}\n\n"
-                return
+                return  # DỪNG STREAM
 
     translated_text = "".join(final_translated_chunks)
 
-    # 6. Update Cache (MSET) in background — chỉ khi có kết quả thành công
+    # 4. Update Redis Cache in background
     if newly_translated_mapping:
         asyncio.create_task(mset_cached_translations(domain_str, newly_translated_mapping))
 
-    # 7. Database Logging — lưu bản dịch + log success
-    def save_to_db():
+    # 5. Save and Log Success to DB
+    def save_and_log_to_db():
         existing_translation = db_check_result.get("existing_translation")
         final_trans_id = None
 
@@ -240,25 +233,93 @@ async def stream_translate_text(
             if existing_translation:
                 final_trans_id = getattr(existing_translation, "id", getattr(existing_translation, "trans_id", None))
 
-        return final_trans_id
-
-    final_trans_id = await run_in_threadpool(save_to_db)
-
-    # Log success
-    def log_operations():
-        from app.db.models import Logs, StatusEnum, RequestTypeEnum
-        from datetime import datetime, timezone
         completed_time = datetime.now(timezone.utc).replace(tzinfo=None)
-        log_status = StatusEnum.success
         log_record = Logs(
             session_id=session_id,
             request_type=RequestTypeEnum.text,
             translation_id=final_trans_id,
-            status=log_status,
+            status=StatusEnum.success,
             request_time=request_time,
             completed_time=completed_time,
         )
         db.add(log_record)
         db.commit()
 
-    await run_in_threadpool(log_operations)
+    # Sử dụng background_tasks thay vì chặn (block) response cuối cùng
+    background_tasks.add_task(save_and_log_to_db)
+
+
+# ==============================================================================
+# HÀM 2: DÀNH CHO XỬ LÝ FILE (DOCX, PDF) - TRẢ VỀ STRING TĨNH, CHỊU LỖI CAO
+# ==============================================================================
+async def batch_translate_document(
+    source_text: str,
+    domain: str | None,
+    session_id: str = "batch_file"
+) -> str:
+    """
+    Dịch toàn bộ văn bản được trích xuất từ file.
+    Trả về một chuỗi kết quả (string). Nếu một chunk bị lỗi, hệ thống sẽ tự động 
+    lấy lại văn bản gốc của chunk đó để đảm bảo cấu trúc file không bị hỏng, 
+    thay vì ngắt ngang toàn bộ quá trình.
+    """
+    domain_str = (domain or "general").strip().lower()
+
+    # 1. Text Splitting
+    chunks = split_text_into_chunks(source_text)
+    if not chunks:
+        return source_text
+
+    logger.info(f"[BATCH FILE] Translating file text (session: {session_id}): split into {len(chunks)} chunks.")
+
+    # 2. Redis Batch Check (MGET)
+    cached_results = await mget_cached_translations(domain_str, chunks)
+    
+    final_translated_chunks = []
+    newly_translated_mapping = {}
+
+    for i, chunk in enumerate(chunks):
+        cleaned_chunk = strictly_normalize_text(chunk)
+
+        if not cleaned_chunk:
+            final_translated_chunks.append(chunk)
+            continue
+
+        cached_val = cached_results.get(chunk)
+
+        if cached_val is not None:
+            restored_cached_val = restore_formatting(chunk, cached_val)
+            final_translated_chunks.append(restored_cached_val)
+        else:
+            try:
+                translated_chunk = await translate_chunk_async(cleaned_chunk, domain_str)
+
+                # KIỂM TRA LỖI - FALLBACK VỀ TEXT GỐC THAY VÌ BÁO LỖI VÀ NGẮT
+                _FAIL_PREFIXES = ("[ERROR", "[TIMEOUT]", "[FAILED]")
+                if translated_chunk is None or translated_chunk.strip() == "" or any(translated_chunk.startswith(p) for p in _FAIL_PREFIXES):
+                    logger.warning(f"⚠️ Chunk {i} translation failed in Batch Mode. Falling back to original text.")
+                    final_translated_chunks.append(chunk) # Cứu file bằng cách trả về chunk gốc
+                    continue
+
+                restored_chunk = restore_formatting(chunk, translated_chunk)
+                final_translated_chunks.append(restored_chunk)
+                newly_translated_mapping[chunk] = translated_chunk
+
+                # Sleep ngắn để giảm tải API
+                if i < len(chunks) - 1:
+                    await asyncio.sleep(0.5)
+
+            except Exception as e:
+                logger.error(f"⚠️ Exception at chunk {i} in Batch Mode: {str(e)}. Falling back to original.")
+                final_translated_chunks.append(chunk) # Lỗi API/Network vẫn trả về chunk gốc
+                continue
+
+    translated_text = "".join(final_translated_chunks)
+
+    # 3. Update Redis Cache in background
+    if newly_translated_mapping:
+        asyncio.create_task(mset_cached_translations(domain_str, newly_translated_mapping))
+
+    # Không lưu DB khối text lớn này để tránh làm phình Database (Cache chunk qua Redis đã đủ)
+    
+    return translated_text
