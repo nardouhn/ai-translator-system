@@ -94,8 +94,6 @@ async def process_file_translation(
                 logger.info(f"File Translation: Found {len(texts)} paragraphs to process.")
                 
                 # --- BƯỚC 1: Chuẩn bị tất cả sub-chunks TRƯỚC khi gọi bất kỳ API nào ---
-                # Mỗi paragraph được cắt thành sub-chunks (<=600 chars), ta build 1 flat list
-                # để batch MGET 1 lần duy nhất, cực kỳ hiệu quả.
                 paragraph_sub_chunks: list[list[str]] = []
                 all_sub_chunks_flat: list[str] = []
                 
@@ -118,11 +116,11 @@ async def process_file_translation(
                 total = len(texts)
                 
                 for idx, (chunk, sub_chunks) in enumerate(zip(texts, paragraph_sub_chunks)):
-                    # 🟢 KIỂM TRA FRONTEND TIMEOUT
-                    if idx > 0: # Bỏ qua chunk đầu tiên vì có thể chưa kịp ping
-                        is_alive = await redis_client.get(f"file_ping:{file_id}")
-                        if not is_alive:
-                            raise Exception("FRONTEND_TIMEOUT: Ứng dụng đã ngắt kết nối (Timeout). Ngừng dịch file để giải phóng GPU.")
+                    # 🟢 ĐÃ VÔ HIỆU HOÁ KIỂM TRA FRONTEND TIMEOUT BẰNG PING REDIS
+                    # if idx > 0: 
+                    #     is_alive = await redis_client.get(f"file_ping:{file_id}")
+                    #     if not is_alive:
+                    #         raise Exception("FRONTEND_TIMEOUT: Ứng dụng đã ngắt kết nối (Timeout). Ngừng dịch file để giải phóng GPU.")
 
                     if not chunk.strip():
                         translated_texts.append(chunk)
