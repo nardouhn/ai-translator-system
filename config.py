@@ -8,7 +8,7 @@ BASE_MODEL_PATH = "/kaggle/input/models/qwen-lm/qwen2.5/transformers/7b-instruct
 DATA_PATH = "/kaggle/input/datasets/haquangdo/final-dataset/final_dataset.csv"
 
 OUTPUT_DIR = "outputs"
-MAX_PER_DOMAIN = 15000
+MAX_PER_DOMAIN = 10000
 MODEL_SAVE_NAME = "qwen_domain_translator_lora"
 
 # ============================================================================
@@ -23,14 +23,13 @@ LORA_BIAS = "none"
 # ============================================================================
 # TRAINING HYPERPARAMETERS
 # ============================================================================
-PER_DEVICE_TRAIN_BATCH_SIZE = 1
-PER_DEVICE_EVAL_BATCH_SIZE = 1
+PER_DEVICE_TRAIN_BATCH_SIZE = 4
 GRADIENT_ACCUMULATION_STEPS = 8
 LEARNING_RATE = 3e-4
 NUM_TRAIN_EPOCHS = 1
-WARMUP_STEPS = 100
+WARMUP_STEPS = 50
 LOGGING_STEPS = 10
-EVAL_STEPS = 500
-SAVE_STEPS = 500
+EVAL_STEPS = 250
+SAVE_STEPS = 250
 WEIGHT_DECAY = 0.1
 MAX_GRAD_NORM = 1.0
